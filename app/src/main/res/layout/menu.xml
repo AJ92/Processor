@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/scrollView"
+    android:layout_row="0"
+    android:layout_column="1" >
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_row="0"
+        android:layout_column="0">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Imagine"
+            android:id="@+id/start"
+            android:layout_gravity="left"
+            android:layout_row="1"
+            android:layout_column="0"/>
+
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Debug Logging"
+            android:id="@+id/debugLog"
+            android:layout_row="2"
+            android:layout_column="0"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Frame Debug Logging"
+            android:id="@+id/frameDebug"
+            android:layout_row="2"
+            android:layout_column="2"
+            android:paddingLeft="20pt"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Allow Duplicate Markers"
+            android:id="@+id/dupMarkers"
+            android:layout_row="3"
+            android:layout_column="0"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Allow Uncertain Decoding"
+            android:id="@+id/hamming"
+            android:layout_row="4"
+            android:layout_column="0"/>
+        <LinearLayout android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_row="0"
+            android:layout_column="0">
+            <TextView android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:text="Binarization Method:"
+                android:textSize="8pt"/>
+            <RadioGroup
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/r_group">
+                <RadioButton android:id="@+id/r_default"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Simple Threshold"/>
+                <RadioButton android:id="@+id/r_adaptive"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Adaptive Threshold"/>
+                <RadioButton android:id="@+id/r_canny"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Canny Edge Detection"/>
+            </RadioGroup>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_row="5"
+            android:layout_column="2"
+            android:paddingLeft="20pt">
+            <EditText android:id="@+id/theshold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Threshold. Default: 100"
+                android:inputType="number"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apply"
+                android:id="@+id/apply"
+                android:layout_gravity="right"/>
+        </LinearLayout>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Visually Debug Frame"
+            android:id="@+id/visualDebug"
+            android:layout_row="6"
+            android:layout_column="0"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Binary Output"
+            android:id="@+id/prepFrame"
+            android:layout_row="6"
+            android:layout_column="2"
+            android:paddingLeft="20pt"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Contours"
+            android:id="@+id/contours"
+            android:layout_row="7"
+            android:layout_column="2"
+            android:paddingLeft="20pt"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Detected Squares"
+            android:id="@+id/square"
+            android:layout_row="8"
+            android:layout_column="2"
+            android:paddingLeft="20pt"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Detected Markers"
+            android:id="@+id/markers"
+            android:layout_row="9"
+            android:layout_column="2"
+            android:paddingLeft="20pt"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Marker Sampling"
+            android:id="@+id/sampling"
+            android:layout_row="10"
+            android:layout_column="2"
+            android:paddingLeft="20pt"/>
+        <Switch
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Marker Binary"
+            android:id="@+id/marker_id"
+            android:layout_row="11"
+            android:layout_column="2"
+            android:paddingLeft="20pt"/>
+        <LinearLayout android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_row="12"
+            android:layout_column="0">
+            <EditText android:id="@+id/trackMarker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="ID between 0 and 255"
+                android:inputType="number"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Marker"
+                android:id="@+id/add"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remove Marker"
+                android:id="@+id/remove"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_row="12"
+            android:layout_column="0">
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Add All"
+                android:id="@+id/addall"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
