@@ -268,4 +268,23 @@ public class Matrix3x3 {
                                 this.mat3[8] / value);
     }
 
+
+    public float[] getFloatArray(boolean transpose){
+        float matrix[] = new float[9];
+        //TRANSPOSE
+        if(transpose) {
+            for (int f = 0; f < 3; f++) {
+                for (int g = 0; g < 3; g++) {
+                    matrix[f * 3 + g] = (float) (mat3[f * 3 + g]);
+                }
+            }
+        }
+        else{
+            for (int f = 0; f < 9; f++) {
+                matrix[f] = (float) (mat3[f]);
+            }
+        }
+        return matrix;
+    }
+
 }

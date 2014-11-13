@@ -257,4 +257,14 @@ public class Vector4 {
         return new Vector3(this.x(), this.y(), this.z());
     }
 
+    public float[] getFloatArray(){
+        float vector[] = new float[4];
+        vector[0] = (float) vec4[0];
+        vector[1] = (float) vec4[1];
+        vector[2] = (float) vec4[2];
+        vector[3] = (float) vec4[3];
+
+        return vector;
+    }
+
 }

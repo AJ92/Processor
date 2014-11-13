@@ -55,7 +55,9 @@ public class Shader {
             created = true;
         }
         else{
-            error_string = "compile failed\n" + GLES20.glGetShaderInfoLog(m_shader_id);
+            error_string = "compile failed...\n" +
+                    "Path: " + shaderPath + "\n" +
+                    GLES20.glGetShaderInfoLog(m_shader_id);
             GLES20.glDeleteShader(m_shader_id);
         }
     }

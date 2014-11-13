@@ -1048,4 +1048,22 @@ void Matrix4x4::rotate(const Quaternion& quaternion)
                 );
     }
 
+    public float[] getFloatArray(boolean transpose){
+        float matrix[] = new float[16];
+        //TRANSPOSE
+        if(transpose) {
+            for (int f = 0; f < 4; f++) {
+                for (int g = 0; g < 4; g++) {
+                    matrix[f * 4 + g] = (float) (mat4[f * 4 + g]);
+                }
+            }
+        }
+        else{
+            for (int f = 0; f < 16; f++) {
+                matrix[f] = (float) (mat4[f]);
+            }
+        }
+        return matrix;
+    }
+
 }

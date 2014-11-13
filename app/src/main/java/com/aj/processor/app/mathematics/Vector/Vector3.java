@@ -229,5 +229,15 @@ public class Vector3 {
         }
         return true;
     }
+
+    public float[] getFloatArray(){
+        float vector[] = new float[3];
+        vector[0] = (float) vec3[0];
+        vector[1] = (float) vec3[1];
+        vector[2] = (float) vec3[2];
+
+        return vector;
+    }
+
 }
 
