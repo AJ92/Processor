@@ -24,16 +24,16 @@ public class Line {
     private FloatBuffer vertexBuffer;
 
     // number of coordinates per vertex in this array
-    private static final int COORDS_PER_VERTEX = 3;
-    private static float lineCoords[] = {
-            0.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f
+    private int COORDS_PER_VERTEX = 3;
+    private float lineCoords[] = {
+            -999.0f, 999.0f, -999.0f,
+            999.0f, -999.0f, 999.0f
     };
-    private final int vertexCount = lineCoords.length / COORDS_PER_VERTEX;
-    private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
+    private int vertexCount = lineCoords.length / COORDS_PER_VERTEX;
+    private  int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
 
     //default white
-    private float color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    private float color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
 
     //init a simple line with 2 vertices
     public Line(){

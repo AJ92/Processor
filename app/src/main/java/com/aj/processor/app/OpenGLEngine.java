@@ -20,6 +20,9 @@ import com.aj.processor.app.mathematics.Vector.Vector3;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
 import eu.imagine.framework.Messenger;
@@ -84,12 +87,19 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     private CompositeObject default_co;
     private Camera default_cam;
 
+    private Line x_dir;
+    private Line y_dir;
+    private Line z_dir;
+
+    private Positation gizmo_posi = new Positation();
+
 
     //all the matrices we need... pre init them to identity
     private Matrix4x4 p_m = new Matrix4x4();
     private Matrix4x4 v_m = new Matrix4x4();
     private Matrix4x4 m_m = new Matrix4x4();
     private Matrix4x4 vm_m = new Matrix4x4();
+    private Matrix4x4 pv_m = new Matrix4x4();
     private Matrix4x4 pvm_m = new Matrix4x4();
 
 
@@ -175,6 +185,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
             // Clear Buffers:
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
+
             // ------------------ get new markerlist if needed --------
             if (mainInterface.getListUpdateStatus()) {
                 this.toRender = mainInterface.getList();
@@ -186,7 +197,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
             }
 
 
-            //cam->getPosition() - touch_to_space(0,0)*near_
+            pv_m = p_m.multiply(v_m);
 
             // ------------------------ RENDER ------------------------
             if (!toRender.isEmpty()) {
@@ -210,7 +221,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
                     m_m = posi.get_model_matrix();
                     vm_m = v_m.multiply(m_m);
-                    pvm_m = (p_m.multiply(v_m)).multiply(m_m);
+                    pvm_m = pv_m.multiply(m_m);
 
                     // Reset model matrix to identity
                     // Matrix.setIdentityM(mModelMatrix, 0);
@@ -218,8 +229,27 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                     if (default_mdl != null) {
                         drawModel(default_mdl);
                     }
+
+                    drawLine(x_dir);
+                    drawLine(y_dir);
+                    drawLine(z_dir);
                 }
             }
+
+
+            //render gizmo
+
+            /*
+            //convert it to space coords
+            Vector3 space_pos = touch_to_space(default_cam, 50, window_size_y - 50);
+            //scale the pos (move away from origin)
+            Vector3 space_pos_scaled = space_pos.multiply( default_cam.getZNEAR() + 6.0);
+            //move away from camera pos (the position we want to render our model at...)
+            Vector3 final_space_pos = default_cam.getPosition().subtract(space_pos_scaled);
+
+            gizmo_posi.set_position(final_space_pos);
+            */
+
 
 
             if (MainInterface.DEBUG_FRAME_LOGGING) {
@@ -327,13 +357,13 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                 }
 
                 GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mesh.get_triangle_count()*3);
-
             }
         }
     }
 
 
     private void drawLine(Line line){
+        /*
         GLES20.glUseProgram(programLine);
 
         // Enable a handle to the triangle vertices
@@ -351,14 +381,62 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
         GLES20.glUniformMatrix4fv(locMVPMatrixLine, 1, false, render_mat, 0);
 
+
+        GLES20.glLineWidth(5f);
+
         // Draw the triangle
-        GLES20.glDrawArrays(GLES20.GL_LINES, 0, line.getVertexCount());
+        GLES20.glDrawArrays(GLES20.GL_LINE_STRIP, 0, line.getVertexCount());
+        */
+
+        GLES20.glUseProgram(programLine);
+
+        float vertices[] = {
+               6.0f,0.0f,0.0f,
+                6.0f,0.0f,0.0f
+        };
+
+        FloatBuffer vertex_pos_buffer = ByteBuffer.allocateDirect(6 * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+
+        vertex_pos_buffer.put(vertices).position(0);
+
+
+        GLES20.glVertexAttribPointer(locPositionLine, 3, GLES20.GL_FLOAT, false, 4 * 3, vertex_pos_buffer);
+
+        GLES20.glEnableVertexAttribArray(locPositionLine);
+
+        GLES20.glUniform4f(locColorLine, 1.0f, 0.0f, 0.0f, 1.0f);
+
+        GLES20.glUniformMatrix4fv(locMVPMatrixLine, 1, false, render_mat, 0);
+
+        GLES20.glLineWidth(2.0f);
+
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 2);
+
+
+
+
+
     }
 
 
 
 
     private void createBasicAssets(){
+
+        //gizmo
+        x_dir = new Line();
+
+        y_dir = new Line();
+
+        z_dir = new Line();
+
+
+
+
+
+
         //create basic camera...
         Camera cam = new Camera();
         cam.set_position(0.0,0.0,0.0);
@@ -465,7 +543,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
 
 
-        locColorLine = GLES20.glGetUniformLocation(programLine, "vColor");
+        locColorLine = GLES20.glGetUniformLocation(programLine, "u_Color");
 
         // Tell OpenGL to use this program when rendering.
         GLES20.glUseProgram(programLine);
