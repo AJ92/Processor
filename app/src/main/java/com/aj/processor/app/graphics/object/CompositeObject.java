@@ -2,6 +2,7 @@ package com.aj.processor.app.graphics.object;
 
 import com.aj.processor.app.graphics.camera.Camera;
 import com.aj.processor.app.graphics.model.Model;
+import com.aj.processor.app.mathematics.Matrix.Matrix4x4;
 
 /**
  * Created by AJ on 01.11.2014.
@@ -44,6 +45,9 @@ public class CompositeObject {
     Model model_;
     Camera camera_;
     Positation positation_;
+
+
+
     //more to follow...
     //Cpp
     //SP<Light> light_;

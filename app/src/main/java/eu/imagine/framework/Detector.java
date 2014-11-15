@@ -255,7 +255,7 @@ public class Detector {
                 for (Marker mark : markerCandidates) {
 
                     Log.e("Marker ID:", Integer.toString(mark.getID()));
-                    Log.e("Marker angle: ", Integer.toString(mark.getAngle()));
+                    //Log.e("Marker angle: ", Integer.toString(mark.getAngle()));
                     boolean[][] tempBool = mark.getPattern();
                     // Might, but shouldn't happen
                     if (tempBool == null) {
@@ -267,12 +267,7 @@ public class Detector {
                     int xoffset = RENDER_SCALE * MARKER_SIZE * count;
 
 
-                    MatOfPoint2f p2f = mark.getCorners();
-                    Point points[] = p2f.toArray();
 
-                    for(int pointz = 0; pointz < points.length; pointz++) {
-                        Log.e("Marker pos:", Double.toString(points[pointz].x) + "   " + Double.toString(points[pointz].y));
-                    }
 
                     count++;
                     for (int i = 0; i < RENDER_SCALE * MARKER_SIZE; i++)

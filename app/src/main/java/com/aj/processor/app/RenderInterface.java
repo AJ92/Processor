@@ -26,7 +26,7 @@ public class RenderInterface {
         mGLView = renderView;
         mGLView.setEGLContextClientVersion(2);
         mGLView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        mGLView.setRenderer(new OpenGLEngine(mainInterface));
+        //mGLView.setRenderer(new OpenGLEngine(mainInterface));
         mGLView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         mGLView.setZOrderMediaOverlay(true);
     }

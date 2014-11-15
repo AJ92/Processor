@@ -425,9 +425,6 @@ public class Material {
         }
         else{
             Log.e(TAG, "Bitmap: " + path + " width: " + image.getWidth() + " height: " + image.getHeight());
-
-            int pix = image.getPixel(0,0);
-            Log.e(TAG,"color: " + pix);
         }
         return image;
     }

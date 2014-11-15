@@ -44,6 +44,7 @@ public class MainInterface {
     private final String TAG = "MainInterface";
     private OpenCVInterface opencv;
     private RenderInterface render;
+    private OpenGLSurfaceView renderView;
     private Activity mainActivity;
     private final Object synLock = new Object();
 
@@ -91,12 +92,16 @@ public class MainInterface {
         }
         // Create OpenGL render part:
         if (RUN_RENDERER) {
-            render = new RenderInterface(this);
-            GLSurfaceView renderView = new GLSurfaceView(mainActivity.getApplicationContext());
+            //render = new RenderInterface(this);
+            //CHANGE
+            //GLSurfaceView renderView = new GLSurfaceView(mainActivity.getApplicationContext());
+            renderView = new OpenGLSurfaceView(mainActivity.getApplicationContext());
             renderView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup
                     .LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             groupView.addView(renderView);
-            render.onCreate(renderView);
+            //retrieve marker when needed...
+            renderView.setMaininterFace(this);
+            //render.onCreate(renderView);
         }
         // Set layout things:
         mainActivity.getWindow().addFlags(WindowManager.LayoutParams
@@ -109,14 +114,14 @@ public class MainInterface {
         if (RUN_OPENCV)
             opencv.onResume(this.mainActivity);
         if (RUN_RENDERER)
-            render.onResume();
+            renderView.onResume();
     }
 
     public void onPause() {
         if (RUN_OPENCV)
             opencv.onPause();
         if (RUN_RENDERER)
-            render.onPause();
+            renderView.onPause();
     }
 
     public void onDestroy() {

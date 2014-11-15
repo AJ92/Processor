@@ -33,9 +33,10 @@ import eu.imagine.framework.Trackable;
  */
 public class OpenGLEngine implements GLSurfaceView.Renderer {
 
-    private final MainInterface mainInterface;
+
     private final String TAG = "OpenGLEngine";
 
+    private MainInterface mainInterface;
     private ArrayList<Trackable> toRender;
 
     private int programLine;
@@ -87,6 +88,9 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     private CompositeObject default_co;
     private Camera default_cam;
 
+    private Matrix4x4 ortho_m = new Matrix4x4();
+
+
     private Line x_dir;
     private Line y_dir;
     private Line z_dir;
@@ -114,11 +118,13 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
      *
      * @param mainInterface Pointer to MainInterface.
      */
-    protected OpenGLEngine(MainInterface mainInterface) {
+
+    public void setMainInterFace(MainInterface mainInterface){
         this.mainInterface = mainInterface;
+    }
+
+    protected OpenGLEngine() {
         this.toRender = new ArrayList<Trackable>();
-
-
     }
 
     /**
@@ -179,7 +185,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
             //retrieve the camera matrix
             v_m = default_cam.get_view_matrix();
-
+            pv_m = p_m.multiply(v_m);
 
 
             // Clear Buffers:
@@ -187,20 +193,27 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
 
             // ------------------ get new markerlist if needed --------
-            if (mainInterface.getListUpdateStatus()) {
-                this.toRender = mainInterface.getList();
-                if (toRender == null) {
-                    log.log(TAG, "Error getting list!");
-                    toRender = new ArrayList<Trackable>();
-                } else
-                    log.debug(TAG, "Updated list – found " + this.toRender.size() + " " + "trackables.");
+            if(mainInterface != null) {
+                if (mainInterface.getListUpdateStatus()) {
+                    this.toRender = mainInterface.getList();
+                    if (toRender == null) {
+                        log.log(TAG, "Error getting list!");
+                        toRender = new ArrayList<Trackable>();
+                    } else
+                        log.debug(TAG, "Updated list – found " + this.toRender.size() + " " + "trackables.");
+                }
             }
 
 
-            pv_m = p_m.multiply(v_m);
+
 
             // ------------------------ RENDER ------------------------
             if (!toRender.isEmpty()) {
+
+                GLES20.glEnableVertexAttribArray(locPositionSimple);
+                GLES20.glEnableVertexAttribArray(locTexCoordSimple);
+                GLES20.glEnableVertexAttribArray(locNormalSimple);
+
                 for (Trackable trackable : toRender) {
 
                     //get the screen pos from the Trackable object
@@ -220,36 +233,58 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                     posi.set_position(final_space_pos);
 
                     m_m = posi.get_model_matrix();
-                    vm_m = v_m.multiply(m_m);
+                    //vm_m = v_m.multiply(m_m);
                     pvm_m = pv_m.multiply(m_m);
 
                     // Reset model matrix to identity
                     // Matrix.setIdentityM(mModelMatrix, 0);
                     // Matrix.multiplyMM(mModelMatrix, 0, trackable.getTRANSLATION(), 0, mModelMatrix, 0);
                     if (default_mdl != null) {
-                        drawModel(default_mdl);
+                       drawModel(default_mdl);
                     }
 
-                    drawLine(x_dir);
-                    drawLine(y_dir);
-                    drawLine(z_dir);
                 }
+
+
+
+                GLES20.glDisableVertexAttribArray(locPositionSimple);
+                GLES20.glDisableVertexAttribArray(locTexCoordSimple);
+                GLES20.glDisableVertexAttribArray(locNormalSimple);
+
             }
+
+
+
+            GLES20.glEnableVertexAttribArray(locPositionLine);
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+
+            //pvm_m = ortho_m;
+
+            //drawLine(x_dir);
+            //drawLine(y_dir);
+            //drawLine(z_dir);
+
 
 
             //render gizmo
 
-            /*
+
             //convert it to space coords
-            Vector3 space_pos = touch_to_space(default_cam, 50, window_size_y - 50);
+            Vector3 space_pos = touch_to_space(default_cam, 100, window_size_y - 100);
             //scale the pos (move away from origin)
             Vector3 space_pos_scaled = space_pos.multiply( default_cam.getZNEAR() + 6.0);
             //move away from camera pos (the position we want to render our model at...)
             Vector3 final_space_pos = default_cam.getPosition().subtract(space_pos_scaled);
 
             gizmo_posi.set_position(final_space_pos);
-            */
 
+            pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
+
+            drawLine(x_dir);
+            drawLine(y_dir);
+            drawLine(z_dir);
+
+            GLES20.glDisableVertexAttribArray(locPositionLine);
 
 
             if (MainInterface.DEBUG_FRAME_LOGGING) {
@@ -302,6 +337,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
 
 
+
+
     private void drawModel(Model mdl){
         GLES20.glUseProgram(programSimple);
 
@@ -315,15 +352,15 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
                 GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mesh.get_vertex_vbo());
                 //actually if once enabled we dont need to enable again.... but safety first xD
-                GLES20.glEnableVertexAttribArray(locPositionSimple);
+                //GLES20.glEnableVertexAttribArray(locPositionSimple);
                 GLES20.glVertexAttribPointer(locPositionSimple, 3, GLES20.GL_FLOAT, false, 0, 0);
 
                 GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mesh.get_texcoord_vbo());
-                GLES20.glEnableVertexAttribArray(locTexCoordSimple);
+                //GLES20.glEnableVertexAttribArray(locTexCoordSimple);
                 GLES20.glVertexAttribPointer(locTexCoordSimple, 3, GLES20.GL_FLOAT, false, 0, 0);
 
                 GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mesh.get_normal_vbo());
-                GLES20.glEnableVertexAttribArray(locNormalSimple);
+                //GLES20.glEnableVertexAttribArray(locNormalSimple);
                 GLES20.glVertexAttribPointer(locNormalSimple, 3, GLES20.GL_FLOAT, false, 0, 0);
 
                 // Set the active texture unit to texture unit 0.
@@ -363,11 +400,11 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
 
     private void drawLine(Line line){
-        /*
+
         GLES20.glUseProgram(programLine);
 
         // Enable a handle to the triangle vertices
-        GLES20.glEnableVertexAttribArray(locPositionLine);
+        //GLES20.glEnableVertexAttribArray(locPositionLine);
 
         // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(locPositionLine, line.getCoordsPerVertex(),
@@ -379,20 +416,24 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
         render_mat = pvm_m.getFloatArray(true);
 
+
         GLES20.glUniformMatrix4fv(locMVPMatrixLine, 1, false, render_mat, 0);
 
 
         GLES20.glLineWidth(5f);
 
         // Draw the triangle
-        GLES20.glDrawArrays(GLES20.GL_LINE_STRIP, 0, line.getVertexCount());
-        */
+        GLES20.glDrawArrays(GLES20.GL_LINES, 0, line.getVertexCount());
+
+
+    /*
+        render_mat = pvm_m.getFloatArray(true);
 
         GLES20.glUseProgram(programLine);
 
         float vertices[] = {
-               6.0f,0.0f,0.0f,
-                6.0f,0.0f,0.0f
+               -1.0f,0.2f,-0.2f,
+                1.0f,-0.2f,0.2f,
         };
 
         FloatBuffer vertex_pos_buffer = ByteBuffer.allocateDirect(6 * 4)
@@ -402,21 +443,18 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
         vertex_pos_buffer.put(vertices).position(0);
 
 
-        GLES20.glVertexAttribPointer(locPositionLine, 3, GLES20.GL_FLOAT, false, 4 * 3, vertex_pos_buffer);
 
+        GLES20.glVertexAttribPointer(locPositionLine, 3, GLES20.GL_FLOAT, false, 4 * 3, vertex_pos_buffer);
         GLES20.glEnableVertexAttribArray(locPositionLine);
 
-        GLES20.glUniform4f(locColorLine, 1.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glUniform4f(locColorLine, 1.0f, 1.0f, 0.0f, 1.0f);
 
         GLES20.glUniformMatrix4fv(locMVPMatrixLine, 1, false, render_mat, 0);
 
-        GLES20.glLineWidth(2.0f);
+       // GLES20.glLineWidth(2.0f);
 
-        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 2);
-
-
-
-
+        GLES20.glDrawArrays(GLES20.GL_LINES, 0, 2);
+    */
 
     }
 
@@ -426,11 +464,23 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     private void createBasicAssets(){
 
         //gizmo
-        x_dir = new Line();
+        x_dir = new Line(
+                0.0f,0.0f,0.0f,
+                0.5f,0.0f,0.0f,
+                1.0f,0.0f,0.0f,1.0f
+        );
 
-        y_dir = new Line();
+        y_dir = new Line(
+                0.0f,0.0f,0.0f,
+                0.0f,0.5f,0.0f,
+                0.0f,1.0f,0.0f,1.0f
+        );
 
-        z_dir = new Line();
+        z_dir = new Line(
+                0.0f,0.0f,0.0f,
+                0.0f,0.0f,0.5f,
+                0.0f,0.0f,1.0f,1.0f
+        );
 
 
 
@@ -494,7 +544,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     private void createShaders() {
 
         //---------------LINE SHADER-------------------------
-//load shader and create a program out of it...
+        //load shader and create a program out of it...
         Shader vertex_shader_line = new Shader("shaders/line.vsh",GLES20.GL_VERTEX_SHADER);
         if(!vertex_shader_line.isCreated()){
             Log.e(TAG, vertex_shader_line.getError());
