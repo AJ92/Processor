@@ -36,6 +36,8 @@ public class ObjectWorld {
 
     //Data store modes
     public final static int store_mode_simple = 0x0001;
+
+    //not implemented yet !!!
     public final static int store_mode_simple_sorted = 0x0002;
     public final static int store_mode_octree = 0x0003;
 
@@ -64,7 +66,7 @@ public class ObjectWorld {
     }
 
     //dynamic (no position as argument)
-    public CompositeObject loadModelObject(String name, String path){
+    public CompositeObject loadModelObject(String name, String path, boolean allow_instance){
 
         //create new dynamic Composite Object
         CompositeObject co = new CompositeObject(name,
@@ -77,7 +79,7 @@ public class ObjectWorld {
         //create load and add Model
         Model m = new Model();
         m.set_path(path);
-        loadModel(m);
+        loadModel(m, allow_instance);
         co.setModel(m);
 
         //add the co to a list we can iterate trough later to render or what ever we want to do...
@@ -96,8 +98,8 @@ public class ObjectWorld {
     }
 
     //private functions...
-    private void loadModel(Model m){
-        ml.loadModel(m);
+    private void loadModel(Model m, boolean allow_instance){
+        ml.loadModel(m, allow_instance);
     }
 
     public int getStoreMode(){

@@ -31,15 +31,16 @@ public class ModelLoader {
         loader = new Loader();
     }
 
-    public void loadModel(Model m){
+    public void loadModel(Model m, boolean allow_instance){
         //first we check if we have the model already loaded...
         //we check if we have the path of the to be loaded model in the
         //unique_models_path_list...
 
         Log.e("ModelLoader",m.get_path());
 
+
         int index = containsPath(m.get_path());
-        if(index < 0){
+        if(index < 0 || !allow_instance){
             //we haven't found an already loaded model...
             Model new_mdl = loader.import_model(m.get_path());
             //copy the loaded model data to the old model...

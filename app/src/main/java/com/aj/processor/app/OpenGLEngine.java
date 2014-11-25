@@ -84,9 +84,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     //our 3 dimensional world, that stores all the objects!
     private ObjectWorld ow;
     //DEFAULT MODEL to render in case we have broken models or so...
-    private Model default_mdl;
-    private Model text_mdl;
-    private CompositeObject default_co;
+
     private Camera default_cam;
 
 
@@ -205,8 +203,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
             default_cam.add_rotation_local(angle_x,0.0,1.0,0.0);
             default_cam.add_rotation_local(angle_y,1.0,0.0,0.0);
 
-            v_m = default_cam.get_view_matrix();
-            pv_m = p_m.multiply(v_m);
+
+
 
 
             // Clear Buffers:
@@ -245,26 +243,28 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                     int x_pos = trackable.getX();
                     int y_pos = trackable.getY();
 
+                    Vector3 space_pos = space_pos = touch_to_space(default_cam, x_pos, y_pos);
+
+
+                    //scale the pos (move away from origin)
+                    Vector3 space_pos_scaled = space_pos.multiply(default_cam.getZNEAR() + 3.0);
+                    //move away from camera pos (the position we want to render our model at...)
+                    Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
+
+                    default_cam.set_position(default_cam.getPosition().subtract(final_space_pos));
+
+
+                    v_m = default_cam.get_view_matrix();
+                    pv_m = p_m.multiply(v_m);
+
+
 
                     if(ow.getStoreMode() == ObjectWorld.store_mode_simple) {
                         for (CompositeObject co : ow.getCompositeObjects()) {
 
                             if (co.hasModel()) {
-                                //convert it to space coords
-                                Vector3 space_pos = new Vector3();
-                                if (co.getName().equalsIgnoreCase("test_text")) {
-                                    space_pos = touch_to_space(default_cam, x_pos + 500, y_pos);
-                                } else {
-                                    space_pos = touch_to_space(default_cam, x_pos, y_pos);
-                                }
-
-                                //scale the pos (move away from origin)
-                                Vector3 space_pos_scaled = space_pos.multiply(default_cam.getZNEAR() + 3.0);
-                                //move away from camera pos (the position we want to render our model at...)
-                                Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
 
                                 Positation posi = co.getPositation();
-                                posi.set_position(final_space_pos);
 
                                 m_m = posi.get_model_matrix();
                                 //vm_m = v_m.multiply(m_m);
@@ -305,8 +305,14 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
             gizmo_posi.set_position(final_space_pos);
 
+
+            v_m = default_cam.get_view_matrix();
+            pv_m = p_m.multiply(v_m);
+
             pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
 
+
+            //gizmo
             drawLine(x_dir);
             drawLine(y_dir);
             drawLine(z_dir);
@@ -470,12 +476,25 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
         //simple storage mode is a linear unsorted list of models!!!
         ow = new ObjectWorld(ObjectWorld.store_mode_simple);
 
-        test_marker_co = ow.loadModelObject("betty","betty.obj");
-        test_marker_text_co = ow.loadModelObject("test_text","text_model.obj");
+        test_marker_co = ow.loadModelObject("betty","betty.obj", true);
+        test_marker_text_co = ow.loadModelObject("test_text","text_model.obj", false);
         //crazy chain...
         test_marker_text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
-                "FF00FF_TEXT_BG.png","This is Betty!",120.0f,0,255,0
+                "FF00FF_TEXT_BG.png","Betty!",100.0f,0,255,0
         );
+
+        //move to the right
+        test_marker_text_co.getPositation().set_position(2.0f,0.0f,0.0f);
+
+        //shadow
+        CompositeObject test_marker_text_co2 = ow.loadModelObject("test_text","text_model.obj", false);
+        //crazy chain...
+        test_marker_text_co2.getModel().get_meshs().get(0).get_material().setDiffuseText(
+                "FF00FF_TEXT_BG.png","Betty!",100.0f,0,0,0
+        );
+
+        //move to the right
+        test_marker_text_co2.getPositation().set_position(2.01f,0.01f,-0.01f);
 
 
         //gizmo
@@ -497,31 +516,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                 0.0f,0.0f,1.0f,1.0f
         );
 
-        //load default 3D object
-/*
-        Model mdl = new Model();
-        loader.load_model_data(mdl,"betty.obj");
-        mdl.loadGLdata();
-        default_mdl = mdl;
 
-        Model mdl2 = new Model();
-        loader.load_model_data(mdl2,"text_model.obj");
-        mdl2.loadGLdata();
-        text_mdl = mdl2;
-
-        text_mdl.get_meshs().get(0).get_material().setDiffuseText(
-                "FF00FF_TEXT_BG.png","Bissl Text...",120.0f,0,255,0
-        );
-
-
-        //pack it with Positation into a CompositeObject
-        Positation posi = new Positation();
-        CompositeObject co = new CompositeObject();
-        co.setModel(default_mdl);
-        co.setPositation(posi);
-        default_co = co;
-
-        */
 
     }
 
