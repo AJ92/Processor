@@ -1,5 +1,7 @@
 package com.aj.processor.app.graphics.model.parser;
 
+import android.util.Log;
+
 import com.aj.processor.app.graphics.model.Model;
 import com.aj.processor.app.graphics.model.parser.format_obj.Loader_obj;
 
@@ -18,18 +20,25 @@ public class Loader {
     }
 
     public Model import_model(String path){
-        String pathlist[] = path.split(".");
-        String suffix = pathlist[pathlist.length - 1];
 
-        if(suffix.equalsIgnoreCase("fbx")){
-            return import_model_format_fbx(path);
+        Log.e("Loader", path);
+
+        String pathlist[] = path.split("\\.");
+
+        if(pathlist.length >= 2) {
+            String suffix = pathlist[pathlist.length - 1];
+
+            if (suffix.equalsIgnoreCase("fbx")) {
+                return import_model_format_fbx(path);
+            } else if (suffix.equalsIgnoreCase("bin")) {
+                return import_model_format_bin(path);
+            } else if (suffix.equalsIgnoreCase("obj")) {
+                return import_model_format_obj(path);
+            }
         }
-        else if(suffix.equalsIgnoreCase("bin")){
-            return import_model_format_bin(path);
-        }
-        else if(suffix.equalsIgnoreCase("obj")){
-            return import_model_format_obj(path);
-        }
+
+        Log.e("Loader", "is not a supported file extension...");
+
         //qDebug("no suitable format detected...");
         return new Model();
     }

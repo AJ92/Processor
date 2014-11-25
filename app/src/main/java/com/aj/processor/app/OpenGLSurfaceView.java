@@ -13,6 +13,7 @@ import android.view.MotionEvent;
 public class OpenGLSurfaceView extends GLSurfaceView {
 
     private final OpenGLEngine renderer;
+    private MainInterface mainInterface;
 
     public OpenGLSurfaceView(Context context) {
         super(context);
@@ -36,7 +37,7 @@ public class OpenGLSurfaceView extends GLSurfaceView {
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
 
-    private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
+    private final float TOUCH_SCALE_FACTOR = 180.0f / 640;
     private float mPreviousX;
     private float mPreviousY;
 
@@ -57,6 +58,10 @@ public class OpenGLSurfaceView extends GLSurfaceView {
                 float dx = x - mPreviousX;
                 float dy = y - mPreviousY;
 
+                renderer.setAngleX(renderer.getAngleX() + (dx * TOUCH_SCALE_FACTOR) );
+                renderer.setAngleY(renderer.getAngleY() + (dy * TOUCH_SCALE_FACTOR) );
+
+                /*
                 // reverse direction of rotation above the mid-line
                 if (y > getHeight() / 2) {
                     dx = dx * -1 ;
@@ -67,12 +72,24 @@ public class OpenGLSurfaceView extends GLSurfaceView {
                     dy = dy * -1 ;
                 }
 
-                /*
+
                 renderer.setAngle(
                         renderer.getAngle() +
                                 ((dx + dy) * TOUCH_SCALE_FACTOR));  // = 180.0f / 320
 
                                 */
+                requestRender();
+                break;
+            case MotionEvent.ACTION_UP:
+                if(x < 50.0f){
+                    if(y > (getHeight() - 50.0f)){
+                        //stop capturing... or start again...
+                        if(mainInterface != null){
+                            mainInterface.toggleOpenCV();
+                        }
+                    }
+                }
+
                 requestRender();
         }
 
@@ -83,6 +100,7 @@ public class OpenGLSurfaceView extends GLSurfaceView {
 
     public void setMaininterFace(MainInterface mainInterface){
         if(renderer != null) {
+            this.mainInterface = mainInterface;
             renderer.setMainInterFace(mainInterface);
         }
     }

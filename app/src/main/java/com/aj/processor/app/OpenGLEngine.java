@@ -85,8 +85,13 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     private ObjectWorld ow;
     //DEFAULT MODEL to render in case we have broken models or so...
     private Model default_mdl;
+    private Model text_mdl;
     private CompositeObject default_co;
     private Camera default_cam;
+
+
+    private CompositeObject test_marker_co;
+    private CompositeObject test_marker_text_co;
 
     private Matrix4x4 ortho_m = new Matrix4x4();
 
@@ -108,6 +113,17 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
 
     private float render_mat[] = new float[16];
+
+
+
+
+    //input from surfaceView
+    private float angle_x = 0.0f;
+    private float angle_y = 0.0f;
+
+    private float pos_x = 0.0f;
+    private float pos_y = 0.0f;
+
 
 
 
@@ -184,6 +200,11 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                     default_cam.getZNEAR(), default_cam.getZFAR());
 
             //retrieve the camera matrix
+            default_cam.clear_rotation_global();
+            default_cam.clear_rotation_local();
+            default_cam.add_rotation_local(angle_x,0.0,1.0,0.0);
+            default_cam.add_rotation_local(angle_y,1.0,0.0,0.0);
+
             v_m = default_cam.get_view_matrix();
             pv_m = p_m.multiply(v_m);
 
@@ -208,7 +229,11 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
 
             // ------------------------ RENDER ------------------------
-            if (!toRender.isEmpty()) {
+
+
+            //      ------------------- simple shader -----------------
+            // render all objects in ObjectWorld ow!!!
+            if (ow != null) {
 
                 GLES20.glEnableVertexAttribArray(locPositionSimple);
                 GLES20.glEnableVertexAttribArray(locTexCoordSimple);
@@ -221,26 +246,34 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                     int y_pos = trackable.getY();
 
 
-                    //convert it to space coords
-                    Vector3 space_pos = touch_to_space(default_cam,x_pos,y_pos);
+                    if(ow.getStoreMode() == ObjectWorld.store_mode_simple) {
+                        for (CompositeObject co : ow.getCompositeObjects()) {
 
-                    //scale the pos (move away from origin)
-                    Vector3 space_pos_scaled = space_pos.multiply( default_cam.getZNEAR() + 6.0);
-                    //move away from camera pos (the position we want to render our model at...)
-                    Vector3 final_space_pos = default_cam.getPosition().subtract(space_pos_scaled);
+                            if (co.hasModel()) {
+                                //convert it to space coords
+                                Vector3 space_pos = new Vector3();
+                                if (co.getName().equalsIgnoreCase("test_text")) {
+                                    space_pos = touch_to_space(default_cam, x_pos + 500, y_pos);
+                                } else {
+                                    space_pos = touch_to_space(default_cam, x_pos, y_pos);
+                                }
 
-                    Positation posi = default_co.getPositation();
-                    posi.set_position(final_space_pos);
+                                //scale the pos (move away from origin)
+                                Vector3 space_pos_scaled = space_pos.multiply(default_cam.getZNEAR() + 3.0);
+                                //move away from camera pos (the position we want to render our model at...)
+                                Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
 
-                    m_m = posi.get_model_matrix();
-                    //vm_m = v_m.multiply(m_m);
-                    pvm_m = pv_m.multiply(m_m);
+                                Positation posi = co.getPositation();
+                                posi.set_position(final_space_pos);
 
-                    // Reset model matrix to identity
-                    // Matrix.setIdentityM(mModelMatrix, 0);
-                    // Matrix.multiplyMM(mModelMatrix, 0, trackable.getTRANSLATION(), 0, mModelMatrix, 0);
-                    if (default_mdl != null) {
-                       drawModel(default_mdl);
+                                m_m = posi.get_model_matrix();
+                                //vm_m = v_m.multiply(m_m);
+                                pvm_m = pv_m.multiply(m_m);
+
+
+                                drawModel(co.getModel());
+                            }
+                        }
                     }
 
                 }
@@ -255,26 +288,20 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
 
 
+
+            //      ------------------- line shader -----------------
+
             GLES20.glEnableVertexAttribArray(locPositionLine);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
-            //pvm_m = ortho_m;
-
-            //drawLine(x_dir);
-            //drawLine(y_dir);
-            //drawLine(z_dir);
-
-
-
             //render gizmo
-
 
             //convert it to space coords
             Vector3 space_pos = touch_to_space(default_cam, 100, window_size_y - 100);
             //scale the pos (move away from origin)
             Vector3 space_pos_scaled = space_pos.multiply( default_cam.getZNEAR() + 6.0);
             //move away from camera pos (the position we want to render our model at...)
-            Vector3 final_space_pos = default_cam.getPosition().subtract(space_pos_scaled);
+            Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
 
             gizmo_posi.set_position(final_space_pos);
 
@@ -287,6 +314,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
             GLES20.glDisableVertexAttribArray(locPositionLine);
 
 
+
+
             if (MainInterface.DEBUG_FRAME_LOGGING) {
                 log.debug(TAG, "OpenGL rendered frame in " + log.popTimer(this).time + "ms.");
             }
@@ -295,8 +324,6 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
     /**
      * Called whenever the draw surface is changed – most notably on creation
-     * . Notably takes care of setting up the correct perspective
-     * transformation based on the camera calibration values.
      *
      * @param gl     Unused context.
      * @param width  Width in pixel of canvas.
@@ -424,44 +451,32 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
         // Draw the triangle
         GLES20.glDrawArrays(GLES20.GL_LINES, 0, line.getVertexCount());
-
-
-    /*
-        render_mat = pvm_m.getFloatArray(true);
-
-        GLES20.glUseProgram(programLine);
-
-        float vertices[] = {
-               -1.0f,0.2f,-0.2f,
-                1.0f,-0.2f,0.2f,
-        };
-
-        FloatBuffer vertex_pos_buffer = ByteBuffer.allocateDirect(6 * 4)
-                .order(ByteOrder.nativeOrder())
-                .asFloatBuffer();
-
-        vertex_pos_buffer.put(vertices).position(0);
-
-
-
-        GLES20.glVertexAttribPointer(locPositionLine, 3, GLES20.GL_FLOAT, false, 4 * 3, vertex_pos_buffer);
-        GLES20.glEnableVertexAttribArray(locPositionLine);
-
-        GLES20.glUniform4f(locColorLine, 1.0f, 1.0f, 0.0f, 1.0f);
-
-        GLES20.glUniformMatrix4fv(locMVPMatrixLine, 1, false, render_mat, 0);
-
-       // GLES20.glLineWidth(2.0f);
-
-        GLES20.glDrawArrays(GLES20.GL_LINES, 0, 2);
-    */
-
     }
 
 
 
 
     private void createBasicAssets(){
+        //create basic camera...
+        Camera cam = new Camera();
+        cam.set_position(0.0,0.0,0.0);
+        cam.setZFAR(300.0);
+        default_cam = cam;
+
+        //our world of graphical objects
+        Loader_obj loader = new Loader_obj();
+
+        //creates it's own ModelLoader
+        //simple storage mode is a linear unsorted list of models!!!
+        ow = new ObjectWorld(ObjectWorld.store_mode_simple);
+
+        test_marker_co = ow.loadModelObject("betty","betty.obj");
+        test_marker_text_co = ow.loadModelObject("test_text","text_model.obj");
+        //crazy chain...
+        test_marker_text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
+                "FF00FF_TEXT_BG.png","This is Betty!",120.0f,0,255,0
+        );
+
 
         //gizmo
         x_dir = new Line(
@@ -482,23 +497,22 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                 0.0f,0.0f,1.0f,1.0f
         );
 
-
-
-
-
-
-        //create basic camera...
-        Camera cam = new Camera();
-        cam.set_position(0.0,0.0,0.0);
-        cam.setZFAR(300.0);
-        default_cam = cam;
-
         //load default 3D object
-        Loader_obj loader = new Loader_obj();
+/*
         Model mdl = new Model();
-        loader.load_model_data(mdl,"box.obj");
+        loader.load_model_data(mdl,"betty.obj");
         mdl.loadGLdata();
         default_mdl = mdl;
+
+        Model mdl2 = new Model();
+        loader.load_model_data(mdl2,"text_model.obj");
+        mdl2.loadGLdata();
+        text_mdl = mdl2;
+
+        text_mdl.get_meshs().get(0).get_material().setDiffuseText(
+                "FF00FF_TEXT_BG.png","Bissl Text...",120.0f,0,255,0
+        );
+
 
         //pack it with Positation into a CompositeObject
         Positation posi = new Positation();
@@ -506,6 +520,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
         co.setModel(default_mdl);
         co.setPositation(posi);
         default_co = co;
+
+        */
 
     }
 
@@ -521,8 +537,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
         double touch_x = -((double)(x)/((double)(window_size_x)*0.5)-1.0);
         double touch_y = ((double)(y)/((double)(window_size_y)*0.5)-1.0);
         */
-        double touch_x = -((double)(x)/((double)(window_size_x)*0.5)-1.0);
-        double touch_y = ((double)(y)/((double)(window_size_y)*0.5)-1.0);
+        double touch_x = ((double)(x)/((double)(window_size_x)*0.5)-1.0);
+        double touch_y = -((double)(y)/((double)(window_size_y)*0.5)-1.0);
 
         /*
         Log.e(TAG, Double.toString(touch_x) + "  " +
@@ -534,12 +550,46 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
         Vector3 projected_pos_normalized = projected_pos.normalized();
         projected_pos_normalized.set_x(-projected_pos_normalized.x());
         projected_pos_normalized.set_y(-projected_pos_normalized.y());
+        projected_pos_normalized.set_z(-projected_pos_normalized.z());
         return projected_pos_normalized;
+    }
+
+    public void setAngleX(float angle_x){
+        this.angle_x = angle_x;
+    }
+
+    public void setAngleY(float angle_y){
+        this.angle_y = angle_y;
+    }
+
+    public void setPosX(float pos_x){
+        this.pos_x = pos_x;
+    }
+
+    public void setPosY(float pos_y){
+        this.pos_y = pos_y;
+    }
+
+    public float getAngleX(){
+        return this.angle_x;
+    }
+
+    public float getAngleY(){
+        return this.angle_y;
+    }
+
+    public float getPosX(){
+        return this.pos_x;
+    }
+
+    public float getPosY(){
+        return this.pos_y;
     }
 
 
     /**
-     * Method for creating the most basic of shaders.
+     * Method for creating the shader programs we need to render our geometry...
+     * No magic involved
      */
     private void createShaders() {
 

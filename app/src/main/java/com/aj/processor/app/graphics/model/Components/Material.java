@@ -3,6 +3,9 @@ package com.aj.processor.app.graphics.model.Components;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
@@ -80,6 +83,13 @@ public class Material {
     private int Material_Type_Bump            = 0x0010;   // Bump         map defined
 
 
+    //combine to get different results...
+    private int Texture_Smooth  = 0x0001;
+    private int Texture_Sharp   = 0x0002;
+    private int Texture_Mipmaps = 0x0004;
+
+
+
     public Material(String name,String path)
     {
         mtl_name = name;
@@ -90,6 +100,7 @@ public class Material {
         mtl_bump_loaded = false;
         tex_slots = 4;
         loaded = false;
+        flagBits = Material_Type_None;
     }
 
     //Material::~Material();
@@ -155,28 +166,36 @@ public class Material {
 
         if(mtl_ambient_loaded && mtl_ambient_img!=null){
             Log.e(TAG, "gl_ambient_map loading...");
-            load_gl_map(gl_ambient_map, mtl_ambient_img);
+            if(load_gl_map(gl_ambient_map, mtl_ambient_img, Texture_Smooth | Texture_Mipmaps)){
+                flagBits = flagBits | Material_Type_Ambient;
+            }
         }
         else{
             Log.e(TAG, "gl_ambient_map loading skipped...");
         }
         if(mtl_diffuse_loaded && mtl_diffuse_img!=null){
             Log.e(TAG, "gl_diffuse_map loading...");
-            load_gl_map(gl_diffuse_map, mtl_diffuse_img);
+            if(load_gl_map(gl_diffuse_map, mtl_diffuse_img, Texture_Smooth | Texture_Mipmaps)){
+                flagBits = flagBits | Material_Type_Diffuse;
+            }
         }
         else{
             Log.e(TAG, "gl_diffuse_map loading skipped...");
         }
         if(mtl_specular_loaded && mtl_specular_img!=null){
             Log.e(TAG, "gl_specular_map loading...");
-            load_gl_map(gl_specular_map, mtl_specular_img);
+            if(load_gl_map(gl_specular_map, mtl_specular_img, Texture_Smooth | Texture_Mipmaps)){
+                flagBits = flagBits | Material_Type_Specular;
+            }
         }
         else{
             Log.e(TAG, "gl_specular_map loading skipped...");
         }
         if(mtl_bump_loaded && mtl_bump_img!=null){
             Log.e(TAG, "gl_bump_map loading...");
-            load_gl_map(gl_bump_map, mtl_bump_img);
+            if(load_gl_map(gl_bump_map, mtl_bump_img, Texture_Smooth | Texture_Mipmaps)){
+                flagBits = flagBits | Material_Type_Bump;
+            }
         }
         else{
             Log.e(TAG, "gl_bump_map loading skipped...");
@@ -189,7 +208,7 @@ public class Material {
         return loaded;
     }
 
-    public boolean load_gl_map(int slot, Bitmap image){
+    public boolean load_gl_map(int slot, Bitmap image, int settingBits){
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, slot);
 
         /* WORKS (but no mipmaps and no filtering)
@@ -201,36 +220,40 @@ public class Material {
 
 
 
-        // Set filtering
-        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-        //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
 
         // Load the bitmap into the bound texture.
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
 
-        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);  //Generate num_mipmaps number of mipmaps here.
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+        if((settingBits & Texture_Mipmaps) == Texture_Mipmaps) {
+            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);  //Generate num_mipmaps number of mipmaps here.
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
 
-        //for mipmaps smooth
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);
+            if((settingBits & Texture_Smooth) == Texture_Smooth) {
+                //for mipmaps smooth
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);
+            }
+            if((settingBits & Texture_Sharp) == Texture_Sharp) {
+                //mipmaps pixelated
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST_MIPMAP_NEAREST);
+            }
 
-        //mipmaps pixelated
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        }
 
-
-        //smooth
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        //pixelated
-        //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        //qDebug("mipmap generated...");
-
+        if((settingBits & Texture_Mipmaps) != Texture_Mipmaps) {
+            if((settingBits & Texture_Smooth) == Texture_Smooth) {
+                //smooth
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+            }
+            if((settingBits & Texture_Sharp) == Texture_Sharp) {
+                //pixelated
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+                GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+            }
+        }
 
         //clean up the image...
         //image.~QImage();
@@ -397,6 +420,51 @@ public class Material {
         mtl_bump_map_path = map_path;
     }
 
+    //sets a Text from left center of the bitmap and loads it into the diffuse slot...
+    public void setDiffuseText(String bitmapPath, String text, float size, int r, int g, int b){
+
+        //load the bitmap
+        Bitmap background = load_map_rgba(bitmapPath);
+        //check if image could load
+        if(background == null){
+            return;
+        }
+
+
+        android.graphics.Bitmap.Config bitmapConfig = background.getConfig();
+        // set default bitmap config if none
+        if(bitmapConfig == null) {
+            bitmapConfig = android.graphics.Bitmap.Config.ARGB_8888;
+        }
+        // resource bitmaps are imutable,
+        // so we need to convert it to mutable one
+        background = background.copy(bitmapConfig, true);
+
+
+        Canvas canvas = new Canvas(background);
+        // new antialised Paint
+        Paint paint = new Paint();
+
+        paint.setColor(Color.rgb(r, g, b));
+        // text size in pixels
+        paint.setTextSize(size);
+
+
+        // draw text to the Canvas center
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        //left
+        int x = 1;
+        //center
+        int y = (background.getHeight() + bounds.height())/2;
+        canvas.drawText(text, x, y, paint);
+
+        //load new bitmap into gpu
+        if(load_gl_map(gl_diffuse_map, background, Texture_Sharp)){
+            flagBits = flagBits | Material_Type_Diffuse;
+        }
+
+    }
 
     private Bitmap load_map_rgba(String path){
 

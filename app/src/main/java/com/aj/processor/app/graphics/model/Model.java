@@ -20,6 +20,9 @@ public class Model {
     double size;
     ArrayList<Mesh> meshs = new ArrayList<Mesh>();
 
+    //flags
+    private boolean visible = true;
+
     String TAG = "Model";
 
     //empty constructor...
@@ -41,7 +44,7 @@ public class Model {
     }
 
     public String get_path(){
-        return path;
+        return this.path;
     }
 
     public void add_mesh(Mesh mesh){
@@ -103,6 +106,15 @@ public class Model {
             temp_size = max(pos.length() + rad, temp_size);
         }
         this.size = temp_size;
+    }
+
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
 }

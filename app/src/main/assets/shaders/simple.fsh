@@ -5,5 +5,8 @@ void main()
 {
 	//add simple normal based shading
 	lowp vec3 color = texture2D(tex_sampler, texc.st).rgb;
-   	gl_FragColor = vec4((color*0.6)+(color*dir*0.4),0.7);
+	if(color.r == 1.0 && color.g == 0.0 && color.b == 1.0){
+		discard;
+	}
+   	gl_FragColor = vec4((color*0.6)+(color*dir*0.4),0.9);
 }

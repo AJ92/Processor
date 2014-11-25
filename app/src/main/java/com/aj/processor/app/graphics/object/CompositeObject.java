@@ -65,6 +65,9 @@ public class CompositeObject {
         movementType_ = movementType;
     }
 
+    public String getName(){
+        return this.name_;
+    }
 
     //stuff for model
     public void setModel(Model model){

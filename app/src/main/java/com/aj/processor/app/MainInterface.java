@@ -63,6 +63,11 @@ public class MainInterface {
     // Detector values
     public int threshold = 100;
 
+
+
+    //is openCV running ?
+    private boolean is_CV_running = true;
+
     public MainInterface(Activity mainActivity,
                          float[][] camMatrix, float[] distortionCoefficients) {
         this.log = Messenger.getInstance();
@@ -89,6 +94,7 @@ public class MainInterface {
             cameraView.setVisibility(JavaCameraView.GONE);
             groupView.addView(cameraView);
             opencv.onCreate(cameraView);
+            is_CV_running = true;
         }
         // Create OpenGL render part:
         if (RUN_RENDERER) {
@@ -110,23 +116,42 @@ public class MainInterface {
                 + "ms.");
     }
 
-    public void onResume() {
-        if (RUN_OPENCV)
+    public void toggleOpenCV(){
+        if(is_CV_running){
+            opencv.onPause();
+            is_CV_running = false;
+        }
+        else{
             opencv.onResume(this.mainActivity);
-        if (RUN_RENDERER)
+            is_CV_running = true;
+        }
+    }
+
+    public void onResume() {
+        if (RUN_OPENCV) {
+            opencv.onResume(this.mainActivity);
+            is_CV_running = true;
+        }
+        if (RUN_RENDERER) {
             renderView.onResume();
+        }
     }
 
     public void onPause() {
-        if (RUN_OPENCV)
+        if (RUN_OPENCV) {
             opencv.onPause();
-        if (RUN_RENDERER)
+            is_CV_running = false;
+        }
+        if (RUN_RENDERER) {
             renderView.onPause();
+        }
     }
 
     public void onDestroy() {
-        if (RUN_OPENCV)
+        if (RUN_OPENCV) {
             opencv.onDestroy();
+            is_CV_running = false;
+        }
         log.log(TAG, "Stopping.");
     }
 
