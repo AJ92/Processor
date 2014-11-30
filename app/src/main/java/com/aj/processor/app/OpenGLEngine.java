@@ -122,6 +122,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     private float pos_x = 0.0f;
     private float pos_y = 0.0f;
 
+    private float scale = 1.0f;
+
 
 
 
@@ -197,6 +199,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
             p_m = p_m.perspective(default_cam.getFOV(), (float) (window_size_x) / (float) (window_size_y),
                     default_cam.getZNEAR(), default_cam.getZFAR());
 
+
             //retrieve the camera matrix
             default_cam.clear_rotation_global();
             default_cam.clear_rotation_local();
@@ -243,11 +246,11 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                     int x_pos = trackable.getX();
                     int y_pos = trackable.getY();
 
-                    Vector3 space_pos = space_pos = touch_to_space(default_cam, x_pos, y_pos);
+                    Vector3 space_pos = space_pos = touch_to_space(default_cam, x_pos + (int) this.pos_x, y_pos + (int) this.pos_y);
 
 
                     //scale the pos (move away from origin)
-                    Vector3 space_pos_scaled = space_pos.multiply(default_cam.getZNEAR() + 3.0);
+                    Vector3 space_pos_scaled = space_pos.multiply(default_cam.getZNEAR() + (3.0 * scale));
                     //move away from camera pos (the position we want to render our model at...)
                     Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
 
@@ -565,6 +568,10 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
         this.pos_y = pos_y;
     }
 
+    public void setScale(float scale){
+        this.scale = scale;
+    }
+
     public float getAngleX(){
         return this.angle_x;
     }
@@ -579,6 +586,10 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
     public float getPosY(){
         return this.pos_y;
+    }
+
+    public float getScale() {
+        return this.scale;
     }
 
 
