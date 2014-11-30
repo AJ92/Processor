@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import com.aj.processor.app.XML.XMLLoadTaskAsync;
 import com.aj.processor.app.graphics.camera.Camera;
 import com.aj.processor.app.graphics.model.Components.Mesh;
 import com.aj.processor.app.graphics.model.Line;
@@ -520,6 +521,11 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
         );
 
 
+
+
+        //TEST XML PARSER
+        XMLLoadTaskAsync xmllta = new XMLLoadTaskAsync();
+        xmllta.retreiveXMLFromAssets("test.xml");
 
     }
 

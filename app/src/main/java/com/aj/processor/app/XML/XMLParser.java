@@ -1,6 +1,10 @@
 package com.aj.processor.app.XML;
 
+import android.util.Log;
 import android.util.Xml;
+
+import com.aj.processor.app.XML.Process.Components.Node;
+import com.aj.processor.app.XML.Process.Components.PComponent;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -20,14 +24,17 @@ public class XMLParser {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
             parser.nextTag();
-            return readFeed(parser);
-        } finally {
+            Log.e("XMLParser","parse");
+            return readProcess(parser);
+        }
+        finally {
             in.close();
         }
     }
 
-    private List readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
-        List entries = new ArrayList();
+    private List readProcess(XmlPullParser parser) throws XmlPullParserException, IOException {
+        List<PComponent> pcomps = new ArrayList<PComponent>();
+
         //the first tag in the xml...
         //ignore namespaces... (ns == null)
         parser.require(XmlPullParser.START_TAG, ns, "template");
@@ -37,8 +44,14 @@ public class XMLParser {
             }
             String tag = parser.getName();
             // Starts by looking for the entry tag
-            if (tag.equals("node")) {
-                entries.add(readEntry(parser));
+            if (tag.equals("nodes")) {
+
+                Log.e("XMLParser","nodes");
+
+                List<PComponent> nodes = readNodes(parser);
+                for(PComponent pc: nodes){
+                    pcomps.add(pc);
+                }
             }
             else if(tag.equals("dataElement")){
 
@@ -53,76 +66,93 @@ public class XMLParser {
                 skip(parser);
             }
         }
-        return entries;
-    }
-		
-	public static class Entry {
-        public final String title;
-        public final String link;
-        public final String summary;
 
-        private Entry(String title, String summary, String link) {
-            this.title = title;
-            this.summary = summary;
-            this.link = link;
+        Log.e("XMLParser","parse done.");
+
+        //temporary log output...
+        for(PComponent p : pcomps){
+            Log.e("XMLParser:","Node...");
+            if(p.hasNode())
+                Log.e("XMLParser:","Node: " + p.getNode().getName());
         }
+
+        return pcomps;
     }
 
-    // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
-    // to their respective "read" methods for processing. Otherwise, skips the tag.
-    private Entry readEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
-        parser.require(XmlPullParser.START_TAG, ns, "entry");
-        String title = null;
-        String summary = null;
-        String link = null;
+    private List readNodes(XmlPullParser parser) throws XmlPullParserException, IOException {
+        List<PComponent> pcomps = new ArrayList<PComponent>();
+        parser.require(XmlPullParser.START_TAG, ns, "nodes");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
-            if (name.equals("title")) {
-                title = readTitle(parser);
-            } else if (name.equals("summary")) {
-                summary = readSummary(parser);
-            } else if (name.equals("link")) {
-                link = readLink(parser);
-            } else {
+            if (name.equals("node")) {
+                Log.e("XMLParser","node");
+                PComponent pc = readNode(parser);
+                pcomps.add(pc);
+            }
+            else {
                 skip(parser);
             }
         }
-        return new Entry(title, summary, link);
-    }
-    
-    // Processes title tags in the feed.
-    private String readTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "title");
-        String title = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "title");
-        return title;
+        return pcomps;
     }
 
-    // Processes link tags in the feed.
-    private String readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String link = "";
-        parser.require(XmlPullParser.START_TAG, ns, "link");
-        String tag = parser.getName();
-        String relType = parser.getAttributeValue(null, "rel");
-        if (tag.equals("link")) {
-            if (relType.equals("alternate")){
-                link = parser.getAttributeValue(null, "href");
-                parser.nextTag();
+    private PComponent readNode(XmlPullParser parser) throws XmlPullParserException, IOException {
+
+        Log.e("XMLParser","1");
+        parser.require(XmlPullParser.START_TAG, ns, "node");
+        String node_id = readNodeID(parser);
+        String node_name = null;
+        String node_description = null;
+        Log.e("XMLParser","2");
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
             }
+            String name = parser.getName();
+            if (name.equals("name")) {
+                node_name = readNodeName(parser);
+            }
+            else if (name.equals("description")) {
+                node_description = readNodeDescription(parser);
+            }
+            else {
+                skip(parser);
+            }
+            Log.e("XMLParser","...");
         }
-        parser.require(XmlPullParser.END_TAG, ns, "link");
-        return link;
+        Log.e("XMLParser","3");
+        Node n = new Node(node_id);
+        n.setName(node_name);
+        n.setDescription(node_description);
+        PComponent pc = new PComponent(n);
+        return pc;
     }
 
-    // Processes summary tags in the feed.
-    private String readSummary(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "summary");
-        String summary = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "summary");
-        return summary;
+    private String readNodeID(XmlPullParser parser) throws XmlPullParserException, IOException {
+        Log.e("XMLParser","readNodeID");
+        parser.require(XmlPullParser.START_TAG, ns, "node");
+        String nodeID = parser.getAttributeValue(null, "id");
+        //parser.require(XmlPullParser.END_TAG, ns, "node");
+        Log.e("XMLParser","readNodeID done!");
+        return nodeID;
+    }
+
+    private String readNodeName(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "name");
+        String nodeName = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "name");
+        return nodeName;
+    }
+
+    private String readNodeDescription(XmlPullParser parser) throws XmlPullParserException, IOException {
+        String nodeDescription = "";
+        parser.require(XmlPullParser.START_TAG, ns, "description");
+        String nodeName = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "description");
+        return nodeDescription;
     }
 
     // For the tags title and summary, extracts their text values.
@@ -134,9 +164,6 @@ public class XMLParser {
         }
         return result;
     }
-
-
-
 
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {

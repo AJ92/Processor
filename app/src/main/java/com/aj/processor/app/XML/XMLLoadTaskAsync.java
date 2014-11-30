@@ -2,9 +2,11 @@ package com.aj.processor.app.XML;
 
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.aj.processor.app.GlobalContext;
 import com.aj.processor.app.R;
+import com.aj.processor.app.XML.Process.Components.PComponent;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -16,7 +18,7 @@ import java.util.List;
 
 public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
 
-    private List<XMLParser.Entry> entry_list;
+    private List<PComponent> pcomp_list;
 
     private final int type_network = 1;
     private final int type_assets = 2;
@@ -33,14 +35,17 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
     }
 
     public void retreiveXMLFromAssets(String path){
+        Log.e("XMLLoadTaskAsync","start");
         type = type_assets;
         doInBackground(path);
+        Log.e("XMLLoadTaskAsync","started");
     }
 
 
 
     @Override
     protected String doInBackground(String... urls) {
+        Log.e("XMLLoadTaskAsync","threading...");
         try {
             if(type == type_network) {
                 return loadXmlFromNetwork(urls[0]);
@@ -61,17 +66,18 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         //from now on the entry_list is ready...
+        Log.e("XMLLoadTaskAsync","result");
     }
 
     private String loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
         InputStream stream = null;
         // Instantiate the parser
         XMLParser parser = new XMLParser();
-        List<XMLParser.Entry> entries = null;
+        List<PComponent> pcomps = null;
 
         try {
             stream = downloadUrl(urlString);
-            entries = parser.parse(stream);
+            pcomps = parser.parse(stream);
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
         } finally {
@@ -80,20 +86,23 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
             }
         }
 
-        entry_list = entries;
+        pcomp_list = pcomps;
 
         return "loadXmlFromNetwork done.";
     }
 
     private String loadXmlFromAssets(String pathString) throws XmlPullParserException, IOException {
+
+
+        Log.e("XMLLoadTaskAsync","loadXmlFromAssets");
         InputStream stream = null;
         // Instantiate the parser
         XMLParser parser = new XMLParser();
-        List<XMLParser.Entry> entries = null;
+        List<PComponent> pcomps = null;
 
         try {
             stream = openAsset(pathString);
-            entries = parser.parse(stream);
+            pcomps = parser.parse(stream);
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
         } finally {
@@ -102,7 +111,8 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
             }
         }
 
-        entry_list = entries;
+        pcomp_list = pcomps;
+        Log.e("XMLLoadTaskAsync","loadXmlFromAssets done?");
 
         return "loadXmlFromAssets done.";
     }
