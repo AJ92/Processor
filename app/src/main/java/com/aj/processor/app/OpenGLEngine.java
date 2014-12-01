@@ -5,7 +5,12 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
+
+import com.aj.processor.app.XML.Process.Components.Node;
+import com.aj.processor.app.XML.Process.Components.StructuralNodeData;
+import com.aj.processor.app.XML.Process.PComponent;
 import com.aj.processor.app.XML.XMLLoadTaskAsync;
+import com.aj.processor.app.XML.XMLProcessLoadedListener;
 import com.aj.processor.app.graphics.camera.Camera;
 import com.aj.processor.app.graphics.model.Components.Mesh;
 import com.aj.processor.app.graphics.model.Line;
@@ -21,6 +26,7 @@ import com.aj.processor.app.mathematics.Vector.Vector3;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -29,10 +35,12 @@ import java.util.ArrayList;
 import eu.imagine.framework.Messenger;
 import eu.imagine.framework.Trackable;
 
+import com.aj.processor.app.XML.Process.Process;
+
 /**
  * Handles the rendering of the objects.
  */
-public class OpenGLEngine implements GLSurfaceView.Renderer {
+public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedListener {
 
 
     private final String TAG = "OpenGLEngine";
@@ -86,6 +94,10 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     private ObjectWorld ow;
     //DEFAULT MODEL to render in case we have broken models or so...
 
+
+    private boolean process_loaded = false;
+    private Process test_process;
+
     private Camera default_cam;
 
 
@@ -98,6 +110,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     private Line x_dir;
     private Line y_dir;
     private Line z_dir;
+
+    private ArrayList<Line> lines = new ArrayList<Line>();
 
     private Positation gizmo_posi = new Positation();
 
@@ -193,6 +207,16 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl) {
         if (MainInterface.DEBUG_FRAME_LOGGING)
             log.pushTimer(this, "opengl frame");
+
+
+        //TODO:
+        //JUST A TEST CHECK...
+        if(process_loaded){
+            if(ow != null) {
+                loadProcessIntoObjectWorld(test_process);
+                process_loaded = false;
+            }
+        }
 
         if(default_cam != null) {
             //create the projection matrix...
@@ -320,6 +344,18 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
             drawLine(x_dir);
             drawLine(y_dir);
             drawLine(z_dir);
+
+
+            //render all lines
+
+            v_m = default_cam.get_view_matrix();
+            pv_m = p_m.multiply(v_m);
+            Positation default_posi = new Positation();
+            pvm_m = pv_m.multiply(default_posi.get_model_matrix());
+            for(Line line : lines){
+                drawLine(line);
+            }
+
 
             GLES20.glDisableVertexAttribArray(locPositionLine);
 
@@ -464,23 +500,208 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
     }
 
 
+    @Override
+    public void onXMLProcessLoaded(Process p) {
+        test_process = p;
+        process_loaded = true;
+    }
 
+    private void loadProcessIntoObjectWorld(Process p){
+        //create the objects we need and connect them with lines and so on...
+
+
+        ArrayList<PComponent>       nodes_pc = new ArrayList<PComponent>();
+        ArrayList<PComponent>       structuralNodeData_pc = new ArrayList<PComponent>();
+
+        ArrayList<CompositeObject>  nodes_3d = new ArrayList<CompositeObject>();
+        ArrayList<CompositeObject>  nodes_3d_text1 = new ArrayList<CompositeObject>();
+
+        //sort out all NODES
+        for(PComponent pc : p.getPComponents()) {
+            if(pc.hasNode()){
+                nodes_pc.add(pc);
+            }
+        }
+
+        //sort in all structuralNodeDatas by NODE's ID
+        for(PComponent node : nodes_pc){
+            String node_id = node.getNode().getID();
+            //find the structuralDataNode by ID
+
+            PComponent structuralNodeData = null;
+
+            for(PComponent pc : p.getPComponents()){
+                if(pc.hasStructuralNodeData()){
+                    if(pc.getStructuralNodeData().getID().equalsIgnoreCase(node_id)){
+                        structuralNodeData = pc;
+                        break;
+                    }
+                }
+            }
+            //might contain null!!!
+            structuralNodeData_pc.add(structuralNodeData);
+        }
+
+
+        //TODO:
+        //need to modofy this... this is only working for linear processes...
+        //sort by topology...
+        PComponent nodes_pc_sorted[] = new PComponent[nodes_pc.size()];
+        PComponent structuralNodeData_pc_sorted[] = new PComponent[nodes_pc.size()];
+        for( int i = 0; i < structuralNodeData_pc.size(); i++){
+            PComponent snd_pc = structuralNodeData_pc.get(i);
+            if(snd_pc != null){
+                if(snd_pc.getStructuralNodeData().hasTopologicalID()){
+                    int topoID = Integer.parseInt(snd_pc.getStructuralNodeData().getTopologicalID());
+                    nodes_pc_sorted[topoID] = nodes_pc.get(i);
+                    structuralNodeData_pc_sorted[topoID] = snd_pc;
+                }
+            }
+
+        }
+
+
+
+
+        //now we know what type each node actually is...
+        //let's construct em
+        float pc_x_pos = 0.0f;
+        float pc_x_pos_mofifier = 2.0f;
+        for(int i=0; i < nodes_pc_sorted.length; i++ ){
+            Node n = nodes_pc_sorted[i].getNode();
+            PComponent snd_pc = structuralNodeData_pc_sorted[i];
+
+
+            CompositeObject loaded_node_3d = null;
+
+            //structuralNodaData might be null !!!
+            if(snd_pc != null){
+                StructuralNodeData snd = snd_pc.getStructuralNodeData();
+                if(snd.hasType()) {
+                    if(snd.getType().equalsIgnoreCase("NT_STARTFLOW")) {
+                        loaded_node_3d = ow.loadModelObject(
+                                n.getName(),
+                                "processComponents/Node/node_start.obj",
+                                true);
+                        Log.e(TAG, "LOADING MODEL...");
+                    }
+                    else if(snd.getType().equalsIgnoreCase("NT_ENDFLOW")) {
+                        loaded_node_3d = ow.loadModelObject(
+                                n.getName(),
+                                "processComponents/Node/node_end.obj",
+                                true);
+                        Log.e(TAG, "LOADING MODEL...");
+                    }
+                    else if(snd.getType().equalsIgnoreCase("NT_NORMAL")) {
+                        loaded_node_3d = ow.loadModelObject(
+                                n.getName(),
+                                "processComponents/Node/node_normal.obj",
+                                true);
+                        Log.e(TAG, "LOADING MODEL...");
+                    }
+                    else{
+                        loaded_node_3d = ow.loadModelObject(
+                                n.getName(),
+                                "processComponents/Node/node_normal.obj",
+                                true);
+                        Log.e(TAG, "LOADING MODEL...");
+                    }
+                }
+            }
+            else{
+                nodes_3d.add(ow.loadModelObject(
+                        n.getName(),
+                        "processComponents/Node/node_normal.obj",
+                        true));
+                Log.e(TAG, "LOADING MODEL...");
+            }
+
+            //move it
+            //TODO:
+            // ATM it is only linear.... make it dynamic for complex structures ...
+            if(loaded_node_3d != null){
+                loaded_node_3d.getPositation().set_position(pc_x_pos,0.0f,0.0f);
+            }
+            //add it
+            nodes_3d.add(loaded_node_3d);
+
+
+
+
+            //create the texts
+            CompositeObject loaded_text_3d = null;
+            if(n.hasName()){
+                loaded_text_3d = ow.loadModelObject("test_text","text_model.obj", false);
+                loaded_text_3d.getModel().get_meshs().get(0).get_material().setDiffuseText(
+                        "FF00FF_TEXT_BG.png",n.getName(),100.0f,255,255,255
+                );
+                Log.e(TAG, "LOADING MODEL...");
+            }
+            //move it
+            //TODO:
+            // ATM it is only linear.... make it dynamic for complex structures ...
+            if(loaded_text_3d != null){
+                loaded_text_3d.getPositation().set_position(pc_x_pos + 0.15f,0.0f,0.15f);
+                loaded_text_3d.getPositation().set_scale(0.5f,0.5f,0.5f);
+            }
+            //add it
+            nodes_3d_text1.add(loaded_text_3d);
+
+
+            pc_x_pos+= pc_x_pos_mofifier;
+
+        }
+
+
+
+
+        //simple line connection test...
+        for(int i = 0; i < nodes_3d.size()-1; i++){
+            lines.add(new Line(
+                    (float) nodes_3d.get(i).getPositation().getPosition().x(),
+                    (float) nodes_3d.get(i).getPositation().getPosition().y(),
+                    (float) nodes_3d.get(i).getPositation().getPosition().z(),
+                    (float) nodes_3d.get(i+1).getPositation().getPosition().x(),
+                    (float) nodes_3d.get(i+1).getPositation().getPosition().y(),
+                    (float) nodes_3d.get(i+1).getPositation().getPosition().z(),
+                    0.0f,1.0f,0.0f,1.0f
+            ));
+        }
+
+
+        /*
+        nodes_3d.add(ow.loadModelObject(
+                pc.getNode().getName(),
+                "processComponents/Node/",
+                true));
+        */
+    }
 
     private void createBasicAssets(){
+
         //create basic camera...
         Camera cam = new Camera();
         cam.set_position(0.0,0.0,0.0);
         cam.setZFAR(300.0);
         default_cam = cam;
 
-        //our world of graphical objects
-        Loader_obj loader = new Loader_obj();
 
         //creates it's own ModelLoader
         //simple storage mode is a linear unsorted list of models!!!
         ow = new ObjectWorld(ObjectWorld.store_mode_simple);
 
-        test_marker_co = ow.loadModelObject("betty","betty.obj", true);
+
+        //TEST XML PARSER (after ow construction... cause we need ow...)
+        XMLLoadTaskAsync xmllta = new XMLLoadTaskAsync();
+        // add the renderer as listener so once xml and the process is ready we can
+        //construct a 3D representation of it
+        xmllta.addXMLProcessLoadedListener(this);
+        xmllta.retreiveXMLFromAssets("test.xml");
+
+
+
+/*
+        test_marker_co = ow.loadModelObject("box","box.obj", true);
         test_marker_text_co = ow.loadModelObject("test_text","text_model.obj", false);
         //crazy chain...
         test_marker_text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
@@ -499,7 +720,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
 
         //move to the right
         test_marker_text_co2.getPositation().set_position(2.01f,0.01f,-0.01f);
-
+*/
 
         //gizmo
         x_dir = new Line(
@@ -519,13 +740,6 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
                 0.0f,0.0f,0.5f,
                 0.0f,0.0f,1.0f,1.0f
         );
-
-
-
-
-        //TEST XML PARSER
-        XMLLoadTaskAsync xmllta = new XMLLoadTaskAsync();
-        xmllta.retreiveXMLFromAssets("test.xml");
 
     }
 
@@ -729,4 +943,5 @@ public class OpenGLEngine implements GLSurfaceView.Renderer {
         // Tell OpenGL to use this program when rendering.
         GLES20.glUseProgram(programSimple);
     }
+
 }

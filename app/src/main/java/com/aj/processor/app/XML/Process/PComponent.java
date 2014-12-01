@@ -1,4 +1,10 @@
-package com.aj.processor.app.XML.Process.Components;
+package com.aj.processor.app.XML.Process;
+
+import com.aj.processor.app.XML.Process.Components.DataEdge;
+import com.aj.processor.app.XML.Process.Components.DataElement;
+import com.aj.processor.app.XML.Process.Components.Edge;
+import com.aj.processor.app.XML.Process.Components.Node;
+import com.aj.processor.app.XML.Process.Components.StructuralNodeData;
 
 /**
  * Created by AJ on 30.11.2014.

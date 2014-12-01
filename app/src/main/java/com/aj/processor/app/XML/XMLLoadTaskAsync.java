@@ -5,8 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.aj.processor.app.GlobalContext;
-import com.aj.processor.app.R;
-import com.aj.processor.app.XML.Process.Components.PComponent;
+import com.aj.processor.app.XML.Process.PComponent;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -14,11 +13,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.aj.processor.app.XML.Process.Process;
 
 public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
 
-    private List<PComponent> pcomp_list;
+    //listener
+    private List<XMLProcessLoadedListener> listener = new ArrayList<XMLProcessLoadedListener>();
+
+    //empty if not loaded...
+    private List<PComponent> pcomp_list = new ArrayList<PComponent>();
+    private Process process = new Process();
 
     private final int type_network = 1;
     private final int type_assets = 2;
@@ -28,16 +35,19 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
 
     }
 
+    public void addXMLProcessLoadedListener(XMLProcessLoadedListener xmlpll){
+        listener.add(xmlpll);
+    }
 
     public void retreiveXMLFromNetwork(String url){
         type = type_network;
-        doInBackground(url);
+        execute(url);
     }
 
     public void retreiveXMLFromAssets(String path){
         Log.e("XMLLoadTaskAsync","start");
         type = type_assets;
-        doInBackground(path);
+        execute(path);
         Log.e("XMLLoadTaskAsync","started");
     }
 
@@ -65,8 +75,13 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        //from now on the entry_list is ready...
-        Log.e("XMLLoadTaskAsync","result");
+        //from now on the process is ready...
+        Log.e("XMLLoadTaskAsync",result);
+
+        //notify all listeners...
+        for(XMLProcessLoadedListener xmlpll : listener){
+            xmlpll.onXMLProcessLoaded(process);
+        }
     }
 
     private String loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
@@ -86,7 +101,10 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
             }
         }
 
-        pcomp_list = pcomps;
+        //pack the pcomps into a process
+        for(PComponent pc : pcomps){
+            process.addPCcomponent(pc);
+        }
 
         return "loadXmlFromNetwork done.";
     }
@@ -111,7 +129,12 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
             }
         }
 
-        pcomp_list = pcomps;
+        //pack the pcomps into a process
+        for(PComponent pc : pcomps){
+            process.addPCcomponent(pc);
+        }
+
+
         Log.e("XMLLoadTaskAsync","loadXmlFromAssets done?");
 
         return "loadXmlFromAssets done.";

@@ -7,7 +7,7 @@ import com.aj.processor.app.XML.Process.Components.DataEdge;
 import com.aj.processor.app.XML.Process.Components.DataElement;
 import com.aj.processor.app.XML.Process.Components.Edge;
 import com.aj.processor.app.XML.Process.Components.Node;
-import com.aj.processor.app.XML.Process.Components.PComponent;
+import com.aj.processor.app.XML.Process.PComponent;
 import com.aj.processor.app.XML.Process.Components.StructuralNodeData;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -347,6 +347,7 @@ public class XMLParser {
         parser.require(XmlPullParser.START_TAG, ns, "structuralNodeData");
         String structuralNodeData_nodeId = readStructuralNodeDataIDAttrib(parser);
         String structuralNodeData_type = null;
+        String structuralNodeData_topologicalID = null;
         Log.e("XMLParser","2");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -356,6 +357,9 @@ public class XMLParser {
             if (name.equals("type")) {
                 structuralNodeData_type = readType(parser);
             }
+            else if (name.equals("topologicalID")) {
+                structuralNodeData_topologicalID = readTopologicalID(parser);
+            }
             else {
                 skip(parser);
             }
@@ -364,6 +368,7 @@ public class XMLParser {
         Log.e("XMLParser","3");
         StructuralNodeData snd = new StructuralNodeData(structuralNodeData_nodeId);
         snd.setType(structuralNodeData_type);
+        snd.setTopologicalID(structuralNodeData_topologicalID);
         PComponent pc = new PComponent(snd);
         return pc;
     }
@@ -503,6 +508,13 @@ public class XMLParser {
         parser.require(XmlPullParser.START_TAG, ns, "dataEdgeType");
         String description = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "dataEdgeType");
+        return description;
+    }
+
+    private String readTopologicalID(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "topologicalID");
+        String description = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "topologicalID");
         return description;
     }
 

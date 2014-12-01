@@ -8,11 +8,13 @@ import com.aj.processor.app.graphics.model.Components.Mesh;
 import com.aj.processor.app.graphics.model.Model;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
 
 
 import com.aj.processor.app.GlobalContext;
@@ -60,8 +62,9 @@ public class Loader_obj {
 
         Log.e(TAG,"Model import: started.");
 
-        String pathlist[] = path.split("/"); //KeepEmptyParts
+        String pathlist[] = path.split(Pattern.quote(File.separator)); //KeepEmptyParts
         String model_name = pathlist[pathlist.length-1];
+        Log.e(TAG,"Model import: ModelName: " + model_name);
 
         //LOAD MESH DATA
         AssetManager am = GlobalContext.getAppContext().getAssets();
@@ -202,16 +205,23 @@ public class Loader_obj {
         }
 
 
-        String mtl_path = combine(pathlist,"/") + "/" + mtllib;
-        String tex_path = combine(pathlist,"/") + "/";
+        String combined_mtl_path = combine(mtlpathlist,"/");
 
-
-        Log.e(TAG,"Model import: mtl_path: " + mtllib);
+        String mtl_path;
+        String tex_path;
+        if(combined_mtl_path != null) {
+            mtl_path = combine(mtlpathlist, "/") + "/" + mtllib;
+            tex_path = combine(mtlpathlist, "/") + "/";
+        }
+        else{
+            mtl_path = mtllib;
+            tex_path = "";
+        }
 
 
         InputStream ismtl = null;
         try {
-            ismtl = am.open(mtllib);
+            ismtl = am.open(mtl_path);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e(TAG,"Model import: Error 6: InputStreamcould not be initialized...");
@@ -436,10 +446,12 @@ public class Loader_obj {
             mtl->load_bump_map(tex_path + mtl_bump_map[mtl_names.value(i)]);
             */
 
-            mtl.set_ambient_map_path(mtl_ambient_map.get(mtl_map_index));
-            mtl.set_diffuse_map_path(mtl_diffuse_map.get(mtl_map_index));
-            mtl.set_specular_map_path(mtl_specular_map.get(mtl_map_index));
-            mtl.set_bump_map_path(mtl_bump_map.get(mtl_map_index));
+            Log.e(TAG,"Model import: TEXTURE PATH: " + tex_path);
+
+            mtl.set_ambient_map_path(tex_path + mtl_ambient_map.get(mtl_map_index));
+            mtl.set_diffuse_map_path(tex_path + mtl_diffuse_map.get(mtl_map_index));
+            mtl.set_specular_map_path(tex_path + mtl_specular_map.get(mtl_map_index));
+            mtl.set_bump_map_path(tex_path + mtl_bump_map.get(mtl_map_index));
 
             mtl.loadData();
 

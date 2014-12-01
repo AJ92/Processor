@@ -1,7 +1,5 @@
 package com.aj.processor.app.XML.Process;
 
-import com.aj.processor.app.XML.Process.Components.PComponent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class Process {
         componentList.remove(pc);
     }
 
-    public List getPComponents(){
+    public List<PComponent> getPComponents(){
         return componentList;
     }
 }
