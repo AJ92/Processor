@@ -9,16 +9,18 @@ public class DataEdge {
     //nobody knows why xmls have 2 almost identical edge types ...
 
     //no id and name ???
-    private String destinationNodeID_    = null;
-    private String sourceNodeID_         = null;
-    private String edgeType_             = null;
+    private String connectorID_         = null;
+    private String dataEdgeType_        = null;
+    private String dataElementID_       = null;
+    private String nodeID_              = null;
     //more to follow...
 
 
     public static final int attribute_none                  = 0x0000;
-    public static final int attribute_destinationNodeID     = 0x0001;
-    public static final int attribute_sourceNodeID          = 0x0002;
-    public static final int attribute_edgeType              = 0x0004;
+    public static final int attribute_connectorID           = 0x0001;
+    public static final int attribute_dataEdgeType          = 0x0002;
+    public static final int attribute_dataElementID         = 0x0004;
+    public static final int attribute_nodeID                = 0x0008;
     //more to follow...
 
 
@@ -29,64 +31,81 @@ public class DataEdge {
 
     }
 
-    public DataEdge(String destinationNodeID, String sourceNodeID, String edgeType){
+    public DataEdge(String connectorID, String dataEdgeType, String dataElementID, String nodeID){
 
     }
 
 
-    //destinationNodeID stuff...
-    public void setDestinationNodeID(String destinationNodeID){
-        destinationNodeID_ = destinationNodeID;
-        this.attributes_ = this.attributes_ | attribute_destinationNodeID; //binary or
+    //connectorID stuff...
+    public void setConnectorID(String connectorID){
+        connectorID_ = connectorID;
+        this.attributes_ = this.attributes_ | attribute_connectorID; //binary or
     }
 
-    public boolean hasDestinationNodeID(){
-        if((attributes_ & attribute_destinationNodeID) == attribute_destinationNodeID){ //binary and
+    public boolean hasConnectorID(){
+        if((attributes_ & attribute_connectorID) == attribute_connectorID){ //binary and
             return true;
         }
         return false;
     }
 
-    public String getDestinationNodeID(){
-        return destinationNodeID_;
+    public String getConnectorID(){
+        return connectorID_;
     }
 
 
-
-    //attribute_sourceNodeID stuff...
-    public void setSourceNodeID(String sourceNodeID){
-        sourceNodeID_ = sourceNodeID;
-        this.attributes_ = this.attributes_ | attribute_sourceNodeID; //binary or
+    //dataEdgeType stuff...
+    public void setDataEdgeType(String dataEdgeType){
+        dataEdgeType_ = dataEdgeType;
+        this.attributes_ = this.attributes_ | attribute_dataEdgeType; //binary or
     }
 
-    public boolean hasSourceNodeID(){
-        if((attributes_ & attribute_sourceNodeID) == attribute_sourceNodeID){ //binary and
+    public boolean hasDataEdgeType(){
+        if((attributes_ & attribute_dataEdgeType) == attribute_dataEdgeType){ //binary and
             return true;
         }
         return false;
     }
 
-    public String getSourceNodeID(){
-        return sourceNodeID_;
+    public String getDataEdgeType(){
+        return dataEdgeType_;
     }
 
 
-
-    //edgeType stuff...
-    public void setEdgeType(String edgeType){
-        edgeType_ = edgeType;
-        this.attributes_ = this.attributes_ | attribute_edgeType; //binary or
+    //dataElementID stuff...
+    public void setDataElementID(String dataElementID){
+        dataElementID_ = dataElementID;
+        this.attributes_ = this.attributes_ | attribute_dataElementID; //binary or
     }
 
-    public boolean hasEdgeType(){
-        if((attributes_ & attribute_edgeType) == attribute_edgeType){ //binary and
+    public boolean hasDataElementID(){
+        if((attributes_ & attribute_dataElementID) == attribute_dataElementID){ //binary and
             return true;
         }
         return false;
     }
 
-    public String getEdgeType(){
-        return edgeType_;
+    public String getDataElementID(){
+        return dataElementID_;
     }
+
+
+    //nodeID stuff...
+    public void setNodeID(String nodeID){
+        nodeID_ = nodeID;
+        this.attributes_ = this.attributes_ | attribute_nodeID; //binary or
+    }
+
+    public boolean hasNodeID(){
+        if((attributes_ & attribute_nodeID) == attribute_nodeID){ //binary and
+            return true;
+        }
+        return false;
+    }
+
+    public String getNodeID(){
+        return nodeID_;
+    }
+
 
 }

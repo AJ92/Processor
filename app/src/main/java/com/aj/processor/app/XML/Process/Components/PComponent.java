@@ -8,12 +8,14 @@ public class PComponent {
     private DataEdge dataEdge_       = null;
     private Node node_               = null;
     private DataElement dataElement_ = null;
+    private StructuralNodeData structuralNodeData_ = null;
 
     public final static int type_empty          = 0x0000;
     public final static int type_edge           = 0x0001;
     public final static int type_dataEdge       = 0x0002;
     public final static int type_node           = 0x0004;
     public final static int type_dataElement    = 0x0008;
+    public final static int type_structuralNodeData    = 0x0010;
 
     //empty...
     private int type_               = type_empty;
@@ -41,6 +43,11 @@ public class PComponent {
     public PComponent(DataElement dataElement){
         this.dataElement_ = dataElement;
         this.type_ = this.type_ | type_dataElement; //binary or
+    }
+
+    public PComponent(StructuralNodeData structuralNodeData){
+        this.structuralNodeData_ = structuralNodeData;
+        this.type_ = this.type_ | type_structuralNodeData; //binary or
     }
 
     public boolean hasEdge(){
@@ -71,6 +78,13 @@ public class PComponent {
         return false;
     }
 
+    public boolean hasStructuralNodeData(){
+        if((type_ & type_structuralNodeData) == type_structuralNodeData){ //binary and
+            return true;
+        }
+        return false;
+    }
+
     public Edge getEdge(){
         return edge_;
     }
@@ -85,5 +99,9 @@ public class PComponent {
 
     public DataElement getDataElement(){
         return dataElement_;
+    }
+
+    public StructuralNodeData getStructuralNodeData(){
+        return structuralNodeData_;
     }
 }
