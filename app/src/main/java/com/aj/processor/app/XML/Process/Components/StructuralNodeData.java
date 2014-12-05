@@ -8,6 +8,8 @@ public class StructuralNodeData {
     private String id_ = null;
     private String type_ = null;
     private String topologicalID_ = null;
+    private String branchID_ = null;
+    private String splitNodeID_ = null;
     //more to follow...
 
 
@@ -15,6 +17,8 @@ public class StructuralNodeData {
     public static final int attribute_id                = 0x0001;
     public static final int attribute_type              = 0x0002;
     public static final int attribute_topological_ID    = 0x0004;
+    public static final int attribute_branch_ID         = 0x0008;
+    public static final int attribute_splitNode_ID      = 0x0010;
 
     //more to follow...
 
@@ -81,6 +85,44 @@ public class StructuralNodeData {
 
     public String getTopologicalID(){
         return topologicalID_;
+    }
+
+
+
+    //branchID stuff...
+    public void setBranchID(String branchID){
+        branchID_ = branchID;
+        this.attributes_ = this.attributes_ | attribute_branch_ID; //binary or
+    }
+
+    public boolean hasBranchID(){
+        if((attributes_ & attribute_branch_ID) == attribute_branch_ID){ //binary and
+            return true;
+        }
+        return false;
+    }
+
+    public String getBranchID(){
+        return branchID_;
+    }
+
+
+
+    //branchID stuff...
+    public void setSplitNodeID(String splitNodeID){
+        splitNodeID_ = splitNodeID;
+        this.attributes_ = this.attributes_ | attribute_splitNode_ID; //binary or
+    }
+
+    public boolean hasSplitNodeID(){
+        if((attributes_ & attribute_splitNode_ID) == attribute_splitNode_ID){ //binary and
+            return true;
+        }
+        return false;
+    }
+
+    public String getSplitNodeID(){
+        return splitNodeID_;
     }
 
 }

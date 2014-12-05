@@ -56,6 +56,31 @@ public class PComponent {
         this.type_ = this.type_ | type_structuralNodeData; //binary or
     }
 
+    public void addEdge(Edge edge){
+        this.edge_ = edge;
+        this.type_ = this.type_ | type_edge; //binary or
+    }
+
+    public void addDataEdge(DataEdge dataEdge){
+        this.dataEdge_ = dataEdge;
+        this.type_ = this.type_ | type_dataEdge; //binary or
+    }
+
+    public void addNode(Node node){
+        this.node_ = node;
+        this.type_ = this.type_ | type_node; //binary or
+    }
+
+    public void addDataElement(DataElement dataElement){
+        this.dataElement_ = dataElement;
+        this.type_ = this.type_ | type_dataElement; //binary or
+    }
+
+    public void addStructuralNodeData(StructuralNodeData structuralNodeData){
+        this.structuralNodeData_ = structuralNodeData;
+        this.type_ = this.type_ | type_structuralNodeData; //binary or
+    }
+
     public boolean hasEdge(){
         if((type_ & type_edge) == type_edge){ //binary and
             return true;

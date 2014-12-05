@@ -348,6 +348,8 @@ public class XMLParser {
         String structuralNodeData_nodeId = readStructuralNodeDataIDAttrib(parser);
         String structuralNodeData_type = null;
         String structuralNodeData_topologicalID = null;
+        String structuralNodeData_branchID = null;
+        String structuralNodeData_splitNodeID = null;
         Log.e("XMLParser","2");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -360,6 +362,12 @@ public class XMLParser {
             else if (name.equals("topologicalID")) {
                 structuralNodeData_topologicalID = readTopologicalID(parser);
             }
+            else if (name.equals("branchID")) {
+                structuralNodeData_branchID = readBranchID(parser);
+            }
+            else if (name.equals("splitNodeID")) {
+                structuralNodeData_splitNodeID = readSplitNodeID(parser);
+            }
             else {
                 skip(parser);
             }
@@ -369,6 +377,8 @@ public class XMLParser {
         StructuralNodeData snd = new StructuralNodeData(structuralNodeData_nodeId);
         snd.setType(structuralNodeData_type);
         snd.setTopologicalID(structuralNodeData_topologicalID);
+        snd.setBranchID(structuralNodeData_branchID);
+        snd.setSplitNodeID(structuralNodeData_splitNodeID);
         PComponent pc = new PComponent(snd);
         return pc;
     }
@@ -499,23 +509,37 @@ public class XMLParser {
 
     private String readEdgeType(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "edgeType");
-        String description = readText(parser);
+        String edgeType = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "edgeType");
-        return description;
+        return edgeType;
     }
 
     private String readDataEdgeType(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "dataEdgeType");
-        String description = readText(parser);
+        String dataEdgeType = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "dataEdgeType");
-        return description;
+        return dataEdgeType;
     }
 
     private String readTopologicalID(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "topologicalID");
-        String description = readText(parser);
+        String topologicalID = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "topologicalID");
-        return description;
+        return topologicalID;
+    }
+
+    private String readBranchID(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "branchID");
+        String branchID = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "branchID");
+        return branchID;
+    }
+
+    private String readSplitNodeID(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "splitNodeID");
+        String splitNodeID = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "splitNodeID");
+        return splitNodeID;
     }
 
     // For the tags title and summary, extracts their text values.

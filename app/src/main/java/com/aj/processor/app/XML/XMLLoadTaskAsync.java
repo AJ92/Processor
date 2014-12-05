@@ -25,7 +25,7 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
 
     //empty if not loaded...
     private List<PComponent> pcomp_list = new ArrayList<PComponent>();
-    private Process process = new Process();
+    private Process process = null;
 
     private final int type_network = 1;
     private final int type_assets = 2;
@@ -56,6 +56,7 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... urls) {
         Log.e("XMLLoadTaskAsync","threading...");
+        pcomp_list.clear();
         try {
             if(type == type_network) {
                 return loadXmlFromNetwork(urls[0]);
@@ -102,9 +103,8 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
         }
 
         //pack the pcomps into a process
-        for(PComponent pc : pcomps){
-            process.addPCcomponent(pc);
-        }
+        process = new Process(pcomps);
+
 
         return "loadXmlFromNetwork done.";
     }
@@ -130,9 +130,7 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
         }
 
         //pack the pcomps into a process
-        for(PComponent pc : pcomps){
-            process.addPCcomponent(pc);
-        }
+        process = new Process(pcomps);
 
 
         Log.e("XMLLoadTaskAsync","loadXmlFromAssets done?");
