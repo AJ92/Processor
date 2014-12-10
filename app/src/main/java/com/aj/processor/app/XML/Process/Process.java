@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.aj.processor.app.XML.Process.Components.Node;
 import com.aj.processor.app.XML.Process.Components.StructuralNodeData;
+import com.aj.processor.app.graphics.world.ObjectWorld;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class Process {
     //sorted by topologyID
     private List<PComponent> node_structuralNodeData_pc_sorted_ = new ArrayList<PComponent>();
 
-    //2 dimensional LIST
+    //multi dimensional LIST
     private ArrayList<Integer> branchID_ = new ArrayList<Integer>();
     private ArrayList<ArrayList<ArrayList<PComponent> > > branches_ = new ArrayList<ArrayList<ArrayList<PComponent> > >();
     private ArrayList<ArrayList<ArrayList<Integer> > > branches_next_branchID_ = new ArrayList<ArrayList<ArrayList<Integer> > >();
@@ -42,6 +43,70 @@ public class Process {
         generateSortedStructure();
     }
 
+    //called by openGL's render thread...
+    public void generate3dDataObjects(ObjectWorld ow){
+        //lets create the 3d data...
+
+
+
+    }
+
+    private int getBranchLength(int branchID){
+        int length = 0;
+
+        //first get the branchIndex from the branchID
+        int index = getBranchIDIndex(branchID);
+        if(index < 0){
+            return length;
+        }
+
+        //now check the branches for their length
+        //get the branch to start with
+        ArrayList<ArrayList<PComponent> > branch = branches_.get(index);
+        int branch_part_index = 0;
+        for(ArrayList<PComponent> branch_part : branch){
+            length += branch_part.size();
+            for(ArrayList<Integer> branch_next_branchID_part : branches_next_branchID_.get(index)){
+                length += getBranchLength(branch_next_branchID_part.get(branch_part_index).intValue());
+            }
+            branch_part_index += 1;
+        }
+        return length;
+    }
+
+    private int getBranchHeight(int branchID){
+        int height = 0;
+
+        //first get the branchIndex from the branchID
+        int index = getBranchIDIndex(branchID);
+        if(index < 0){
+            return height;
+        }
+
+        height = 1;
+
+        //now check the branches for their height
+        //get the branch to start with
+        ArrayList<ArrayList<Integer> > branch_next_branchID = branches_next_branchID_.get(index);
+        for(ArrayList<Integer> branch_next_branchID_part : branch_next_branchID){
+            int branches = 0;
+            int temp_height = 0;
+            for(Integer next_branchID : branch_next_branchID_part){
+                branches += 1;
+                temp_height = getBranchHeight(next_branchID.intValue());
+            }
+            if(temp_height > branches){
+                height = Math.max(height,temp_height);
+            }
+            else if(branches > 0){
+                height = branches;
+            }
+        }
+
+        return height;
+    }
+
+    //called in thread of async xmlparser
     private void generateSortedStructure(){
         ArrayList<PComponent>       nodes_pc = new ArrayList<PComponent>();
         ArrayList<PComponent>       structuralNodeData_pc = new ArrayList<PComponent>();
@@ -214,6 +279,17 @@ public class Process {
                             String splitNodeID = snd.getSplitNodeID();
                             PComponent splitNode = getPComponentByNodeID(splitNodeID);
 
+                            if(splitNode == null){
+                                Log.e(TAG,"splitNode is null !!! snd:splitNodeID:" + splitNodeID);
+
+                                if(first_pc.hasNode()){
+                                    if(first_pc.getNode().hasID()){
+                                        Log.e(TAG,"node:NodeID:" + first_pc.getNode().getID());
+                                    }
+                                }
+                                continue;
+                            }
+
                             //get the branchID and branchPartIndex of the splitNode
                             if(splitNode.hasStructuralNodeData()){
                                 StructuralNodeData snd_splitNode = splitNode.getStructuralNodeData();
@@ -250,7 +326,9 @@ public class Process {
 
 
         //final result
-                /*
+        /*
+
+
                      -
                     n50
                     n40
@@ -272,7 +350,9 @@ public class Process {
             <1,      9,     13,      /,     12,      /,     14,      />
              -       -       -       -       -       -       -       -
 
-         */
+
+
+        */
 
         Log.e(TAG, "generateSortedStructure() DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
@@ -328,10 +408,10 @@ public class Process {
         for(Integer index : branchID_){
             i += 1;
             if(index.intValue() == branchID){
-                break;
+                return i;
             }
         }
-        return i;
+        return -1;
     }
 
     public PComponent getPComponentByNodeID(String nodeID){

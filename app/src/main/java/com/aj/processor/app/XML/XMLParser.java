@@ -378,7 +378,9 @@ public class XMLParser {
         snd.setType(structuralNodeData_type);
         snd.setTopologicalID(structuralNodeData_topologicalID);
         snd.setBranchID(structuralNodeData_branchID);
-        snd.setSplitNodeID(structuralNodeData_splitNodeID);
+        if(structuralNodeData_splitNodeID!=null) {
+            snd.setSplitNodeID(structuralNodeData_splitNodeID);
+        }
         PComponent pc = new PComponent(snd);
         return pc;
     }

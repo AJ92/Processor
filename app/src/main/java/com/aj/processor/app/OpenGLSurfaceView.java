@@ -54,7 +54,7 @@ public class OpenGLSurfaceView extends GLSurfaceView {
 
     private int interactMode = rotMode;
 
-    private float max_scale = 8.0f;
+    private float max_scale = 64.0f;
     private float min_scale = 0.3f;
 
     @Override

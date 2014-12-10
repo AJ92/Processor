@@ -1,5 +1,8 @@
 package com.aj.processor.app.graphics.model;
 
+import com.aj.processor.app.mathematics.Vector.Vector3;
+import com.aj.processor.app.mathematics.Vector.Vector4;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -59,6 +62,28 @@ public class Line {
         color[1] = green;
         color[2] = blue;
         color[3] = alpha;
+
+        //see Mesh class for more details...
+        ByteBuffer bb = ByteBuffer.allocateDirect(
+                lineCoords.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        vertexBuffer = bb.asFloatBuffer();
+        vertexBuffer.put(lineCoords);
+        vertexBuffer.position(0);
+    }
+
+    public Line( Vector3 p1, Vector3 p2, Vector4 c){
+        lineCoords[0] = (float) p1.x();
+        lineCoords[1] = (float) p1.y();
+        lineCoords[2] = (float) p1.z();
+        lineCoords[3] = (float) p2.x();
+        lineCoords[4] = (float) p2.y();
+        lineCoords[5] = (float) p2.z();
+
+        color[0] = (float) c.x();
+        color[1] = (float) c.y();
+        color[2] = (float) c.z();
+        color[3] = (float) c.w();
 
         //see Mesh class for more details...
         ByteBuffer bb = ByteBuffer.allocateDirect(

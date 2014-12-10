@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<template xmlns="http://www.aristaflow.de/adept2/processmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="54fc804b-2956-47ab-9af9-43ac1796dd5b" version="16" xsi:schemaLocation="http://www.aristaflow.de/adept2/processmodel template.xsd http://www.w3.org/2000/09/xmldsig# xmldsig-core-schema.xsd">
+<name>Mum Screen Frage 20 linear</name>
+<description/>
+<processType/>
+<supervisorAgent>
+<agentID>-1</agentID>
+<agentName>supervisor</agentName>
+<orgPositionID>-1</orgPositionID>
+<orgPositionName>supervisor</orgPositionName>
+</supervisorAgent>
+<version/>
+<nodes>
+<node id="n0">
+<name>Start</name>
+<description/>
+<staffAssignmentRule/>
+<autoStart>false</autoStart>
+</node>
+<node id="n1">
+<name>End</name>
+<description/>
+<staffAssignmentRule/>
+<autoStart>false</autoStart>
+</node>
+<node id="n32">
+<name>Frage 19</name>
+<description>Eine Schwangerschaft ist eine große Veränderung. Dies wirkt sich auch auf die Partnerschaft aus.</description>
+<staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">SWTContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>true</isSuspensible>
+<isResettable>true</isResettable>
+<isClosable>true</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<parameterChangePolicy>GENERIC</parameterChangePolicy>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+</node>
+<node id="n33">
+<name>Frage 20</name>
+<description/>
+<staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">SWTContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>true</isSuspensible>
+<isResettable>true</isResettable>
+<isClosable>true</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<parameterChangePolicy>GENERIC</parameterChangePolicy>
+<outputParameters>
+<outputParameter>
+<name>alkohol</name>
+<description>Trinken Sie derzeit Alkohol, wie z.B. Wein, Sekt oder Bier?</description>
+<type>BOOLEAN</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">3</configurationEntry>
+</configuration>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
+</outputParameter>
+<outputParameter>
+<name>alkoholZahl</name>
+<description>Wenn ja: Wie viel Wein, Bier etc trinken Sie derzeit? (Bitte angeben ob pro Tag, Woche oder Monat)</description>
+<type>STRING</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">4</configurationEntry>
+</configuration>
+</outputParameter>
+<outputParameter>
+<name>drogen</name>
+<description>Nehmen sie derzeit Medikamente (z.B. Psychopharmaka) oder Drogen ein?</description>
+<type>BOOLEAN</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">5</configurationEntry>
+</configuration>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
+</outputParameter>
+<outputParameter>
+<name>drogenZahl</name>
+<description>Wenn ja: Welche Drogen/Medikamente nehmen Sie derzeit? Wie oft nehmen Sie diese Drogen/ Medikamente ein? (Keine Nahrungsergänzungsmittel und Schwangerschaftspräparate)</description>
+<type>STRING</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">6</configurationEntry>
+</configuration>
+</outputParameter>
+<outputParameter>
+<name>rauchen</name>
+<description>Rauchen sie derzeit?</description>
+<type>BOOLEAN</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">1</configurationEntry>
+</configuration>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
+</outputParameter>
+<outputParameter>
+<name>rauchenZahl</name>
+<description>Wenn ja, Wie viele pro Tag?</description>
+<type>INTEGER</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">2</configurationEntry>
+</configuration>
+</outputParameter>
+</outputParameters>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+<connectorParameterMappings>
+<connectorParameterMapping accessType="WRITE" connector="2" parameterName="alkohol"/>
+<connectorParameterMapping accessType="WRITE" connector="5" parameterName="alkoholZahl"/>
+<connectorParameterMapping accessType="WRITE" connector="0" parameterName="drogen"/>
+<connectorParameterMapping accessType="WRITE" connector="4" parameterName="drogenZahl"/>
+<connectorParameterMapping accessType="WRITE" connector="1" parameterName="rauchen"/>
+<connectorParameterMapping accessType="WRITE" connector="3" parameterName="rauchenZahl"/>
+</connectorParameterMappings>
+</node>
+<node id="n50">
+<name>Frage 21</name>
+<description>Wie verhält sich das bei Ihrem Partner?</description>
+<staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">SWTContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>true</isSuspensible>
+<isResettable>true</isResettable>
+<isClosable>true</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<parameterChangePolicy>GENERIC</parameterChangePolicy>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+</node>
+</nodes>
+<dataElements>
+<dataElement id="d41">
+<type>BOOLEAN</type>
+<name>drogen</name>
+<description>Nehmen sie derzeit Medikamente (z.B. Psychopharmaka) oder Drogen ein?</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d42">
+<type>BOOLEAN</type>
+<name>rauchen</name>
+<description>Rauchen sie derzeit?</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d43">
+<type>BOOLEAN</type>
+<name>alkohol</name>
+<description>Trinken Sie derzeit Alkohol, wie z.B. Wein, Sekt oder Bier?</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d44">
+<type>INTEGER</type>
+<name>rauchenZahl</name>
+<description>Wieviel Zigaretten rauchen sie pro Tag?</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d45">
+<type>STRING</type>
+<name>alkoholZahl</name>
+<description>Wie viel Wein, Bier etc trinken Sie derzeit? (Bitte angeben ob pro Tag, Woche oder Monat)</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d46">
+<type>STRING</type>
+<name>drogenZahl</name>
+<description>Welche Drogen / Medikamente nehmen Sie derzeit? Wie oft nehmen die diese Drogen / Medikamente ein? (Keine Nahrungsergänzungsmittel und Schwangerschaftspräparate)</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+</dataElements>
+<edges>
+<edge destinationNodeID="n1" edgeType="ET_CONTROL" sourceNodeID="n50">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n32" edgeType="ET_CONTROL" sourceNodeID="n0">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n33" edgeType="ET_CONTROL" sourceNodeID="n32">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n50" edgeType="ET_CONTROL" sourceNodeID="n33">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+</edges>
+<dataEdges>
+<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d41" nodeID="n33">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="1" dataEdgeType="WRITE" dataElementID="d42" nodeID="n33">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="2" dataEdgeType="WRITE" dataElementID="d43" nodeID="n33">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="3" dataEdgeType="WRITE" dataElementID="d44" nodeID="n33">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="4" dataEdgeType="WRITE" dataElementID="d46" nodeID="n33">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="5" dataEdgeType="WRITE" dataElementID="d45" nodeID="n33">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+</dataEdges>
+<startNode>n0</startNode>
+<endNode>n1</endNode>
+<structuralData>
+<structuralNodeData nodeID="n0">
+<type>NT_STARTFLOW</type>
+<topologicalID>0</topologicalID>
+<branchID>0</branchID>
+<correspondingBlockNodeID>n1</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n1">
+<type>NT_ENDFLOW</type>
+<topologicalID>4</topologicalID>
+<branchID>0</branchID>
+<correspondingBlockNodeID>n0</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n32">
+<type>NT_NORMAL</type>
+<topologicalID>1</topologicalID>
+<branchID>1</branchID>
+<splitNodeID>n0</splitNodeID>
+<correspondingBlockNodeID>n0</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n33">
+<type>NT_NORMAL</type>
+<topologicalID>2</topologicalID>
+<branchID>1</branchID>
+<splitNodeID>n0</splitNodeID>
+<correspondingBlockNodeID>n0</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n50">
+<type>NT_NORMAL</type>
+<topologicalID>3</topologicalID>
+<branchID>1</branchID>
+<splitNodeID>n0</splitNodeID>
+<correspondingBlockNodeID>n0</correspondingBlockNodeID>
+</structuralNodeData>
+</structuralData>
+<instanceNameTemplate/>
+</template>

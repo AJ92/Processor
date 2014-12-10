@@ -261,9 +261,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
             // render all objects in ObjectWorld ow!!!
             if (ow != null) {
 
-                GLES20.glEnableVertexAttribArray(locPositionSimple);
-                GLES20.glEnableVertexAttribArray(locTexCoordSimple);
-                GLES20.glEnableVertexAttribArray(locNormalSimple);
+
 
                 for (Trackable trackable : toRender) {
 
@@ -271,7 +269,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                     int x_pos = trackable.getX();
                     int y_pos = trackable.getY();
 
-                    Vector3 space_pos = space_pos = touch_to_space(default_cam, x_pos + (int) this.pos_x, y_pos + (int) this.pos_y);
+                    Vector3 space_pos = space_pos = touch_to_space(default_cam, x_pos, y_pos);
 
 
                     //scale the pos (move away from origin)
@@ -279,16 +277,24 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                     //move away from camera pos (the position we want to render our model at...)
                     Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
 
-                    default_cam.set_position(default_cam.getPosition().subtract(final_space_pos));
+                    default_cam.set_position(default_cam.getPosition()
+                            .subtract(final_space_pos)
+                            .add(new Vector3(-this.pos_x / 100.0, this.pos_y / 100.0, 0.0)));
 
 
                     v_m = default_cam.get_view_matrix();
                     pv_m = p_m.multiply(v_m);
 
-
-
                     if(ow.getStoreMode() == ObjectWorld.store_mode_simple) {
-                        for (CompositeObject co : ow.getCompositeObjects()) {
+
+
+
+
+                        //MODELS
+                        GLES20.glEnableVertexAttribArray(locPositionSimple);
+                        GLES20.glEnableVertexAttribArray(locTexCoordSimple);
+                        GLES20.glEnableVertexAttribArray(locNormalSimple);
+                        for (CompositeObject co : ow.getCompositeObjectsModels()) {
 
                             if (co.hasModel()) {
 
@@ -302,22 +308,36 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                                 drawModel(co.getModel());
                             }
                         }
+                        GLES20.glDisableVertexAttribArray(locPositionSimple);
+                        GLES20.glDisableVertexAttribArray(locTexCoordSimple);
+                        GLES20.glDisableVertexAttribArray(locNormalSimple);
+                        //MODELS DONE
+
+
+                        //LINES
+                        GLES20.glEnableVertexAttribArray(locPositionLine);
+                        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+                        for (CompositeObject co : ow.getCompositeObjectsModels()) {
+                            if (co.hasLine()) {
+                                Positation posi = co.getPositation();
+                                pvm_m = pv_m.multiply(posi.get_model_matrix());
+                                drawLine(co.getLine());
+                            }
+                        }
+                        GLES20.glDisableVertexAttribArray(locPositionLine);
+                        //LINES DONE
                     }
 
                 }
 
 
 
-                GLES20.glDisableVertexAttribArray(locPositionSimple);
-                GLES20.glDisableVertexAttribArray(locTexCoordSimple);
-                GLES20.glDisableVertexAttribArray(locNormalSimple);
-
             }
 
 
 
 
-            //      ------------------- line shader -----------------
+            //      ------------------- line shader only for gizmo atm-----------------
 
             GLES20.glEnableVertexAttribArray(locPositionLine);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
@@ -339,23 +359,10 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
 
             pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
 
-
             //gizmo
             drawLine(x_dir);
             drawLine(y_dir);
             drawLine(z_dir);
-
-
-            //render all lines
-
-            v_m = default_cam.get_view_matrix();
-            pv_m = p_m.multiply(v_m);
-            Positation default_posi = new Positation();
-            pvm_m = pv_m.multiply(default_posi.get_model_matrix());
-            for(Line line : lines){
-                drawLine(line);
-            }
-
 
             GLES20.glDisableVertexAttribArray(locPositionLine);
 
@@ -509,172 +516,6 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
     private void loadProcessIntoObjectWorld(Process p){
         //create the objects we need and connect them with lines and so on...
 
-
-        ArrayList<PComponent>       nodes_pc = new ArrayList<PComponent>();
-        ArrayList<PComponent>       structuralNodeData_pc = new ArrayList<PComponent>();
-
-        ArrayList<CompositeObject>  nodes_3d = new ArrayList<CompositeObject>();
-        ArrayList<CompositeObject>  nodes_3d_text1 = new ArrayList<CompositeObject>();
-
-        //sort out all NODES
-        for(PComponent pc : p.getPComponents()) {
-            if(pc.hasNode()){
-                nodes_pc.add(pc);
-            }
-        }
-
-        //sort in all structuralNodeDatas by NODE's ID
-        for(PComponent node : nodes_pc){
-            String node_id = node.getNode().getID();
-            //find the structuralDataNode by ID
-
-            PComponent structuralNodeData = null;
-
-            for(PComponent pc : p.getPComponents()){
-                if(pc.hasStructuralNodeData()){
-                    if(pc.getStructuralNodeData().getID().equalsIgnoreCase(node_id)){
-                        structuralNodeData = pc;
-                        break;
-                    }
-                }
-            }
-            //might contain null!!!
-            structuralNodeData_pc.add(structuralNodeData);
-        }
-
-
-        //TODO:
-        //need to modofy this... this is only working for linear processes...
-        //sort by topology...
-        PComponent nodes_pc_sorted[] = new PComponent[nodes_pc.size()];
-        PComponent structuralNodeData_pc_sorted[] = new PComponent[nodes_pc.size()];
-        for( int i = 0; i < structuralNodeData_pc.size(); i++){
-            PComponent snd_pc = structuralNodeData_pc.get(i);
-            if(snd_pc != null){
-                if(snd_pc.getStructuralNodeData().hasTopologicalID()){
-                    int topoID = Integer.parseInt(snd_pc.getStructuralNodeData().getTopologicalID());
-                    nodes_pc_sorted[topoID] = nodes_pc.get(i);
-                    structuralNodeData_pc_sorted[topoID] = snd_pc;
-                }
-            }
-
-        }
-
-
-
-
-        //now we know what type each node actually is...
-        //let's construct em
-        float pc_x_pos = 0.0f;
-        float pc_x_pos_mofifier = 2.0f;
-        for(int i=0; i < nodes_pc_sorted.length; i++ ){
-            Node n = nodes_pc_sorted[i].getNode();
-            PComponent snd_pc = structuralNodeData_pc_sorted[i];
-
-
-            CompositeObject loaded_node_3d = null;
-
-            //structuralNodaData might be null !!!
-            if(snd_pc != null){
-                StructuralNodeData snd = snd_pc.getStructuralNodeData();
-                if(snd.hasType()) {
-                    if(snd.getType().equalsIgnoreCase("NT_STARTFLOW")) {
-                        loaded_node_3d = ow.loadModelObject(
-                                n.getName(),
-                                "processComponents/Node/node_start.obj",
-                                true);
-                        Log.e(TAG, "LOADING MODEL...");
-                    }
-                    else if(snd.getType().equalsIgnoreCase("NT_ENDFLOW")) {
-                        loaded_node_3d = ow.loadModelObject(
-                                n.getName(),
-                                "processComponents/Node/node_end.obj",
-                                true);
-                        Log.e(TAG, "LOADING MODEL...");
-                    }
-                    else if(snd.getType().equalsIgnoreCase("NT_NORMAL")) {
-                        loaded_node_3d = ow.loadModelObject(
-                                n.getName(),
-                                "processComponents/Node/node_normal.obj",
-                                true);
-                        Log.e(TAG, "LOADING MODEL...");
-                    }
-                    else{
-                        loaded_node_3d = ow.loadModelObject(
-                                n.getName(),
-                                "processComponents/Node/node_normal.obj",
-                                true);
-                        Log.e(TAG, "LOADING MODEL...");
-                    }
-                }
-            }
-            else{
-                nodes_3d.add(ow.loadModelObject(
-                        n.getName(),
-                        "processComponents/Node/node_normal.obj",
-                        true));
-                Log.e(TAG, "LOADING MODEL...");
-            }
-
-            //move it
-            //TODO:
-            // ATM it is only linear.... make it dynamic for complex structures ...
-            if(loaded_node_3d != null){
-                loaded_node_3d.getPositation().set_position(pc_x_pos,0.0f,0.0f);
-            }
-            //add it
-            nodes_3d.add(loaded_node_3d);
-
-
-
-
-            //create the texts
-            CompositeObject loaded_text_3d = null;
-            if(n.hasName()){
-                loaded_text_3d = ow.loadModelObject("test_text","text_model.obj", false);
-                loaded_text_3d.getModel().get_meshs().get(0).get_material().setDiffuseText(
-                        "FF00FF_TEXT_BG.png",n.getName(),100.0f,255,255,255
-                );
-                Log.e(TAG, "LOADING MODEL...");
-            }
-            //move it
-            //TODO:
-            // ATM it is only linear.... make it dynamic for complex structures ...
-            if(loaded_text_3d != null){
-                loaded_text_3d.getPositation().set_position(pc_x_pos + 0.15f,0.0f,0.15f);
-                loaded_text_3d.getPositation().set_scale(0.5f,0.5f,0.5f);
-            }
-            //add it
-            nodes_3d_text1.add(loaded_text_3d);
-
-
-            pc_x_pos+= pc_x_pos_mofifier;
-
-        }
-
-
-
-
-        //simple line connection test...
-        for(int i = 0; i < nodes_3d.size()-1; i++){
-            lines.add(new Line(
-                    (float) nodes_3d.get(i).getPositation().getPosition().x(),
-                    (float) nodes_3d.get(i).getPositation().getPosition().y(),
-                    (float) nodes_3d.get(i).getPositation().getPosition().z(),
-                    (float) nodes_3d.get(i+1).getPositation().getPosition().x(),
-                    (float) nodes_3d.get(i+1).getPositation().getPosition().y(),
-                    (float) nodes_3d.get(i+1).getPositation().getPosition().z(),
-                    0.0f,1.0f,0.0f,1.0f
-            ));
-        }
-
-
-        /*
-        nodes_3d.add(ow.loadModelObject(
-                pc.getNode().getName(),
-                "processComponents/Node/",
-                true));
-        */
     }
 
     private void createBasicAssets(){
@@ -696,31 +537,37 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
         // add the renderer as listener so once xml and the process is ready we can
         //construct a 3D representation of it
         xmllta.addXMLProcessLoadedListener(this);
-        xmllta.retreiveXMLFromAssets("test.xml");
+        //xmllta.retreiveXMLFromAssets("test.xml");
+        xmllta.retreiveXMLFromAssets("frage20l.xml");
 
 
 
-/*
-        test_marker_co = ow.loadModelObject("box","box.obj", true);
-        test_marker_text_co = ow.loadModelObject("test_text","text_model.obj", false);
-        //crazy chain...
-        test_marker_text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
-                "FF00FF_TEXT_BG.png","Betty!",100.0f,0,255,0
-        );
+        for(int y = 0; y < 10; y++) {
+            for(int x = 0; x < 10; x++) {
+                test_marker_co = ow.loadModelObject("box", "box.obj", true);
+                test_marker_co.getPositation().set_position(x * 4.0,- y * 4.0, 0.0);
 
-        //move to the right
-        test_marker_text_co.getPositation().set_position(2.0f,0.0f,0.0f);
+                test_marker_text_co = ow.loadModelObject("test_text", "text_model.obj", false);
+                //crazy chain...
+                test_marker_text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
+                        "FF00FF_TEXT_BG.png", "Node", 100.0f, 0, 255, 0
+                );
 
-        //shadow
-        CompositeObject test_marker_text_co2 = ow.loadModelObject("test_text","text_model.obj", false);
-        //crazy chain...
-        test_marker_text_co2.getModel().get_meshs().get(0).get_material().setDiffuseText(
-                "FF00FF_TEXT_BG.png","Betty!",100.0f,0,0,0
-        );
+                //move to the right
+                test_marker_text_co.getPositation().set_position(0.5f + x * 4.0, 0.0f - y * 4.0, 1.02f);
 
-        //move to the right
-        test_marker_text_co2.getPositation().set_position(2.01f,0.01f,-0.01f);
-*/
+                //shadow
+                CompositeObject test_marker_text_co2 = ow.loadModelObject("test_text", "text_model.obj", false);
+                //crazy chain...
+                test_marker_text_co2.getModel().get_meshs().get(0).get_material().setDiffuseText(
+                        "FF00FF_TEXT_BG.png", "Node", 100.0f, 0, 0, 0
+                );
+
+                //move to the right
+                test_marker_text_co2.getPositation().set_position(0.51f + x * 4.0, 0.01f - y * 4.0, 1.01f);
+            }
+        }
+
 
         //gizmo
         x_dir = new Line(
@@ -740,6 +587,9 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                 0.0f,0.0f,0.5f,
                 0.0f,0.0f,1.0f,1.0f
         );
+
+
+        Log.e(TAG,"assets LOADED !!!");
 
     }
 

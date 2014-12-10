@@ -1,9 +1,12 @@
 package com.aj.processor.app.graphics.world;
 
+import com.aj.processor.app.graphics.model.Line;
 import com.aj.processor.app.graphics.model.Model;
 import com.aj.processor.app.graphics.model.ModelLoader;
 import com.aj.processor.app.graphics.object.CompositeObject;
 import com.aj.processor.app.graphics.object.Positation;
+import com.aj.processor.app.mathematics.Vector.Vector3;
+import com.aj.processor.app.mathematics.Vector.Vector4;
 
 import java.util.ArrayList;
 
@@ -45,7 +48,8 @@ public class ObjectWorld {
     private int store_mode = 0x0001;
 
     //lets use simple list for now...
-    ArrayList<CompositeObject> compositeObjects = new ArrayList<CompositeObject>();
+    ArrayList<CompositeObject> compositeObjects_Models = new ArrayList<CompositeObject>();
+    ArrayList<CompositeObject> compositeObjects_Lines = new ArrayList<CompositeObject>();
 
     public ObjectWorld(){
         ml = new ModelLoader();
@@ -63,6 +67,31 @@ public class ObjectWorld {
     public ObjectWorld(ModelLoader ml, int store_mode){
         this.store_mode = store_mode;
         this.ml = ml;
+    }
+
+    //dynamic (no position as argument)
+    public CompositeObject loadLineObject(String name, Vector3 p1, Vector3 p2, Vector4 color){
+        new Line(
+                0.0f,0.0f,0.0f,
+                0.5f,0.0f,0.0f,
+                1.0f,0.0f,0.0f,1.0f
+        );
+
+        //create new dynamic Composite Object
+        CompositeObject co = new CompositeObject(name,
+                CompositeObject.Object_Movement_Type_MovementDynamic);
+
+        //add Positation
+        Positation posi = new Positation();
+        co.setPositation(posi);
+
+        co.setLine(new Line(p1,p2,color));
+
+        //add the co to a list we can iterate trough later to render or what ever we want to do...
+        //this is the store_mode_simple case !!!
+        compositeObjects_Lines.add(co);
+
+        return co;
     }
 
     //dynamic (no position as argument)
@@ -84,7 +113,7 @@ public class ObjectWorld {
 
         //add the co to a list we can iterate trough later to render or what ever we want to do...
         //this is the store_mode_simple case !!!
-        compositeObjects.add(co);
+        compositeObjects_Models.add(co);
 
 
         return co;
@@ -93,8 +122,12 @@ public class ObjectWorld {
 
     //this is the store_mode_simple case !!!
     //but also awailable for all the complex modes too !!!
-    public ArrayList<CompositeObject> getCompositeObjects(){
-        return compositeObjects;
+    public ArrayList<CompositeObject> getCompositeObjectsModels(){
+        return compositeObjects_Models;
+    }
+
+    public ArrayList<CompositeObject> getCompositeObjectsLines(){
+        return compositeObjects_Lines;
     }
 
     //private functions...

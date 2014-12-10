@@ -1,6 +1,7 @@
 package com.aj.processor.app.graphics.object;
 
 import com.aj.processor.app.graphics.camera.Camera;
+import com.aj.processor.app.graphics.model.Line;
 import com.aj.processor.app.graphics.model.Model;
 import com.aj.processor.app.mathematics.Matrix.Matrix4x4;
 
@@ -27,6 +28,7 @@ public class CompositeObject {
     public final static int Object_Type_ObjectPhysics               = 0x0004;
     public final static int Object_Type_ObjectInput                 = 0x0008;
     public final static int Object_Type_ObjectLight                 = 0x0010;
+    public final static int Object_Type_ObjectLine              = 0x0020;
 
     public final static int Object_Type_ObjectCamera                = 0x0020;
 
@@ -42,9 +44,10 @@ public class CompositeObject {
     private int type_ = 0;          //Object_Type_ObjectEmpty
     private int movementType_ = 1;  //Object_Movement_Type_MovementDynamic
 
-    Model model_;
-    Camera camera_;
-    Positation positation_;
+    private Model model_;
+    private Line line_;
+    private Camera camera_;
+    private Positation positation_;
 
 
 
@@ -84,6 +87,24 @@ public class CompositeObject {
 
     public Model getModel(){
         return model_;
+    }
+
+
+    //stuff for Line
+    public void setLine(Line line){
+        line_ = line;
+        type_ = type_ | Object_Type_ObjectLine; //binary or
+    }
+
+    public boolean hasLine(){
+        if((type_ & Object_Type_ObjectLine) == Object_Type_ObjectLine){ //binary and
+            return true;
+        }
+        return false;
+    }
+
+    public Line getLine(){
+        return line_;
     }
 
 
