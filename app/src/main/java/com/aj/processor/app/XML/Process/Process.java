@@ -4,6 +4,7 @@ package com.aj.processor.app.XML.Process;
 
 import android.util.Log;
 
+import com.aj.processor.app.XML.Process.Components.Edge;
 import com.aj.processor.app.XML.Process.Components.Node;
 import com.aj.processor.app.XML.Process.Components.StructuralNodeData;
 import com.aj.processor.app.graphics.world.ObjectWorld;
@@ -30,17 +31,31 @@ public class Process {
 
     //sorted by topologyID
     private List<PComponent> node_structuralNodeData_pc_sorted_ = new ArrayList<PComponent>();
+    //corresponding following nodes
+    private ArrayList<ArrayList<PComponent> > next_nodes_pc_ = new ArrayList<ArrayList<PComponent> >();
 
+
+    private List<PComponent> edges_pc_unsorted_ = new ArrayList<PComponent>();
+
+
+
+
+
+
+
+
+//UNUSED
     //multi dimensional LIST
     private ArrayList<Integer> branchID_ = new ArrayList<Integer>();
     private ArrayList<ArrayList<ArrayList<PComponent> > > branches_ = new ArrayList<ArrayList<ArrayList<PComponent> > >();
     private ArrayList<ArrayList<ArrayList<Integer> > > branches_next_branchID_ = new ArrayList<ArrayList<ArrayList<Integer> > >();
-
+//UNUSED END
 
     //dummy constructor
     public Process(List<PComponent> pComponents){
         componentList_ = pComponents;
-        generateSortedStructure();
+        //generateSortedStructure();
+        generateSortedStructure_v2();
     }
 
     //called by openGL's render thread...
@@ -50,6 +65,205 @@ public class Process {
 
 
     }
+
+    private void generateSortedStructure_v2(){
+        ArrayList<PComponent>       nodes_pc = new ArrayList<PComponent>();
+        ArrayList<PComponent>       structuralNodeData_pc = new ArrayList<PComponent>();
+
+        //sort in all NODES
+        for(PComponent pc : componentList_) {
+            if(pc.hasNode()){
+                nodes_pc.add(pc);
+            }
+        }
+
+        //sort in all structuralNodeDatas by NODE's ID
+        for(PComponent node : nodes_pc){
+            String node_id = node.getNode().getID();
+            //find the structuralDataNode by ID
+
+            PComponent structuralNodeData = null;
+
+            for(PComponent pc : componentList_){
+                if(pc.hasStructuralNodeData()){
+                    if(pc.getStructuralNodeData().getID().equalsIgnoreCase(node_id)){
+                        structuralNodeData = pc;
+                        break;
+                    }
+                }
+            }
+            //might contain null!!! (xml specs probably forbid it but we check it later...)
+            structuralNodeData_pc.add(structuralNodeData);
+        }
+
+        //store them so we can ask later what node has which structural data and visa versa
+        nodes_pc_unsorted_ = nodes_pc;
+        structuralNodeData_pc_unsorted_ = structuralNodeData_pc;
+
+
+
+
+
+
+
+        //now sort it so we can build branches and stuff..
+        int sorted_nodes = 0;
+        int nodes_to_sort = nodes_pc_unsorted_.size();
+
+        int topology = 0;
+
+        while(sorted_nodes < nodes_to_sort) {
+            for (PComponent pc_snd : structuralNodeData_pc_unsorted_) {
+                if(pc_snd != null) {
+                    if (pc_snd.hasStructuralNodeData()) {
+                        StructuralNodeData snd = pc_snd.getStructuralNodeData();
+                        if (snd.hasTopologicalID()) {
+                            try {
+                                int topologicalID = Integer.parseInt(snd.getTopologicalID());
+                                if (topologicalID == topology) {
+                                    structuralNodeData_pc_sorted_.add(pc_snd);
+                                    nodes_pc_sorted_.add(getStructuralNodeDatasNode(pc_snd));
+                                    sorted_nodes += 1;
+                                }
+                            } catch (Exception e) {
+                                Log.e(TAG, "generateSortedStructure_v2()  StructuralNodeData's TopologicalID is a malformed integer...");
+                            }
+                        } else {
+                            Log.e(TAG, "generateSortedStructure_v2()  StructuralNodeData has no TopologicalID...");
+                        }
+                    } else {
+                        Log.e(TAG, "generateSortedStructure_v2()  StructuralNodeData PComponent does not contain any StructuralNodeData...");
+                    }
+                }
+                else {
+                    Log.e(TAG, "generateSortedStructure_v2()  StructuralNodeData PComponent is null...");
+                }
+            }
+            topology += 1;
+
+            //if we have not enough structuralNodeDatas we might encounter infinit loop...
+            if((nodes_to_sort * 3) < topology){
+                //if we have checked 3 times higher topological id than we actually have nodes
+                //we bail out
+                Log.e(TAG, "generateSortedStructure_v2()  found malformed Nodes, bailing out of sorting...");
+                break;
+            }
+
+        }
+
+
+
+        //lets join Nodes and StructuralNodeData
+        for(int i = 0; i < nodes_pc_sorted_.size(); i++){
+            PComponent n_snd = nodes_pc_sorted_.get(i);
+            n_snd.addStructuralNodeData(structuralNodeData_pc_sorted_.get(i).getStructuralNodeData());
+            node_structuralNodeData_pc_sorted_.add(n_snd);
+
+            //fill list with empty lists
+            next_nodes_pc_.add(new ArrayList<PComponent>());
+        }
+        //now PComponents in node_structuralNodeData_pc_sorted_ contain
+        // a Node and a StructuralNodeData
+
+        Log.e(TAG, "generateSortedStructure_v2()  pre sorted Nodes and structuralNodeDatas data ...");
+
+
+
+
+
+
+
+
+        //now sort out edges...
+        for(PComponent pc : componentList_){
+            if(pc.hasEdge()){
+                if(pc.getEdge() != null){
+                    edges_pc_unsorted_.add(pc);
+                }
+                else{
+                    Log.e(TAG, "generateSortedStructure_v2()  PComponent says it has an Edge but returns null ...");
+                }
+            }
+        }
+        //we have all edges...
+
+
+
+
+
+
+        //check if first node is startnode...
+        boolean has_start = false;
+        PComponent pc_start = node_structuralNodeData_pc_sorted_.get(0);
+        if(pc_start != null){
+            if(pc_start.hasStructuralNodeData()){
+                if(pc_start.getStructuralNodeData() != null){
+                    if(pc_start.getStructuralNodeData().hasType()){
+                        if(pc_start.getStructuralNodeData().getType() != null){
+                            if(pc_start.getStructuralNodeData().getType().equalsIgnoreCase("NT_STARTFLOW")){
+                                has_start = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(!has_start){
+            Log.e(TAG, "generateSortedStructure_v2()  no start node ...");
+            return;
+        }
+
+
+        //find the following nodes for the node_structuralNodeData_pc_sorted_ list
+        //next_nodes_pc_
+
+        int max_depth = 0;
+
+        int index_to_sort_in = 0;
+        for(PComponent pc : node_structuralNodeData_pc_sorted_){
+            //find following nodes for pc
+            if(pc.hasNode()){
+                if(pc.getNode() != null){
+                    String nodeID = pc.getNode().getID();
+                    //find following nodes for nodeID
+
+                    for(PComponent pc_edge : edges_pc_unsorted_){
+                        if(pc_edge.getEdge().getSourceNodeID().equalsIgnoreCase(nodeID)){
+                            max_depth += 1;
+
+                            //find the destinationID's node and sort it in...
+
+                            String destinationID = pc_edge.getEdge().getDestinationNodeID();
+
+                            for(PComponent pc_dest : node_structuralNodeData_pc_sorted_){
+                                if(pc_dest.hasNode()) {
+                                    if (pc_dest.getNode() != null) {
+                                        if(pc_dest.getNode().getID().equalsIgnoreCase(destinationID)){
+                                            next_nodes_pc_.get(index_to_sort_in).add(pc_dest);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+            index_to_sort_in += 1;
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+    //everything below is not needed...
 
     private int getBranchLength(int branchID){
         int length = 0;
