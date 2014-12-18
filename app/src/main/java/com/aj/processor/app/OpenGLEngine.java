@@ -317,7 +317,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                         //LINES
                         GLES20.glEnableVertexAttribArray(locPositionLine);
                         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-                        for (CompositeObject co : ow.getCompositeObjectsModels()) {
+                        for (CompositeObject co : ow.getCompositeObjectsLines()) {
                             if (co.hasLine()) {
                                 Positation posi = co.getPositation();
                                 pvm_m = pv_m.multiply(posi.get_model_matrix());
@@ -515,7 +515,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
 
     private void loadProcessIntoObjectWorld(Process p){
         //create the objects we need and connect them with lines and so on...
-
+        p.generate3dDataObjects_v3(ow);
     }
 
     private void createBasicAssets(){
@@ -538,10 +538,10 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
         //construct a 3D representation of it
         xmllta.addXMLProcessLoadedListener(this);
         //xmllta.retreiveXMLFromAssets("test.xml");
-        xmllta.retreiveXMLFromAssets("frage20l.xml");
+        xmllta.retreiveXMLFromAssets("frage20nl.xml");
 
 
-
+        /*
         for(int y = 0; y < 10; y++) {
             for(int x = 0; x < 10; x++) {
                 test_marker_co = ow.loadModelObject("box", "box.obj", true);
@@ -567,6 +567,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                 test_marker_text_co2.getPositation().set_position(0.51f + x * 4.0, 0.01f - y * 4.0, 1.01f);
             }
         }
+        */
 
 
         //gizmo

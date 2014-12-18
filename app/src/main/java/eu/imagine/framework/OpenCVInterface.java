@@ -113,7 +113,8 @@ public class OpenCVInterface implements CameraBridgeViewBase
     }
 
     public void onResume(Activity mainActivity) {
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_6, mainActivity,
+        //changed to 2_4_9 from 2_4_6
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_9, mainActivity,
                 mLoaderCallback);
     }
 

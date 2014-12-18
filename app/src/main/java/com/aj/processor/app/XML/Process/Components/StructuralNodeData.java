@@ -10,6 +10,7 @@ public class StructuralNodeData {
     private String topologicalID_ = null;
     private String branchID_ = null;
     private String splitNodeID_ = null;
+    private String correspondingBlockNodeID_ = null;
     //more to follow...
 
 
@@ -19,6 +20,7 @@ public class StructuralNodeData {
     public static final int attribute_topological_ID    = 0x0004;
     public static final int attribute_branch_ID         = 0x0008;
     public static final int attribute_splitNode_ID      = 0x0010;
+    public static final int attribute_correspondingBlockNode_ID      = 0x0020;
 
     //more to follow...
 
@@ -123,6 +125,25 @@ public class StructuralNodeData {
 
     public String getSplitNodeID(){
         return splitNodeID_;
+    }
+
+
+
+    //correspondingBlockNodeID_ stuff...
+    public void setCorrespondingBlockNodeID(String correspondingBlockNodeID){
+        correspondingBlockNodeID_ = correspondingBlockNodeID;
+        this.attributes_ = this.attributes_ | attribute_correspondingBlockNode_ID; //binary or
+    }
+
+    public boolean hasCorrespondingBlockNodeID(){
+        if((attributes_ & attribute_correspondingBlockNode_ID) == attribute_correspondingBlockNode_ID){ //binary and
+            return true;
+        }
+        return false;
+    }
+
+    public String getCorrespondingBlockNodeID(){
+        return correspondingBlockNodeID_;
     }
 
 }

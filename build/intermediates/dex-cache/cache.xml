@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<pre-dex-items>
+<items version="2" >
 
     <item
-        dex="C:\Users\AJ\Desktop\BA\build\Processor\app\build\intermediates\pre-dexed\debug\classes-e62c016e09fa4e3fb395cc12df2c9ae7fbb7e4d1.jar"
         jar="C:\Users\AJ\Desktop\BA\build\Processor\app\build\intermediates\exploded-aar\Processor\openCV\unspecified\classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="444abc795ae1dc2bc20f24bec0c0eb9c981ccd52"/>
+        sha1="66bd7568901d2d859c3cb1531c0607289cfa255f">
+        <dex dex="C:\Users\AJ\Desktop\BA\build\Processor\app\build\intermediates\pre-dexed\debug\classes-e62c016e09fa4e3fb395cc12df2c9ae7fbb7e4d1.jar" />
+    </item>
 
-</pre-dex-items>
+</items>

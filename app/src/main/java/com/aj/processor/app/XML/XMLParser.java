@@ -350,6 +350,7 @@ public class XMLParser {
         String structuralNodeData_topologicalID = null;
         String structuralNodeData_branchID = null;
         String structuralNodeData_splitNodeID = null;
+        String structuralNodeData_correspondingBlockNodeID = null;
         Log.e("XMLParser","2");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -368,6 +369,9 @@ public class XMLParser {
             else if (name.equals("splitNodeID")) {
                 structuralNodeData_splitNodeID = readSplitNodeID(parser);
             }
+            else if (name.equals("correspondingBlockNodeID")) {
+                structuralNodeData_correspondingBlockNodeID = readCorrespondingBlockNodeID(parser);
+            }
             else {
                 skip(parser);
             }
@@ -380,6 +384,9 @@ public class XMLParser {
         snd.setBranchID(structuralNodeData_branchID);
         if(structuralNodeData_splitNodeID!=null) {
             snd.setSplitNodeID(structuralNodeData_splitNodeID);
+        }
+        if(structuralNodeData_correspondingBlockNodeID!=null) {
+            snd.setCorrespondingBlockNodeID(structuralNodeData_correspondingBlockNodeID);
         }
         PComponent pc = new PComponent(snd);
         return pc;
@@ -542,6 +549,13 @@ public class XMLParser {
         String splitNodeID = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "splitNodeID");
         return splitNodeID;
+    }
+
+    private String readCorrespondingBlockNodeID(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "correspondingBlockNodeID");
+        String correspondingBlockNodeID = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "correspondingBlockNodeID");
+        return correspondingBlockNodeID;
     }
 
     // For the tags title and summary, extracts their text values.
