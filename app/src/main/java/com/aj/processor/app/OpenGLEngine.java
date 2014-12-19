@@ -515,7 +515,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
 
     private void loadProcessIntoObjectWorld(Process p){
         //create the objects we need and connect them with lines and so on...
-        p.generate3dDataObjects_v3(ow);
+        //p.generate3dDataObjects_v3(ow);
+        p.generate3dDataObjects_v4(ow);
     }
 
     private void createBasicAssets(){

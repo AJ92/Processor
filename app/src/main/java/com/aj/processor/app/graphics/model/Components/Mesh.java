@@ -177,7 +177,7 @@ public class Mesh {
 
         /*
         for(int i = 0; i < texcoords.length; i+=3){
-            Log.e(TAG, "texcoord: " + texcoords[i] + " " + texcoords[i+1] + " " + texcoords[i+2]);
+            Debugger.warning(TAG, "texcoord: " + texcoords[i] + " " + texcoords[i+1] + " " + texcoords[i+2]);
         }
         */
 

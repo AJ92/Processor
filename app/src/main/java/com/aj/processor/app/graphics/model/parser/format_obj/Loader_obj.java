@@ -3,6 +3,7 @@ package com.aj.processor.app.graphics.model.parser.format_obj;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+import com.aj.processor.app.Debugger;
 import com.aj.processor.app.graphics.model.Components.Material;
 import com.aj.processor.app.graphics.model.Components.Mesh;
 import com.aj.processor.app.graphics.model.Model;
@@ -60,11 +61,11 @@ public class Loader_obj {
     //mdl is a reference...
     public boolean load_model_data(Model mdl, String path){
 
-        Log.e(TAG,"Model import: started.");
+        Debugger.warning(TAG,"Model import: started.");
 
         String pathlist[] = path.split(Pattern.quote(File.separator)); //KeepEmptyParts
         String model_name = pathlist[pathlist.length-1];
-        Log.e(TAG,"Model import: ModelName: " + model_name);
+        Debugger.warning(TAG,"Model import: ModelName: " + model_name);
 
         //LOAD MESH DATA
         AssetManager am = GlobalContext.getAppContext().getAssets();
@@ -73,18 +74,18 @@ public class Loader_obj {
             is = am.open(path);
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Model import: Error 1: InputStream could not be initialized...");
+            Debugger.warning(TAG,"Model import: Error 1: InputStream could not be initialized...");
             return false;
         }
         InputStreamReader isr = new InputStreamReader(is);
         try {
             if(!isr.ready()){
-                Log.e(TAG,"Model import: Error 2: InputStreamReader could not be initialized...");
+                Debugger.warning(TAG,"Model import: Error 2: InputStreamReader could not be initialized...");
                 return false;
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Model import: Error 2: InputStreamReader could not be initialized...");
+            Debugger.warning(TAG,"Model import: Error 2: InputStreamReader could not be initialized...");
             return false;
         }
         BufferedReader file= new BufferedReader(isr);
@@ -93,12 +94,12 @@ public class Loader_obj {
         try {
             if (!file.ready())
             {
-                Log.e(TAG,"Model import: Error 3: Model file could not be loaded...");
+                Debugger.warning(TAG,"Model import: Error 3: Model file could not be loaded...");
                 return false;
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Model import: Error 3: Model file could not be loaded...");
+            Debugger.warning(TAG,"Model import: Error 3: Model file could not be loaded...");
             return false;
         }
 
@@ -122,7 +123,7 @@ public class Loader_obj {
                 line = file.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e(TAG,"Model import: Error 4: Model file line could not be read...");
+                Debugger.warning(TAG,"Model import: Error 4: Model file line could not be read...");
                 return false;
             }
             //end of file...
@@ -190,7 +191,7 @@ public class Loader_obj {
             file.close();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Model import: Error 5: Model file could not be closed...");
+            Debugger.warning(TAG,"Model import: Error 5: Model file could not be closed...");
             return false;
         }
 
@@ -224,18 +225,18 @@ public class Loader_obj {
             ismtl = am.open(mtl_path);
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Model import: Error 6: InputStreamcould not be initialized...");
+            Debugger.warning(TAG, "Model import: Error 6: InputStreamcould not be initialized...");
             return false;
         }
         InputStreamReader isrmtl = new InputStreamReader(ismtl);
         try {
             if(!isrmtl.ready()){
-                Log.e(TAG,"Model import: Error 7: InputStreamReader could not be initialized...");
+                Debugger.warning(TAG,"Model import: Error 7: InputStreamReader could not be initialized...");
                 return false;
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Model import: Error 7: InputStreamReader could not be initialized...");
+            Debugger.warning(TAG,"Model import: Error 7: InputStreamReader could not be initialized...");
             return false;
         }
         BufferedReader filemtl = new BufferedReader(isrmtl);
@@ -244,12 +245,12 @@ public class Loader_obj {
         try {
             if (!filemtl.ready())
             {
-                Log.e(TAG,"Model import: Error 8: Model mtl file could not be loaded...");
+                Debugger.warning(TAG,"Model import: Error 8: Model mtl file could not be loaded...");
                 return false;
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Model import: Error 8: Model mtl file could not be loaded...");
+            Debugger.warning(TAG,"Model import: Error 8: Model mtl file could not be loaded...");
             return false;
         }
 
@@ -280,7 +281,7 @@ public class Loader_obj {
                 mtlline = filemtl.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e(TAG,"Model import: Error 9: Model mtl file line could not be read...");
+                Debugger.warning(TAG,"Model import: Error 9: Model mtl file line could not be read...");
                 return false;
             }
             //end of file...
@@ -381,7 +382,7 @@ public class Loader_obj {
             filemtl.close();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG,"Model import: Error 10: Model mtl file could not be closed...");
+            Debugger.warning(TAG,"Model import: Error 10: Model mtl file could not be closed...");
             return false;
         }
 
@@ -417,19 +418,19 @@ public class Loader_obj {
             //maps
             if(mtl_ambient_map.containsKey(mtl_map_index)) {
                 mtl.set_ambient_map_name(mtl_ambient_map.get(mtl_map_index));
-                Log.e(TAG,"Model import: ambient map:" + mtl.get_ambient_map_name());
+                Debugger.warning(TAG,"Model import: ambient map:" + mtl.get_ambient_map_name());
             }
             if(mtl_diffuse_map.containsKey(mtl_map_index)) {
                 mtl.set_diffuse_map_name(mtl_diffuse_map.get(mtl_map_index));
-                Log.e(TAG,"Model import: diffuse map:" + mtl.get_diffuse_map_name());
+                Debugger.warning(TAG,"Model import: diffuse map:" + mtl.get_diffuse_map_name());
             }
             if(mtl_specular_map.containsKey(mtl_map_index)) {
                 mtl.set_specular_map_name(mtl_specular_map.get(mtl_map_index));
-                Log.e(TAG,"Model import: specular map:" + mtl.get_specular_map_name());
+                Debugger.warning(TAG,"Model import: specular map:" + mtl.get_specular_map_name());
             }
             if(mtl_bump_map.containsKey(mtl_map_index)) {
                 mtl.set_bump_map_name(mtl_bump_map.get(mtl_map_index));
-                Log.e(TAG,"Model import: bump map:" + mtl.get_bump_map_name());
+                Debugger.warning(TAG,"Model import: bump map:" + mtl.get_bump_map_name());
             }
 
             //illuminate ?
@@ -446,7 +447,7 @@ public class Loader_obj {
             mtl->load_bump_map(tex_path + mtl_bump_map[mtl_names.value(i)]);
             */
 
-            Log.e(TAG,"Model import: TEXTURE PATH: " + tex_path);
+            Debugger.warning(TAG,"Model import: TEXTURE PATH: " + tex_path);
 
             mtl.set_ambient_map_path(tex_path + mtl_ambient_map.get(mtl_map_index));
             mtl.set_diffuse_map_path(tex_path + mtl_diffuse_map.get(mtl_map_index));
@@ -622,7 +623,7 @@ public class Loader_obj {
 
         mdl.set_path(path);
 
-        Log.e(TAG,"Model import: done.");
+        Debugger.warning(TAG,"Model import: done.");
 
         return true;
     }

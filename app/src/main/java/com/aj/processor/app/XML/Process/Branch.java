@@ -8,6 +8,9 @@ import java.util.ArrayList;
 public class Branch {
 
 
+    private static int branchID = 0;
+    private int myBranchID = 0;
+
     ArrayList<PComponent> elements = new ArrayList<PComponent>();
     ArrayList<Branch> branches = new ArrayList<Branch>();
 
@@ -16,7 +19,12 @@ public class Branch {
     private int branchCount = 0;
 
     public Branch(){
+        Branch.branchID += 1;
+        myBranchID = Branch.branchID;
+    }
 
+    public int getBranchID(){
+        return myBranchID;
     }
 
     public void addElement(PComponent pc){
@@ -79,6 +87,11 @@ public class Branch {
     //distance from root
     private int distance = 0;
 
+    //how far is this branch away from the first branch (in terms of splits)
+    private int branchLevel = 0;
+
+
+
     public int getDepth(){
         return depth;
     }
@@ -119,5 +132,25 @@ public class Branch {
         overlapping_branches = count;
     }
 
+    public int getBranchLevel(){
+        return branchLevel;
+    }
+
+    public void setBranchLevel(int lvl){
+        branchLevel = lvl;
+    }
+
+    public int getBranchCountInTREE(Branch b){
+        int count = 0;
+
+        if(this.getBranchID() == b.getBranchID()){
+            return 1;
+        }
+
+        for(Branch b2 : branches){
+            count += b2.getBranchCountInTREE(b);
+        }
+        return count;
+    }
 
 }

@@ -3,6 +3,7 @@ package com.aj.processor.app.XML;
 import android.util.Log;
 import android.util.Xml;
 
+import com.aj.processor.app.Debugger;
 import com.aj.processor.app.XML.Process.Components.DataEdge;
 import com.aj.processor.app.XML.Process.Components.DataElement;
 import com.aj.processor.app.XML.Process.Components.Edge;
@@ -28,7 +29,7 @@ public class XMLParser {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
             parser.nextTag();
-            Log.e("XMLParser","parse");
+            Debugger.warning("XMLParser", "parse");
             return readProcess(parser);
         }
         finally {
@@ -50,7 +51,7 @@ public class XMLParser {
             // Starts by looking for the entry tag
             if (tag.equals("nodes")) {
 
-                Log.e("XMLParser","nodes");
+                Debugger.warning("XMLParser","nodes");
 
                 List<PComponent> nodes = readNodes(parser);
                 for(PComponent pc: nodes){
@@ -58,7 +59,7 @@ public class XMLParser {
                 }
             }
             else if(tag.equals("dataElements")){
-                Log.e("XMLParser","dataElements");
+                Debugger.warning("XMLParser","dataElements");
 
                 List<PComponent> dataElements = readDataElements(parser);
                 for(PComponent pc: dataElements){
@@ -66,7 +67,7 @@ public class XMLParser {
                 }
             }
             else if(tag.equals("edges")){
-                Log.e("XMLParser","edges");
+                Debugger.warning("XMLParser","edges");
 
                 List<PComponent> edges = readEdges(parser);
                 for(PComponent pc: edges){
@@ -74,7 +75,7 @@ public class XMLParser {
                 }
             }
             else if(tag.equals("dataEdges")){
-                Log.e("XMLParser","dataEdges");
+                Debugger.warning("XMLParser","dataEdges");
 
                 List<PComponent> dataEdges = readDataEdges(parser);
                 for(PComponent pc: dataEdges){
@@ -82,7 +83,7 @@ public class XMLParser {
                 }
             }
             else if(tag.equals("structuralData")){
-                Log.e("XMLParser","structuralData");
+                Debugger.warning("XMLParser","structuralData");
 
                 List<PComponent> dataEdges = readStructuralNodeDatas(parser);
                 for(PComponent pc: dataEdges){
@@ -94,13 +95,13 @@ public class XMLParser {
             }
         }
 
-        Log.e("XMLParser","parse done.");
+        Debugger.warning("XMLParser","parse done.");
 
         //temporary log output...
         for(PComponent p : pcomps){
-            Log.e("XMLParser:","PComponent...");
+            Debugger.warning("XMLParser:","PComponent...");
             if(p.hasNode())
-                Log.e("XMLParser:","Node: " + p.getNode().getName());
+                Debugger.warning("XMLParser:","Node: " + p.getNode().getName());
         }
 
         return pcomps;
@@ -117,7 +118,7 @@ public class XMLParser {
             }
             String name = parser.getName();
             if (name.equals("node")) {
-                Log.e("XMLParser","node");
+                Debugger.warning("XMLParser","node");
                 PComponent pc = readNode(parser);
                 pcomps.add(pc);
             }
@@ -129,12 +130,12 @@ public class XMLParser {
     }
 
     private PComponent readNode(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","1");
+        Debugger.warning("XMLParser","1");
         parser.require(XmlPullParser.START_TAG, ns, "node");
         String node_id = readNodeIDAttrib(parser);
         String node_name = null;
         String node_description = null;
-        Log.e("XMLParser","2");
+        Debugger.warning("XMLParser","2");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -149,9 +150,9 @@ public class XMLParser {
             else {
                 skip(parser);
             }
-            Log.e("XMLParser","...");
+            Debugger.warning("XMLParser","...");
         }
-        Log.e("XMLParser","3");
+        Debugger.warning("XMLParser","3");
         Node n = new Node(node_id);
         n.setName(node_name);
         n.setDescription(node_description);
@@ -175,7 +176,7 @@ public class XMLParser {
             }
             String name = parser.getName();
             if (name.equals("dataElement")) {
-                Log.e("XMLParser","dataElement");
+                Debugger.warning("XMLParser","dataElement");
                 PComponent pc = readDataElement(parser);
                 pcomps.add(pc);
             }
@@ -187,13 +188,13 @@ public class XMLParser {
     }
 
     private PComponent readDataElement(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","1");
+        Debugger.warning("XMLParser","1");
         parser.require(XmlPullParser.START_TAG, ns, "dataElement");
         String dataElement_id = readDataElementIDAttrib(parser);
         String dataElement_type = null;
         String dataElement_name = null;
         String dataElement_description = null;
-        Log.e("XMLParser","2");
+        Debugger.warning("XMLParser","2");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -211,9 +212,9 @@ public class XMLParser {
             else {
                 skip(parser);
             }
-            Log.e("XMLParser","...");
+            Debugger.warning("XMLParser","...");
         }
-        Log.e("XMLParser","3");
+        Debugger.warning("XMLParser","3");
         DataElement de = new DataElement(dataElement_id);
         de.setType(dataElement_type);
         de.setName(dataElement_name);
@@ -235,7 +236,7 @@ public class XMLParser {
             }
             String name = parser.getName();
             if (name.equals("edge")) {
-                Log.e("XMLParser","edge");
+                Debugger.warning("XMLParser","edge");
                 PComponent pc = readEdge(parser);
                 pcomps.add(pc);
             }
@@ -247,12 +248,12 @@ public class XMLParser {
     }
 
     private PComponent readEdge(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","1");
+        Debugger.warning("XMLParser","1");
         parser.require(XmlPullParser.START_TAG, ns, "edge");
         String edge_destinationId = readEdgeDestinationNodeIDAttrib(parser);
         String edge_edgeType = readEdgeTypeAttrib(parser);
         String edge_sourceId = readEdgeSourceNodeIDAttrib(parser);
-        Log.e("XMLParser","2");
+        Debugger.warning("XMLParser","2");
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -261,10 +262,10 @@ public class XMLParser {
 
             skip(parser);
 
-            Log.e("XMLParser","...");
+            Debugger.warning("XMLParser","...");
         }
 
-        Log.e("XMLParser","3");
+        Debugger.warning("XMLParser","3");
         Edge e = new Edge(edge_destinationId,edge_sourceId,edge_edgeType);
         PComponent pc = new PComponent(e);
         return pc;
@@ -282,7 +283,7 @@ public class XMLParser {
             }
             String name = parser.getName();
             if (name.equals("dataEdge")) {
-                Log.e("XMLParser","dataEdge");
+                Debugger.warning("XMLParser","dataEdge");
                 PComponent pc = readDataEdge(parser);
                 pcomps.add(pc);
             }
@@ -294,23 +295,23 @@ public class XMLParser {
     }
 
     private PComponent readDataEdge(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","1");
+        Debugger.warning("XMLParser","1");
         parser.require(XmlPullParser.START_TAG, ns, "dataEdge");
         String dataEdge_connectorId = readDataEdgeConnectorIDAttrib(parser);
         String dataEdge_dataEdgeType = readDataEdgeTypeAttrib(parser);
         String dataEdge_dataElementID = readDataEdgeDataElementIDAttrib(parser);
         String dataEdge_nodeID = readDataEdgeNodeIDAttrib(parser);
-        Log.e("XMLParser","2");
+        Debugger.warning("XMLParser","2");
 
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             skip(parser);
-            Log.e("XMLParser","...");
+            Debugger.warning("XMLParser","...");
         }
 
-        Log.e("XMLParser","3");
+        Debugger.warning("XMLParser","3");
         DataEdge de = new DataEdge(dataEdge_connectorId,
                 dataEdge_dataEdgeType,
                 dataEdge_dataElementID,
@@ -331,7 +332,7 @@ public class XMLParser {
             }
             String name = parser.getName();
             if (name.equals("structuralNodeData")) {
-                Log.e("XMLParser","structuralNodeData");
+                Debugger.warning("XMLParser","structuralNodeData");
                 PComponent pc = readStructuralNodeData(parser);
                 pcomps.add(pc);
             }
@@ -343,7 +344,7 @@ public class XMLParser {
     }
 
     private PComponent readStructuralNodeData(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","1");
+        Debugger.warning("XMLParser","1");
         parser.require(XmlPullParser.START_TAG, ns, "structuralNodeData");
         String structuralNodeData_nodeId = readStructuralNodeDataIDAttrib(parser);
         String structuralNodeData_type = null;
@@ -351,7 +352,7 @@ public class XMLParser {
         String structuralNodeData_branchID = null;
         String structuralNodeData_splitNodeID = null;
         String structuralNodeData_correspondingBlockNodeID = null;
-        Log.e("XMLParser","2");
+        Debugger.warning("XMLParser","2");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -375,9 +376,9 @@ public class XMLParser {
             else {
                 skip(parser);
             }
-            Log.e("XMLParser","...");
+            Debugger.warning("XMLParser","...");
         }
-        Log.e("XMLParser","3");
+        Debugger.warning("XMLParser","3");
         StructuralNodeData snd = new StructuralNodeData(structuralNodeData_nodeId);
         snd.setType(structuralNodeData_type);
         snd.setTopologicalID(structuralNodeData_topologicalID);
@@ -403,83 +404,83 @@ public class XMLParser {
     //can't reuse the ID function... checking for correct tag!!!
 
     private String readNodeIDAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readNodeIDAttrib");
+        Debugger.warning("XMLParser","readNodeIDAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "node");
         String nodeID = parser.getAttributeValue(null, "id");
-        Log.e("XMLParser","readNodeIDAttrib done!");
+        Debugger.warning("XMLParser","readNodeIDAttrib done!");
         return nodeID;
     }
 
     private String readDataElementIDAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readDataElementIDAttrib");
+        Debugger.warning("XMLParser","readDataElementIDAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "dataElement");
         String dataElementID = parser.getAttributeValue(null, "id");
-        Log.e("XMLParser","readDataElementIDAttrib done!");
+        Debugger.warning("XMLParser","readDataElementIDAttrib done!");
         return dataElementID;
     }
 
 
     private String readEdgeDestinationNodeIDAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readEdgeDestinationNodeIDAttrib");
+        Debugger.warning("XMLParser","readEdgeDestinationNodeIDAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "edge");
         String edgeDestinationNodeID = parser.getAttributeValue(null, "destinationNodeID");
-        Log.e("XMLParser","readEdgeDestinationNodeIDAttrib done!");
+        Debugger.warning("XMLParser","readEdgeDestinationNodeIDAttrib done!");
         return edgeDestinationNodeID;
     }
 
     private String readEdgeSourceNodeIDAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readEdgeSourceNodeIDAttrib");
+        Debugger.warning("XMLParser","readEdgeSourceNodeIDAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "edge");
         String edgeSourceNodeID = parser.getAttributeValue(null, "sourceNodeID");
-        Log.e("XMLParser","readEdgeSourceNodeIDAttrib done!");
+        Debugger.warning("XMLParser","readEdgeSourceNodeIDAttrib done!");
         return edgeSourceNodeID;
     }
 
     private String readEdgeTypeAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readEdgeTypeAttrib");
+        Debugger.warning("XMLParser","readEdgeTypeAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "edge");
         String edgeTypeAttrib = parser.getAttributeValue(null, "edgeType");
-        Log.e("XMLParser","readEdgeTypeAttribute done!");
+        Debugger.warning("XMLParser","readEdgeTypeAttribute done!");
         return edgeTypeAttrib;
     }
 
     private String readDataEdgeTypeAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readDataEdgeTypeAttrib");
+        Debugger.warning("XMLParser","readDataEdgeTypeAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "dataEdge");
         String dataEdgeTypeAttrib = parser.getAttributeValue(null, "dataEdgeType");
-        Log.e("XMLParser","readDataEdgeTypeAttrib done!");
+        Debugger.warning("XMLParser","readDataEdgeTypeAttrib done!");
         return dataEdgeTypeAttrib;
     }
 
     private String readDataEdgeConnectorIDAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readDataEdgeconnectorIDAttrib");
+        Debugger.warning("XMLParser","readDataEdgeconnectorIDAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "dataEdge");
         String dataEdgeConnectorIDAttrib = parser.getAttributeValue(null, "connectorID");
-        Log.e("XMLParser","readDataEdgeconnectorIDAttrib done!");
+        Debugger.warning("XMLParser","readDataEdgeconnectorIDAttrib done!");
         return dataEdgeConnectorIDAttrib;
     }
 
     private String readDataEdgeDataElementIDAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readDataEdgeDataElementIDAttrib");
+        Debugger.warning("XMLParser","readDataEdgeDataElementIDAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "dataEdge");
         String dataEdgeDataElementIDAttrib = parser.getAttributeValue(null, "dataElementID");
-        Log.e("XMLParser","readDataEdgeDataElementIDAttrib done!");
+        Debugger.warning("XMLParser","readDataEdgeDataElementIDAttrib done!");
         return dataEdgeDataElementIDAttrib;
     }
 
     private String readDataEdgeNodeIDAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readDataEdgeNodeIDAttrib");
+        Debugger.warning("XMLParser","readDataEdgeNodeIDAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "dataEdge");
         String dataEdgeNodeIDAttrib = parser.getAttributeValue(null, "nodeID");
-        Log.e("XMLParser","readDataEdgeNodeIDAttrib done!");
+        Debugger.warning("XMLParser","readDataEdgeNodeIDAttrib done!");
         return dataEdgeNodeIDAttrib;
     }
 
     private String readStructuralNodeDataIDAttrib(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.e("XMLParser","readStructuralNodeDataIDAttrib");
+        Debugger.warning("XMLParser","readStructuralNodeDataIDAttrib");
         parser.require(XmlPullParser.START_TAG, ns, "structuralNodeData");
         String structuralNodeDataIDAttrib = parser.getAttributeValue(null, "nodeID");
-        Log.e("XMLParser","readStructuralNodeDataIDAttrib done!");
+        Debugger.warning("XMLParser","readStructuralNodeDataIDAttrib done!");
         return structuralNodeDataIDAttrib;
     }
 

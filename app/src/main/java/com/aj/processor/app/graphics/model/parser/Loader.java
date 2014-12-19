@@ -2,6 +2,7 @@ package com.aj.processor.app.graphics.model.parser;
 
 import android.util.Log;
 
+import com.aj.processor.app.Debugger;
 import com.aj.processor.app.graphics.model.Model;
 import com.aj.processor.app.graphics.model.parser.format_obj.Loader_obj;
 
@@ -21,7 +22,7 @@ public class Loader {
 
     public Model import_model(String path){
 
-        Log.e("Loader", path);
+        Debugger.warning("Loader", path);
 
         String pathlist[] = path.split("\\.");
 
@@ -37,7 +38,7 @@ public class Loader {
             }
         }
 
-        Log.e("Loader", "is not a supported file extension...");
+        Debugger.warning("Loader", "is not a supported file extension...");
 
         //qDebug("no suitable format detected...");
         return new Model();

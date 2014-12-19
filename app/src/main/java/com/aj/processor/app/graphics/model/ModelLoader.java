@@ -2,6 +2,7 @@ package com.aj.processor.app.graphics.model;
 
 import android.util.Log;
 
+import com.aj.processor.app.Debugger;
 import com.aj.processor.app.graphics.model.parser.Loader;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class ModelLoader {
         //we check if we have the path of the to be loaded model in the
         //unique_models_path_list...
 
-        Log.e("ModelLoader",m.get_path());
+        Debugger.warning("ModelLoader", m.get_path());
 
 
         int index = containsPath(m.get_path());

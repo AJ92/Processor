@@ -3,6 +3,7 @@ package com.aj.processor.app.graphics.model;
 
 import android.util.Log;
 
+import com.aj.processor.app.Debugger;
 import com.aj.processor.app.graphics.model.Components.Material;
 import com.aj.processor.app.graphics.model.Components.Mesh;
 import com.aj.processor.app.mathematics.Vector.Vector3;
@@ -79,7 +80,7 @@ public class Model {
                 }
             }
             else{
-                Log.e(TAG,"mtl is missing for mesh: " + mesh.get_name());
+                Debugger.warning(TAG, "mtl is missing for mesh: " + mesh.get_name());
             }
             if(!mesh.isLoaded()){
                 mesh.loadGLdata();

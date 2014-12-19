@@ -11,6 +11,7 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
 
+import com.aj.processor.app.Debugger;
 import com.aj.processor.app.GlobalContext;
 import com.aj.processor.app.mathematics.Vector.Vector3;
 
@@ -120,7 +121,7 @@ public class Material {
             int gl_map[] = new int[1];
             GLES20.glGenTextures(1, gl_map, 0);
             if(gl_map[0] == 0){
-                Log.e(TAG, "ambient_map slot could not be generated");
+                Debugger.warning(TAG, "ambient_map slot could not be generated");
             }
             gl_ambient_map = gl_map[0];
         }
@@ -130,7 +131,7 @@ public class Material {
             int gl_map[] = new int[1];
             GLES20.glGenTextures(1, gl_map, 0);
             if(gl_map[0] == 0){
-                Log.e(TAG, "diffuse_map slot could not be generated");
+                Debugger.warning(TAG, "diffuse_map slot could not be generated");
             }
             gl_diffuse_map = gl_map[0];
         }
@@ -140,7 +141,7 @@ public class Material {
             int gl_map[] = new int[1];
             GLES20.glGenTextures(1, gl_map, 0);
             if(gl_map[0] == 0){
-                Log.e(TAG, "specular_map slot could not be generated");
+                Debugger.warning(TAG, "specular_map slot could not be generated");
             }
             gl_specular_map = gl_map[0];
         }
@@ -150,7 +151,7 @@ public class Material {
             int gl_map[] = new int[1];
             GLES20.glGenTextures(1, gl_map, 0);
             if(gl_map[0] == 0){
-                Log.e(TAG, "bump_map slot could not be generated");
+                Debugger.warning(TAG, "bump_map slot could not be generated");
             }
             gl_bump_map = gl_map[0];
         }
@@ -165,40 +166,40 @@ public class Material {
         //qDebug("loading material");
 
         if(mtl_ambient_loaded && mtl_ambient_img!=null){
-            Log.e(TAG, "gl_ambient_map loading...");
+            Debugger.warning(TAG, "gl_ambient_map loading...");
             if(load_gl_map(gl_ambient_map, mtl_ambient_img, Texture_Smooth | Texture_Mipmaps)){
                 flagBits = flagBits | Material_Type_Ambient;
             }
         }
         else{
-            Log.e(TAG, "gl_ambient_map loading skipped...");
+            Debugger.warning(TAG, "gl_ambient_map loading skipped...");
         }
         if(mtl_diffuse_loaded && mtl_diffuse_img!=null){
-            Log.e(TAG, "gl_diffuse_map loading...");
+            Debugger.warning(TAG, "gl_diffuse_map loading...");
             if(load_gl_map(gl_diffuse_map, mtl_diffuse_img, Texture_Smooth | Texture_Mipmaps)){
                 flagBits = flagBits | Material_Type_Diffuse;
             }
         }
         else{
-            Log.e(TAG, "gl_diffuse_map loading skipped...");
+            Debugger.warning(TAG, "gl_diffuse_map loading skipped...");
         }
         if(mtl_specular_loaded && mtl_specular_img!=null){
-            Log.e(TAG, "gl_specular_map loading...");
+            Debugger.warning(TAG, "gl_specular_map loading...");
             if(load_gl_map(gl_specular_map, mtl_specular_img, Texture_Smooth | Texture_Mipmaps)){
                 flagBits = flagBits | Material_Type_Specular;
             }
         }
         else{
-            Log.e(TAG, "gl_specular_map loading skipped...");
+            Debugger.warning(TAG, "gl_specular_map loading skipped...");
         }
         if(mtl_bump_loaded && mtl_bump_img!=null){
-            Log.e(TAG, "gl_bump_map loading...");
+            Debugger.warning(TAG, "gl_bump_map loading...");
             if(load_gl_map(gl_bump_map, mtl_bump_img, Texture_Smooth | Texture_Mipmaps)){
                 flagBits = flagBits | Material_Type_Bump;
             }
         }
         else{
-            Log.e(TAG, "gl_bump_map loading skipped...");
+            Debugger.warning(TAG, "gl_bump_map loading skipped...");
         }
         //qDebug("loaded material!");
         loaded = true;
@@ -265,7 +266,7 @@ public class Material {
         if(slot == 0){
             //looks like we couldn't load the texture and GLES gave us back the default black tex...
 
-            Log.e(TAG,"tex slot " + slot + " could not be loaded...");
+            Debugger.warning(TAG,"tex slot " + slot + " could not be loaded...");
 
             return false;
         }
@@ -488,11 +489,11 @@ public class Material {
         Bitmap image = BitmapFactory.decodeStream(istr, outPadding, options);
 
         if(image == null){
-            Log.e(TAG,"Bitmap: " + path + " could not decode the Stream...");
+            Debugger.warning(TAG,"Bitmap: " + path + " could not decode the Stream...");
             return null;
         }
         else{
-            Log.e(TAG, "Bitmap: " + path + " width: " + image.getWidth() + " height: " + image.getHeight());
+            Debugger.warning(TAG, "Bitmap: " + path + " width: " + image.getWidth() + " height: " + image.getHeight());
         }
         return image;
     }
