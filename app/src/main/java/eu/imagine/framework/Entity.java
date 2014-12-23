@@ -7,11 +7,17 @@ import java.nio.FloatBuffer;
  * User: tamino
  * Date: 9/18/13
  * Time: 2:40 PM
+ *
+ *
+ * modified by AJ...
  */
 public interface Entity {
     public int getID();
 
     public boolean getVisibility();
 
-    public FloatBuffer getFloatBuffer();
+    public String getProcess();
+
+    //no need
+    //public FloatBuffer getFloatBuffer();
 }

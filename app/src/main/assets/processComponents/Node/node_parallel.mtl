@@ -1,8 +1,8 @@
 # 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
-# File Created: 01.12.2014 23:31:51
+# File Created: 21.12.2014 12:49:00
 
-newmtl Material__29
-	Ns 10.000000
+newmtl Material__parallel
+	Ns 9.999999
 	Ni 1.500000
 	d 1.000000
 	Tr 0.000000
@@ -12,5 +12,5 @@ newmtl Material__29
 	Kd 0.588000 0.588000 0.588000
 	Ks 0.000000 0.000000 0.000000
 	Ke 0.000000 0.000000 0.000000
-	map_Ka C:\Users\AJ\Desktop\ProcessComponentObjects\Node\node.png
-	map_Kd C:\Users\AJ\Desktop\ProcessComponentObjects\Node\node.png
+	map_Ka C:\Users\AJ\Desktop\ProcessComponentObjects\Node\node_split_join.png
+	map_Kd C:\Users\AJ\Desktop\ProcessComponentObjects\Node\node_split_join.png

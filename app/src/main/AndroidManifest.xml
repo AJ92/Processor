@@ -16,6 +16,9 @@
         android:required="true"/>
     <uses-permission android:name="android.permission.CAMERA"/>
 
+    <!-- possible x86 avd fix crash fix
+        android:allowClearUserData="true"
+    -->
 
     <application
         android:name="com.aj.processor.app.GlobalContext"
@@ -23,6 +26,7 @@
         android:icon="@drawable/marker_121"
         android:label="@string/app_name"
         android:hardwareAccelerated="true"
+
         android:allowClearUserData="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         <activity

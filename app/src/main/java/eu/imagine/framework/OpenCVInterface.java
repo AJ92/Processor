@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.aj.processor.app.Debugger;
 import com.aj.processor.app.MainInterface;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -114,13 +115,22 @@ public class OpenCVInterface implements CameraBridgeViewBase
 
     public void onResume(Activity mainActivity) {
         //changed to 2_4_9 from 2_4_6
+        Debugger.error(TAG, "OpenCVInterface:onResume()");
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_9, mainActivity,
                 mLoaderCallback);
+        Debugger.error(TAG, "OpenCVInterface:onResume() done!");
     }
 
+    //modified... synchronize this, so we don't get trouble if we call this from threads...
+
+    //TODO: CAUSES ERROR: ANDROID C LIB CRASH... openCV bug ?
     public void onPause() {
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
+        Debugger.error(TAG, "OpenCVInterface:onPause()");
+        synchronized(this) {
+            if (mOpenCvCameraView != null)
+                mOpenCvCameraView.disableView();
+        }
+        Debugger.error(TAG, "OpenCVInterface:onPause() done!");
     }
 
     public void onDestroy() {

@@ -1,7 +1,6 @@
 package com.aj.processor.app;
 
 import android.app.Activity;
-import android.opengl.GLSurfaceView;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -49,7 +48,9 @@ public class MainInterface {
     private final Object synLock = new Object();
 
     // Store markers per frame:
-    private ArrayList<Entity> allTrackables;
+    private ArrayList<Entity> allTrackings;
+    private boolean newTrackings = false;
+
     private ArrayList<Trackable> detectedTrackables;
     private boolean updatedData = false;
 
@@ -74,7 +75,7 @@ public class MainInterface {
         log.log(TAG, "Constructing framework.");
         this.mainActivity = mainActivity;
         this.listeners = new ArrayList<HomographyListener>();
-        this.allTrackables = new ArrayList<Entity>();
+        this.allTrackings = new ArrayList<Entity>();
         this.detectedTrackables = new ArrayList<Trackable>();
         // Set camera matrix:
         this.camMatrix = camMatrix;
@@ -116,15 +117,21 @@ public class MainInterface {
                 + "ms.");
     }
 
+
+    //checking syncronization... might fix LibC crash...
     public void toggleOpenCV(){
-        if(is_CV_running){
+        Debugger.error(TAG,"MainInterface:toggleOpenCV()");
+        if (is_CV_running) {
+            Debugger.error(TAG,"MainInterface:toggleOpenCV() is_CV_running");
             opencv.onPause();
             is_CV_running = false;
-        }
-        else{
+        } else {
+            Debugger.error(TAG,"MainInterface:toggleOpenCV() !is_CV_running");
             opencv.onResume(this.mainActivity);
             is_CV_running = true;
         }
+
+        Debugger.error(TAG,"MainInterface:toggleOpenCV() done!");
     }
 
     public void onResume() {
@@ -202,7 +209,8 @@ public class MainInterface {
      */
     @SuppressWarnings("UnusedDeclaration")
     public void registerEntity(Entity entity) {
-        this.allTrackables.add(entity);
+        this.allTrackings.add(entity);
+        newTrackings = true;
     }
 
     /**
@@ -212,7 +220,7 @@ public class MainInterface {
      */
     @SuppressWarnings("UnusedDeclaration")
     public void removeEntity(Entity entity) {
-        this.allTrackables.remove(entity);
+        this.allTrackings.remove(entity);
     }
 
     /**
@@ -376,7 +384,7 @@ public class MainInterface {
                 // Remove old list:
                 detectedTrackables.clear();
                 // Now go through all trackables:
-                for (Entity tracking : allTrackables) {
+                for (Entity tracking : allTrackings) {
                     // Check if we want to render it:
                     if (!tracking.getVisibility())
                         continue;
@@ -416,7 +424,7 @@ public class MainInterface {
      * @return True when a new list has been posted, false else.
      */
 
-    protected boolean getListUpdateStatus() {
+    protected boolean getRecognizedTrackablesStatus() {
         synchronized (synLock) {
             return updatedData;
         }
@@ -428,11 +436,30 @@ public class MainInterface {
      *
      * @return List containing all markers for now.
      */
-    protected ArrayList<Trackable> getList() {
+    protected ArrayList<Trackable> getRecognizedTrackables() {
         synchronized (synLock) {
             updatedData = false;
             //noinspection unchecked
             return (ArrayList<Trackable>) detectedTrackables.clone();
+        }
+    }
+
+
+
+    //do we have new processes in the list ?
+    protected boolean getAllTrackingsStatus() {
+        synchronized (synLock) {
+            return newTrackings;
+        }
+    }
+
+    //NEW retrieve all trackable links between IDs and XMLs so we can preload them during
+    //openGL start...
+    protected ArrayList<Entity> getAllTrackings() {
+        synchronized (synLock) {
+            newTrackings = false;
+            //noinspection unchecked
+            return (ArrayList<Entity>) allTrackings.clone();
         }
     }
 }

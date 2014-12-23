@@ -1,12 +1,12 @@
 package com.aj.processor.app;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
-import com.aj.processor.app.R;
 
 import java.util.ArrayList;
 
@@ -19,15 +19,16 @@ import java.util.ArrayList;
 public class StartActivity extends Activity implements View.OnClickListener,
         CompoundButton.OnCheckedChangeListener, RadioGroup.OnCheckedChangeListener {
 
-    private Button b_start, b_apply, b_add, b_remove;
+    private Button b_start, b_apply, b_link, b_remove;
     private Switch b_debugLog, b_debugFrameLog, b_dupMarkers, b_frameDebug,
             b_prepFrame, b_contours, b_squares, b_markers, b_sampling,
             b_markerID, b_uncertain;
     private RadioGroup r_binMethod;
-    private EditText threshold, trackMarker;
+    private EditText threshold, trackMarker, trackProcess;
 
     private Bundle options;
     private ArrayList<Integer> trackers;
+    private ArrayList<String> processes;
     private final String TAG = "StartActivity";
 
     public void onCreate(Bundle savedInstanceState) {
@@ -36,13 +37,14 @@ public class StartActivity extends Activity implements View.OnClickListener,
 
         options = new Bundle();
         trackers = new ArrayList<Integer>();
+        processes = new ArrayList<String>();
 
         b_start = (Button) findViewById(R.id.start);
         b_start.setOnClickListener(this);
         b_apply = (Button) findViewById(R.id.apply);
         b_apply.setOnClickListener(this);
-        b_add = (Button) findViewById(R.id.add);
-        b_add.setOnClickListener(this);
+        b_link = (Button) findViewById(R.id.link);
+        b_link.setOnClickListener(this);
         b_remove = (Button) findViewById(R.id.remove);
         b_remove.setOnClickListener(this);
 
@@ -52,6 +54,7 @@ public class StartActivity extends Activity implements View.OnClickListener,
 
         threshold = (EditText) findViewById(R.id.theshold);
         trackMarker = (EditText) findViewById(R.id.trackMarker);
+        trackProcess = (EditText) findViewById(R.id.trackProcess);
 
         b_debugLog = (Switch) findViewById(R.id.debugLog);
         b_debugLog.setOnCheckedChangeListener(this);
@@ -94,6 +97,7 @@ public class StartActivity extends Activity implements View.OnClickListener,
                 in.setClass(getApplicationContext(), ImagineActivity.class);
                 // Add all trackers:
                 options.putIntegerArrayList("trackers", trackers);
+                options.putStringArrayList("processes", processes);
                 in.putExtras(options);
                 startActivity(in);
                 break;
@@ -104,20 +108,26 @@ public class StartActivity extends Activity implements View.OnClickListener,
                 else
                     options.putInt("threshold", 100);
                 break;
-            case R.id.add:
-                String add = trackMarker.getText().toString();
-                if (!add.isEmpty())
-                    trackers.add(Integer.valueOf(add));
+            case R.id.link:
+                String marker = trackMarker.getText().toString();
+                String process = trackProcess.getText().toString();
+                if (!marker.isEmpty() && !process.isEmpty()){
+                    trackers.add(Integer.valueOf(marker));
+                    processes.add(process);
+                }
+                else{
+                    Context context = getApplicationContext();
+                    CharSequence text = "No marker id or process xml!";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }
                 break;
             case R.id.remove:
                 String remove = trackMarker.getText().toString();
                 if (!remove.isEmpty())
                     trackers.remove(Integer.valueOf(remove));
-                break;
-            case R.id.addall:
-                for(int i = 0; i < 255; i++){
-                    trackers.add(new Integer(i));
-                }
                 break;
             default:
                 Log.e(TAG, "Unknown button clicked!");

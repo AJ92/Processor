@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<template xmlns="http://www.aristaflow.de/adept2/processmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="2319546c-385a-4c14-bebf-1e16db4d9454" version="16" xsi:schemaLocation="http://www.aristaflow.de/adept2/processmodel template.xsd http://www.w3.org/2000/09/xmldsig# xmldsig-core-schema.xsd">
-<name>KINDEX Mum Screen</name>
+<template xmlns="http://www.aristaflow.de/adept2/processmodel" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="26ef7e4c-37b6-4833-95ec-42ddeafb6498" version="16" xsi:schemaLocation="http://www.aristaflow.de/adept2/processmodel template.xsd http://www.w3.org/2000/09/xmldsig# xmldsig-core-schema.xsd">
+<name>Mum Screen - Frage 20 nicht linear</name>
 <description/>
 <processType/>
 <supervisorAgent>
@@ -16,18 +16,6 @@
 <description/>
 <staffAssignmentRule/>
 <autoStart>false</autoStart>
-<connectorParameterMappings>
-<connectorParameterMapping accessType="SYSTEM_WRITE" connector="0" parameterName="InstanceInitiator-AgentID"/>
-</connectorParameterMappings>
-<nodeParameters>
-<nodeParameter accessType="SYSTEM_WRITE">
-<name>InstanceInitiator-AgentID</name>
-<description>The ID of the initiating agent of the instance.</description>
-<type>INTEGER</type>
-<identifierID>01234567-89ab-cdef-0011-000004688714</identifierID>
-<isOptional>false</isOptional>
-</nodeParameter>
-</nodeParameters>
 </node>
 <node id="n1">
 <name>End</name>
@@ -35,19 +23,18 @@
 <staffAssignmentRule/>
 <autoStart>false</autoStart>
 </node>
-<node id="n2">
-<name>Frage 1</name>
-<description>Datum des Interviews: </description>
-<staffAssignmentRule>Agent(id=20) OR OrgPosition(id=1) OR OrgPosition(id=2) OR OrgPosition(id=9) OR OrgPosition(id=10) OR Agent(id=%i:InstanceInitiator-AgentID%)</staffAssignmentRule>
+<node id="n32">
+<name>Frage 19</name>
+<description>Eine Schwangerschaft ist eine große Veränderung. Dies wirkt sich auch auf die Partnerschaft aus.</description>
+<staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
 <executableBusinessProcess>
-<activity id="fbd2c906-bea6-4653-a8fc-2a454eb3f425">
-<ecName>de.aristaflow.form.Form</ecName>
-<operationName>User Form</operationName>
-<name>User Form</name>
-<description origin="OPERATION">Generated form.</description>
-<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.view.multilinetextform.MultilineTextFormEnvironment</implementationClass>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
 <isSingleton origin="ECD">false</isSingleton>
-<systemComponent origin="ECD">AQ==</systemComponent>
 <guiContextID origin="ECD">SWTContext</guiContextID>
 <executionControlProperties origin="ECD">
 <isSuspensible>true</isSuspensible>
@@ -57,223 +44,22 @@
 <supportsViewOnly origin="OPERATION">true</supportsViewOnly>
 <supportsTestExecution origin="OPERATION">false</supportsTestExecution>
 <parameterChangePolicy>GENERIC</parameterChangePolicy>
-<outputParameters>
-<outputParameter>
-<name>name0</name>
-<description/>
-<type>STRING</type>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isOptional>false</isOptional>
-<userAttributes>
-<userAttribute name="fromParameterTemplate">Default</userAttribute>
-</userAttributes>
-</outputParameter>
-</outputParameters>
 </activity>
 </executableBusinessProcess>
 <autoStart>false</autoStart>
-<connectorParameterMappings>
-<connectorParameterMapping accessType="WRITE" connector="0" parameterName="name0"/>
-<connectorParameterMapping accessType="SYSTEM_READ" connector="1" parameterName="InstanceInitiator-AgentID"/>
-</connectorParameterMappings>
-<nodeParameters>
-<nodeParameter accessType="SYSTEM_READ">
-<name>InstanceInitiator-AgentID</name>
-<description>The ID of the initiating agent of the instance.</description>
-<type>INTEGER</type>
-<identifierID>01234567-89ab-cdef-0011-000004688714</identifierID>
-<isOptional>false</isOptional>
-</nodeParameter>
-</nodeParameters>
 </node>
-<node id="n3">
-<name>Frage 2</name>
-<description>Name der Interviewerin / des Interviewers und Telefonnummer / Postadresse:</description>
-<staffAssignmentRule>Agent(id=1) OR Agent(id=2) OR Agent(id=20) OR Agent(id=8) OR Agent(id=9) OR OrgPosition(id=1) OR OrgPosition(id=2) OR OrgPosition(id=9) OR OrgPosition(id=10) OR OrgUnit(id=1)</staffAssignmentRule>
-<executableBusinessProcess>
-<activity id="fbd2c906-bea6-4653-a8fc-2a454eb3f425">
-<ecName>de.aristaflow.form.Form</ecName>
-<operationName>User Form</operationName>
-<name>User Form</name>
-<description origin="OPERATION">Generated form.</description>
-<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.view.multilinetextform.MultilineTextFormEnvironment</implementationClass>
-<isSingleton origin="ECD">false</isSingleton>
-<systemComponent origin="ECD">AQ==</systemComponent>
-<guiContextID origin="ECD">SWTContext</guiContextID>
-<executionControlProperties origin="ECD">
-<isSuspensible>true</isSuspensible>
-<isResettable>true</isResettable>
-<isClosable>true</isClosable>
-</executionControlProperties>
-<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
-<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
-<parameterChangePolicy>GENERIC</parameterChangePolicy>
-<outputParameters>
-<outputParameter>
-<name>name1</name>
-<description/>
-<type>STRING</type>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isOptional>false</isOptional>
-<userAttributes>
-<userAttribute name="fromParameterTemplate">Default</userAttribute>
-</userAttributes>
-</outputParameter>
-</outputParameters>
-</activity>
-</executableBusinessProcess>
-<autoStart>false</autoStart>
-<connectorParameterMappings>
-<connectorParameterMapping accessType="WRITE" connector="0" parameterName="name1"/>
-</connectorParameterMappings>
-</node>
-<node id="n4">
-<name>Frage 3</name>
-<description>Code (1. Buchstabe Nachname + vollständiges Geburtsdatum):</description>
-<staffAssignmentRule>OrgPosition(id=1) OR OrgPosition(id=2) OR OrgPosition(id=9) OR OrgPosition(id=10)</staffAssignmentRule>
-<executableBusinessProcess>
-<activity id="fbd2c906-bea6-4653-a8fc-2a454eb3f425">
-<ecName>de.aristaflow.form.Form</ecName>
-<operationName>User Form</operationName>
-<name>User Form</name>
-<description origin="OPERATION">Generated form.</description>
-<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.view.multilinetextform.MultilineTextFormEnvironment</implementationClass>
-<isSingleton origin="ECD">false</isSingleton>
-<systemComponent origin="ECD">AQ==</systemComponent>
-<guiContextID origin="ECD">SWTContext</guiContextID>
-<executionControlProperties origin="ECD">
-<isSuspensible>true</isSuspensible>
-<isResettable>true</isResettable>
-<isClosable>true</isClosable>
-</executionControlProperties>
-<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
-<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
-<parameterChangePolicy>GENERIC</parameterChangePolicy>
-<outputParameters>
-<outputParameter>
-<name>name2</name>
-<description/>
-<type>STRING</type>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isOptional>false</isOptional>
-<userAttributes>
-<userAttribute name="fromParameterTemplate">Default</userAttribute>
-</userAttributes>
-</outputParameter>
-</outputParameters>
-</activity>
-</executableBusinessProcess>
-<autoStart>false</autoStart>
-<connectorParameterMappings>
-<connectorParameterMapping accessType="WRITE" connector="0" parameterName="name2"/>
-</connectorParameterMappings>
-</node>
-<node id="n5">
-<name>Frage 4</name>
-<description>„Wie alt sind Sie?“</description>
-<staffAssignmentRule>OrgPosition(id=1) OR OrgPosition(id=2) OR OrgPosition(id=9) OR OrgPosition(id=10)</staffAssignmentRule>
-<executableBusinessProcess>
-<activity id="fbd2c906-bea6-4653-a8fc-2a454eb3f425">
-<ecName>de.aristaflow.form.Form</ecName>
-<operationName>User Form</operationName>
-<name>User Form</name>
-<description origin="OPERATION">Generated form.</description>
-<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.view.multilinetextform.MultilineTextFormEnvironment</implementationClass>
-<isSingleton origin="ECD">false</isSingleton>
-<systemComponent origin="ECD">AQ==</systemComponent>
-<guiContextID origin="ECD">SWTContext</guiContextID>
-<executionControlProperties origin="ECD">
-<isSuspensible>true</isSuspensible>
-<isResettable>true</isResettable>
-<isClosable>true</isClosable>
-</executionControlProperties>
-<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
-<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
-<parameterChangePolicy>GENERIC</parameterChangePolicy>
-<outputParameters>
-<outputParameter>
-<name>name3</name>
-<description/>
-<type>STRING</type>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isOptional>false</isOptional>
-<userAttributes>
-<userAttribute name="fromParameterTemplate">Default</userAttribute>
-</userAttributes>
-</outputParameter>
-</outputParameters>
-</activity>
-</executableBusinessProcess>
-<autoStart>false</autoStart>
-<connectorParameterMappings>
-<connectorParameterMapping accessType="WRITE" connector="0" parameterName="name3"/>
-</connectorParameterMappings>
-</node>
-<node id="n6">
-<name>Frage 5</name>
-<description> „Wo wurden Sie geboren?“</description>
-<staffAssignmentRule>OrgPosition(id=1) OR OrgPosition(id=2) OR OrgPosition(id=9) OR OrgPosition(id=10)</staffAssignmentRule>
-<executableBusinessProcess>
-<activity id="fbd2c906-bea6-4653-a8fc-2a454eb3f425">
-<ecName>de.aristaflow.form.Form</ecName>
-<operationName>User Form</operationName>
-<name>User Form</name>
-<description origin="OPERATION">Generated form.</description>
-<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.view.multilinetextform.MultilineTextFormEnvironment</implementationClass>
-<isSingleton origin="ECD">false</isSingleton>
-<systemComponent origin="ECD">AQ==</systemComponent>
-<guiContextID origin="ECD">SWTContext</guiContextID>
-<executionControlProperties origin="ECD">
-<isSuspensible>true</isSuspensible>
-<isResettable>true</isResettable>
-<isClosable>true</isClosable>
-</executionControlProperties>
-<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
-<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
-<parameterChangePolicy>GENERIC</parameterChangePolicy>
-<outputParameters>
-<outputParameter>
-<name>EE</name>
-<description>BB</description>
-<type>STRING</type>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isOptional>false</isOptional>
-<userAttributes>
-<userAttribute name="fromParameterTemplate">Default</userAttribute>
-</userAttributes>
-</outputParameter>
-<outputParameter>
-<name>FF</name>
-<description>BB</description>
-<type>STRING</type>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isOptional>false</isOptional>
-<userAttributes>
-<userAttribute name="fromParameterTemplate">Default</userAttribute>
-</userAttributes>
-</outputParameter>
-</outputParameters>
-</activity>
-</executableBusinessProcess>
-<autoStart>false</autoStart>
-<connectorParameterMappings>
-<connectorParameterMapping accessType="WRITE" connector="1" parameterName="EE"/>
-<connectorParameterMapping accessType="WRITE" connector="0" parameterName="FF"/>
-</connectorParameterMappings>
-</node>
-<node id="n8">
-<name>#8</name>
+<node id="n33">
+<name>Frage 20</name>
 <description/>
 <staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
 <executableBusinessProcess>
-<activity id="fbd2c906-bea6-4653-a8fc-2a454eb3f425">
-<ecName>de.aristaflow.form.Form</ecName>
-<operationName>User Form</operationName>
-<name>User Form</name>
-<description origin="OPERATION">Generated form.</description>
-<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.view.multilinetextform.MultilineTextFormEnvironment</implementationClass>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
 <isSingleton origin="ECD">false</isSingleton>
-<systemComponent origin="ECD">AQ==</systemComponent>
 <guiContextID origin="ECD">SWTContext</guiContextID>
 <executionControlProperties origin="ECD">
 <isSuspensible>true</isSuspensible>
@@ -283,153 +69,671 @@
 <supportsViewOnly origin="OPERATION">true</supportsViewOnly>
 <supportsTestExecution origin="OPERATION">false</supportsTestExecution>
 <parameterChangePolicy>GENERIC</parameterChangePolicy>
+<outputParameters>
+<outputParameter>
+<name>alkohol</name>
+<description>Trinken Sie derzeit Alkohol, wie z.B. Wein, Sekt oder Bier?</description>
+<type>BOOLEAN</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">2</configurationEntry>
+</configuration>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
+</outputParameter>
+<outputParameter>
+<name>drogen</name>
+<description>Nehmen sie derzeit Medikamente (z.B. Psychopharmaka) oder Drogen ein?</description>
+<type>BOOLEAN</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">3</configurationEntry>
+</configuration>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
+</outputParameter>
+<outputParameter>
+<name>rauchen</name>
+<description>Rauchen sie derzeit?</description>
+<type>BOOLEAN</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<configuration>
+<configurationEntry fixed="false" name="pos">1</configurationEntry>
+</configuration>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
+</outputParameter>
+</outputParameters>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+<connectorParameterMappings>
+<connectorParameterMapping accessType="WRITE" connector="2" parameterName="alkohol"/>
+<connectorParameterMapping accessType="WRITE" connector="0" parameterName="drogen"/>
+<connectorParameterMapping accessType="WRITE" connector="1" parameterName="rauchen"/>
+</connectorParameterMappings>
+</node>
+<node id="n39">
+<name/>
+<description/>
+<staffAssignmentRule/>
+<autoStart>false</autoStart>
+</node>
+<node id="n40">
+<name/>
+<description/>
+<staffAssignmentRule/>
+<autoStart>false</autoStart>
+</node>
+<node id="n41">
+<name>#41</name>
+<description/>
+<staffAssignmentRule>Agent(id=8)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="2489da5c-88d7-433e-acf4-1b1b9cca8506">
+<ecName>de.aristaflow.rules.XOR</ecName>
+<operationName>XOR Predicate</operationName>
+<name>XOR Predicate</name>
+<description origin="OPERATION">Create a decision based on an XOR predicate.</description>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.xorsupport.core.runtime.DecisionExecutionEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">NullContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>false</isSuspensible>
+<isResettable>false</isResettable>
+<isClosable>false</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">false</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<configuration>
+<configurationEntry fixed="false" name="DECISION_BYTECODE">H4sIAAAAAAAAAK1US1MTQRD+ho0shCAQhPKBID4gCciS8DZIlTxUqgJBY1GlHlKT3UlYatlNbSYI
+N3+Hf4ALB/WAjyotTh78UZY9SShe8QDlZaanp/vrr7/p3d9/vv8EEMdjHQ0MaUsY3LdLkucd753B
+LVGUCUPsSOGWbM8tGTueXyoXi54vDdPzBS2WKAjXWPOFZZtciqVt7pS5pOCMLOd0BBheXhZ0flcK
+ZZ8F93yGxlnbteUcQziS2uTb3ChL2zFWeDEZXWdoztgFl8uyLximzwTMVo8OdwtGRvq2W0ie8KRz
+m8KUybkKTGCBqgehoSWEK2hkaEvZrlgtb+WE/4rnHEIPpzyTO+vUnzrXnAG5YZcYXqT+s5xJ6my7
+Vqqk2JzunKH7NJvd4hGjiUtpQO2JKgGxKExbcV5epCqRt+ejo8tEztkorVO8ItdZJ4bh2hFeSuTl
+c+5aGdsiel2RaN3wYMYr+6Z4aqseev6hyohKZJiqcz02Y01O5GfyWWtUTGTH43Erm5uaHM9OmvlE
+fiaeMHNmXkcPQ/vZ4jp6GXSfl80N4TbhDkNLQcgjZRkGIucljJ5vIYS7uBfEbdxn6Di+nfc8R3BX
+xwDDswsMyRbNh2NsCcmNBW9b+IrLIpdcvbSOCDGeT6dTS09WCfYiw3cCt0btCJU6iGGoGVEMM7SS
+BAveVpH71Y/weiR6Yq6ObyhpBEaQkkaJknoNkc6ruXlzUqJaJQpOYCyIQYzTfNSD0zFJMGblTNIP
+Rs7rXG8eQ5jGTAum8Eh7T/849NMzaMqglanvGQ3Q6dSAJjTTvkZWA+2NsaEvCH6qxIVoDVa8vZTR
+h1ayuqtRuIq2Cloj2tFBiGGyQ7RXPZ1kkUK4QatCj1G+uusN/EDfay0W7j/Ag19oqxqHGNyjf2Xm
+YwWRdEBXLW+BWCjWU5/x8BDRA8RXhoe0ROArJr4hqeEDmvagafvKqZ12BvbDs/s1wJuVRm/9BQcd
+cFnwBQAA</configurationEntry>
+<configurationEntry fixed="false" name="DECISION_XML">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xordecision&gt;&lt;expressions&gt;&lt;expression type="VAR_COMP_CONST"&gt;&lt;leftHandSide&gt;rauchen&lt;/leftHandSide&gt;&lt;variableOrder/&gt;&lt;predicates&gt;&lt;predicate exclusive="false" id="0" type="IS_TRUE"&gt;&lt;lowerBound included="true" kind="null"/&gt;&lt;upperBound included="true" kind="null"/&gt;&lt;/predicate&gt;&lt;predicate exclusive="false" id="1" type="IS_FALSE"&gt;&lt;lowerBound included="true" kind="null"/&gt;&lt;upperBound included="true" kind="null"/&gt;&lt;/predicate&gt;&lt;/predicates&gt;&lt;/expression&gt;&lt;/expressions&gt;&lt;exclusionIDAssignment/&gt;&lt;IDAssignment&gt;&lt;node decisionID="0" predicate="0"/&gt;&lt;node decisionID="1" predicate="1"/&gt;&lt;/IDAssignment&gt;&lt;/xordecision&gt;</configurationEntry>
+</configuration>
+<parameterChangePolicy>ADD_PARAMETERS</parameterChangePolicy>
+<decisionParameter>Decision</decisionParameter>
+<decisionStatements>
+<decisionStatement edgeCode="0">
+<decisionLabel>[{rauchen = TRUE}] </decisionLabel>
+<decisionStatement>[{rauchen = TRUE}] </decisionStatement>
+<decisionID>0</decisionID>
+</decisionStatement>
+<decisionStatement edgeCode="1">
+<decisionLabel>[{rauchen = FALSE}] </decisionLabel>
+<decisionStatement>[{rauchen = FALSE}] </decisionStatement>
+<decisionID>1</decisionID>
+</decisionStatement>
+</decisionStatements>
 <inputParameters>
 <inputParameter>
-<name>name0</name>
+<name>rauchen</name>
 <description/>
-<type>STRING</type>
+<type>BOOLEAN</type>
 <identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
 <isOptional>false</isOptional>
 </inputParameter>
 </inputParameters>
 <outputParameters>
 <outputParameter>
-<name>name7</name>
+<name>Decision</name>
 <description/>
-<type>STRING</type>
-<identifierID>ffffffff-ffff-fffe-8000-000000000000</identifierID>
+<type>INTEGER</type>
+<identifierID>f31b8592-f943-4911-847a-bdc65a8bdacd</identifierID>
 <isOptional>false</isOptional>
+<defaultValue/>
+<userAttributes>
+<userAttribute name="fromParameter">Decision</userAttribute>
+</userAttributes>
+</outputParameter>
+</outputParameters>
+<userAttributes>
+<userAttribute name="decision">true</userAttribute>
+</userAttributes>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+<connectorParameterMappings>
+<connectorParameterMapping accessType="READ" connector="0" parameterName="rauchen"/>
+<connectorParameterMapping accessType="WRITE" connector="1" parameterName="Decision"/>
+</connectorParameterMappings>
+</node>
+<node id="n42">
+<name/>
+<description/>
+<staffAssignmentRule/>
+<autoStart>false</autoStart>
+</node>
+<node id="n43">
+<name>#43</name>
+<description/>
+<staffAssignmentRule>Agent(id=8)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="2489da5c-88d7-433e-acf4-1b1b9cca8506">
+<ecName>de.aristaflow.rules.XOR</ecName>
+<operationName>XOR Predicate</operationName>
+<name>XOR Predicate</name>
+<description origin="OPERATION">Create a decision based on an XOR predicate.</description>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.xorsupport.core.runtime.DecisionExecutionEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">NullContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>false</isSuspensible>
+<isResettable>false</isResettable>
+<isClosable>false</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">false</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<configuration>
+<configurationEntry fixed="false" name="DECISION_BYTECODE">H4sIAAAAAAAAAK1US1MTQRD+ho0shCAQhPKBID4gAWQh8kgMUiUPlapA0FhUqQdqsjuExc1uajNB
+uPk7/ANcOKgHfFRpcfLgj7LsyaN4xQOUl56enu5vvv6md3//+f4TwDge6WhgSFvC4L5dlHzD8d4Z
+3BIFGTPEjhRu0fbcorHj+cVSoeD50jA9X5CxRE64xqovLNvkUixuc6fEJSVnZCmrI8Dw4qKgc7tS
+KP80uOczNM7Yri1nGcKR1Bbf5kZJ2o6xzAvJ6BpDc8bOuVyWfMEQP5UwU9k63M0ZGenbbi55LJLO
+bglTJmfLMIF5uj0IDS0hXEIjQ1vKdsVKKZ8V/kuedQg9nPJM7qxRf2pfDQbkpl1keJ76z3ImqbPt
+6lVFxeZk5wzdJ9nsFmqMJi+kAbUnKgTEgjBtxXlpgW6JvDmbHV0ics5mcY3yFbnOOjkMV2p4KbEh
+n3HXytgW0euKROumBzNeyTfFE1v10PMPVUZVIcN0nWNTWOa4ycfWpxJkJqxYYj2ejcXWzel4Im6J
+qYSYsnT0MLSfvlxHL4POnbfepuc04RZDS07ImrIMA5GzEkbPthDCbdwJ4ibuMnQcnc55niO4q2OA
+4ek5hiRP8+EYeSG5Me9tC19xWeCSq5fWESHGc+l0avHxCsGeZ/iO4Vap1VCpgyEMNyOKEYZWkmDe
+yxe4X/kIr0aix+bq6ISKRmEEqWiMKKnXEOkNNTevj0tUvYmSY3gQxCAmaD7qwemYIhizvCfpByNn
+da43jyHEkWjBNB5q7+kfh356Bk05ZJn6ntEAnXYNaEIzravkNdDaODT8BcFP5bwQ2WA52ksVfWgl
+r7uShctoK6M1oh0dhBgmP0RrJdJJHimEa2QV+hDVq7PewA/0vdKGwv0HuPcLbRXnEIN79K/MfCwj
+kg7oqtbNEwvFevoz7h8ieoDx5ZFhLRb4islvSGr4gKY9aNq+Cmong4H98Mx+FfB6udEbfwGC1dCP
+8AUAAA==</configurationEntry>
+<configurationEntry fixed="false" name="DECISION_XML">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xordecision&gt;&lt;expressions&gt;&lt;expression type="VAR_COMP_CONST"&gt;&lt;leftHandSide&gt;alkohol&lt;/leftHandSide&gt;&lt;variableOrder/&gt;&lt;predicates&gt;&lt;predicate exclusive="false" id="0" type="IS_TRUE"&gt;&lt;lowerBound included="true" kind="null"/&gt;&lt;upperBound included="true" kind="null"/&gt;&lt;/predicate&gt;&lt;predicate exclusive="false" id="1" type="IS_FALSE"&gt;&lt;lowerBound included="true" kind="null"/&gt;&lt;upperBound included="true" kind="null"/&gt;&lt;/predicate&gt;&lt;/predicates&gt;&lt;/expression&gt;&lt;/expressions&gt;&lt;exclusionIDAssignment/&gt;&lt;IDAssignment&gt;&lt;node decisionID="0" predicate="0"/&gt;&lt;node decisionID="1" predicate="1"/&gt;&lt;/IDAssignment&gt;&lt;/xordecision&gt;</configurationEntry>
+</configuration>
+<parameterChangePolicy>ADD_PARAMETERS</parameterChangePolicy>
+<decisionParameter>Decision</decisionParameter>
+<decisionStatements>
+<decisionStatement edgeCode="0">
+<decisionLabel>[{alkohol = TRUE}] </decisionLabel>
+<decisionStatement>[{alkohol = TRUE}] </decisionStatement>
+<decisionID>0</decisionID>
+</decisionStatement>
+<decisionStatement edgeCode="1">
+<decisionLabel>[{alkohol = FALSE}] </decisionLabel>
+<decisionStatement>[{alkohol = FALSE}] </decisionStatement>
+<decisionID>1</decisionID>
+</decisionStatement>
+</decisionStatements>
+<inputParameters>
+<inputParameter>
+<name>alkohol</name>
+<description/>
+<type>BOOLEAN</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+</inputParameter>
+</inputParameters>
+<outputParameters>
+<outputParameter>
+<name>Decision</name>
+<description/>
+<type>INTEGER</type>
+<identifierID>f31b8592-f943-4911-847a-bdc65a8bdacd</identifierID>
+<isOptional>false</isOptional>
+<defaultValue/>
+<userAttributes>
+<userAttribute name="fromParameter">Decision</userAttribute>
+</userAttributes>
+</outputParameter>
+</outputParameters>
+<userAttributes>
+<userAttribute name="decision">true</userAttribute>
+</userAttributes>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+<connectorParameterMappings>
+<connectorParameterMapping accessType="READ" connector="0" parameterName="alkohol"/>
+<connectorParameterMapping accessType="WRITE" connector="1" parameterName="Decision"/>
+</connectorParameterMappings>
+</node>
+<node id="n44">
+<name/>
+<description/>
+<staffAssignmentRule/>
+<autoStart>false</autoStart>
+</node>
+<node id="n45">
+<name>#45</name>
+<description/>
+<staffAssignmentRule>Agent(id=8)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="2489da5c-88d7-433e-acf4-1b1b9cca8506">
+<ecName>de.aristaflow.rules.XOR</ecName>
+<operationName>XOR Predicate</operationName>
+<name>XOR Predicate</name>
+<description origin="OPERATION">Create a decision based on an XOR predicate.</description>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.xorsupport.core.runtime.DecisionExecutionEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">NullContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>false</isSuspensible>
+<isResettable>false</isResettable>
+<isClosable>false</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">false</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<configuration>
+<configurationEntry fixed="false" name="DECISION_BYTECODE">H4sIAAAAAAAAAK1US1MTQRD+ho0shCAQhPKBKD4gAWQJQkgMUiUPlapA0FhUqQdqspmEpTa7qc0k
+ws3f4R/gwkE94KNKi5MHf5RlTx7FKx6gvMz09HR//fU3vfv7z/efACJ4rKOFIZUVBveskuQ5231n
+8KwoyilD7EjhlCzXKRk7rlcqF4uuJw3T9QQtWZEXjrHuiaxlcimWK9wuc0nBaVnO6PAxvLwo6MKu
+FMo+De56DK1zlmPJeYZgKLnNK9woS8s2VnkxEd5gaE9beYfLsicYYqcC5mpHmzt5Iy09y8knjnlS
+mW1hysR8Fca3SNX90NARwCW0MnQlLUeslQsZ4b3iGZvQg0nX5PYG9afOdadPblklhhfJ/yxngjqr
+1EuVFJuTnTP0n2SzW2wwmrmQBtSeqBEQS8K0FOeVJaoSens2OrxC5Oyt0gbFK3K9TWIYrjTwkiIn
+n3Mnm7ayRK8vFG4a7k+7Zc8UTy3Vw8A/VJlQiQyzTa6j8UxMZITYFNHIzOZ0RExu8sloZDMXj0dN
+bsZiPD6tY4Ch+3RxHYM0ZFnPpedow22GjryQDWEZhkNnFQyf7SCAO7jrx03cY+g5ul1wXVtwR8cw
+w7NzzEiBxsM2CkJyY9GtCE9xWeKSq4fWEWLQF1Kp5PKTNYI9z+wdw61Ta6BSB6MYa0cY4wydJMGi
+Wyhyr/YNXg2Fj43V0Q0lTcDwU9IkUVKPIVI5NTZvjktUr0TBU3joxwimaTyawemIEoxZPZP0I6Gz
+OjcbxwBiiHdgFo+09/SLwxA9g6YMWpn6nNECnU4taEM77etktdDeOjr2Bf5P1bgArf6qd5AybqGT
+rP5aFC6jq4rWim70EGKQ7ADtNU8vWaQQrtGq0EcpX90N+n7g1mttNDh0gPu/0FUzDjGyR7/K9Mcq
+IumAvnreIrFQrGc/48EhwgeIrI6PaVO+r5j5hoSGD2jbg6btK6d20unbD87t1wGvVxu98RcJ+3x2
+7wUAAA==</configurationEntry>
+<configurationEntry fixed="false" name="DECISION_XML">&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;xordecision&gt;&lt;expressions&gt;&lt;expression type="VAR_COMP_CONST"&gt;&lt;leftHandSide&gt;drogen&lt;/leftHandSide&gt;&lt;variableOrder/&gt;&lt;predicates&gt;&lt;predicate exclusive="false" id="0" type="IS_TRUE"&gt;&lt;lowerBound included="true" kind="null"/&gt;&lt;upperBound included="true" kind="null"/&gt;&lt;/predicate&gt;&lt;predicate exclusive="false" id="1" type="IS_FALSE"&gt;&lt;lowerBound included="true" kind="null"/&gt;&lt;upperBound included="true" kind="null"/&gt;&lt;/predicate&gt;&lt;/predicates&gt;&lt;/expression&gt;&lt;/expressions&gt;&lt;exclusionIDAssignment/&gt;&lt;IDAssignment&gt;&lt;node decisionID="0" predicate="0"/&gt;&lt;node decisionID="1" predicate="1"/&gt;&lt;/IDAssignment&gt;&lt;/xordecision&gt;</configurationEntry>
+</configuration>
+<parameterChangePolicy>ADD_PARAMETERS</parameterChangePolicy>
+<decisionParameter>Decision</decisionParameter>
+<decisionStatements>
+<decisionStatement edgeCode="0">
+<decisionLabel>[{drogen = TRUE}] </decisionLabel>
+<decisionStatement>[{drogen = TRUE}] </decisionStatement>
+<decisionID>0</decisionID>
+</decisionStatement>
+<decisionStatement edgeCode="1">
+<decisionLabel>[{drogen = FALSE}] </decisionLabel>
+<decisionStatement>[{drogen = FALSE}] </decisionStatement>
+<decisionID>1</decisionID>
+</decisionStatement>
+</decisionStatements>
+<inputParameters>
+<inputParameter>
+<name>drogen</name>
+<description/>
+<type>BOOLEAN</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+</inputParameter>
+</inputParameters>
+<outputParameters>
+<outputParameter>
+<name>Decision</name>
+<description/>
+<type>INTEGER</type>
+<identifierID>f31b8592-f943-4911-847a-bdc65a8bdacd</identifierID>
+<isOptional>false</isOptional>
+<defaultValue/>
+<userAttributes>
+<userAttribute name="fromParameter">Decision</userAttribute>
+</userAttributes>
+</outputParameter>
+</outputParameters>
+<userAttributes>
+<userAttribute name="decision">true</userAttribute>
+</userAttributes>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+<connectorParameterMappings>
+<connectorParameterMapping accessType="READ" connector="0" parameterName="drogen"/>
+<connectorParameterMapping accessType="WRITE" connector="1" parameterName="Decision"/>
+</connectorParameterMappings>
+</node>
+<node id="n46">
+<name/>
+<description/>
+<staffAssignmentRule/>
+<autoStart>false</autoStart>
+</node>
+<node id="n47">
+<name>Frage 20a</name>
+<description/>
+<staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">SWTContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>true</isSuspensible>
+<isResettable>true</isResettable>
+<isClosable>true</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<parameterChangePolicy>GENERIC</parameterChangePolicy>
+<outputParameters>
+<outputParameter>
+<name>rauchenZahl</name>
+<description>Wieviel Zigaretten rauchen sie pro Tag?</description>
+<type>INTEGER</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
 </outputParameter>
 </outputParameters>
 </activity>
 </executableBusinessProcess>
 <autoStart>false</autoStart>
 <connectorParameterMappings>
-<connectorParameterMapping accessType="READ" connector="1" parameterName="name0"/>
-<connectorParameterMapping accessType="WRITE" connector="0" parameterName="name7"/>
+<connectorParameterMapping accessType="WRITE" connector="0" parameterName="rauchenZahl"/>
 </connectorParameterMappings>
+</node>
+<node id="n48">
+<name>Frage 20b</name>
+<description/>
+<staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">SWTContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>true</isSuspensible>
+<isResettable>true</isResettable>
+<isClosable>true</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<parameterChangePolicy>GENERIC</parameterChangePolicy>
+<outputParameters>
+<outputParameter>
+<name>alkoholZahl</name>
+<description>Wie viel Wein, Bier etc trinken Sie derzeit? (Bitte angeben ob pro Tag, Woche oder Monat)</description>
+<type>STRING</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
+</outputParameter>
+</outputParameters>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+<connectorParameterMappings>
+<connectorParameterMapping accessType="WRITE" connector="0" parameterName="alkoholZahl"/>
+</connectorParameterMappings>
+</node>
+<node id="n49">
+<name>Frage 20c</name>
+<description/>
+<staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">SWTContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>true</isSuspensible>
+<isResettable>true</isResettable>
+<isClosable>true</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<parameterChangePolicy>GENERIC</parameterChangePolicy>
+<outputParameters>
+<outputParameter>
+<name>drogenZahl</name>
+<description>Welche Drogen / Medikamente nehmen Sie derzeit? Wie oft nehmen die diese Drogen / Medikamente ein? (Keine Nahrungsergänzungsmittel und Schwangerschaftspräparate)</description>
+<type>STRING</type>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isOptional>false</isOptional>
+<userAttributes>
+<userAttribute name="fromParameterTemplate">Default</userAttribute>
+</userAttributes>
+</outputParameter>
+</outputParameters>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
+<connectorParameterMappings>
+<connectorParameterMapping accessType="WRITE" connector="0" parameterName="drogenZahl"/>
+</connectorParameterMappings>
+</node>
+<node id="n50">
+<name>Frage 21</name>
+<description>Wie verhält sich das bei Ihrem Partner?</description>
+<staffAssignmentRule>Agent(id=20)</staffAssignmentRule>
+<executableBusinessProcess>
+<activity id="b2a58711-bc94-4a2c-9272-9b85f9dd3b1e">
+<ecName>de.aristaflow.form.GeneratedForm</ecName>
+<operationName>Generated Form</operationName>
+<name>Generated Form</name>
+<description origin="OPERATION"/>
+<implementationClass origin="ECD">de.aristaflow.adept2.extensions.generatedforms2.FormToolkitDataBindingEnvironment</implementationClass>
+<isSingleton origin="ECD">false</isSingleton>
+<guiContextID origin="ECD">SWTContext</guiContextID>
+<executionControlProperties origin="ECD">
+<isSuspensible>true</isSuspensible>
+<isResettable>true</isResettable>
+<isClosable>true</isClosable>
+</executionControlProperties>
+<supportsViewOnly origin="OPERATION">true</supportsViewOnly>
+<supportsTestExecution origin="OPERATION">false</supportsTestExecution>
+<parameterChangePolicy>GENERIC</parameterChangePolicy>
+</activity>
+</executableBusinessProcess>
+<autoStart>false</autoStart>
 </node>
 </nodes>
 <dataElements>
-<dataElement id="d0">
-<type>STRING</type>
-<name>name0</name>
-<description/>
+<dataElement id="d41">
+<type>BOOLEAN</type>
+<name>drogen</name>
+<description>Nehmen sie derzeit Medikamente (z.B. Psychopharmaka) oder Drogen ein?</description>
 <identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
 <isPublic>false</isPublic>
 </dataElement>
-<dataElement id="d1">
-<type>STRING</type>
-<name>name1</name>
-<description/>
+<dataElement id="d42">
+<type>BOOLEAN</type>
+<name>rauchen</name>
+<description>Rauchen sie derzeit?</description>
 <identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
 <isPublic>false</isPublic>
 </dataElement>
-<dataElement id="d2">
-<type>STRING</type>
-<name>name2</name>
-<description/>
+<dataElement id="d43">
+<type>BOOLEAN</type>
+<name>alkohol</name>
+<description>Trinken Sie derzeit Alkohol, wie z.B. Wein, Sekt oder Bier?</description>
 <identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
 <isPublic>false</isPublic>
 </dataElement>
-<dataElement id="d3">
-<type>STRING</type>
-<name>name3</name>
-<description/>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isPublic>false</isPublic>
-</dataElement>
-<dataElement id="d4">
-<type>STRING</type>
-<name>name4</name>
-<description/>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isPublic>false</isPublic>
-</dataElement>
-<dataElement id="d5">
-<type>STRING</type>
-<name>name5</name>
-<description/>
-<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
-<isPublic>false</isPublic>
-</dataElement>
-<dataElement id="d6">
+<dataElement id="d44">
 <type>INTEGER</type>
-<name>InstanceInitiator-AgentID</name>
-<description/>
-<identifierID>01234567-89ab-cdef-0011-000004688714</identifierID>
+<name>rauchenZahl</name>
+<description>Wieviel Zigaretten rauchen sie pro Tag?</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
 <isPublic>false</isPublic>
 </dataElement>
-<dataElement id="d7">
+<dataElement id="d45">
 <type>STRING</type>
-<name>test22</name>
-<description>aaasd</description>
-<identifierID>ffffffff-ffff-fffe-8000-000000000000</identifierID>
+<name>alkoholZahl</name>
+<description>Wie viel Wein, Bier etc trinken Sie derzeit? (Bitte angeben ob pro Tag, Woche oder Monat)</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d46">
+<type>STRING</type>
+<name>drogenZahl</name>
+<description>Welche Drogen / Medikamente nehmen Sie derzeit? Wie oft nehmen die diese Drogen / Medikamente ein? (Keine Nahrungsergänzungsmittel und Schwangerschaftspräparate)</description>
+<identifierID>ffffffff-ffff-ffff-8000-000000000000</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d47">
+<type>INTEGER</type>
+<name>Decision</name>
+<description/>
+<identifierID>f31b8592-f943-4911-847a-bdc65a8bdacd</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d48">
+<type>INTEGER</type>
+<name>Decision48</name>
+<description/>
+<identifierID>f31b8592-f943-4911-847a-bdc65a8bdacd</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d49">
+<type>INTEGER</type>
+<name>Decision49</name>
+<description/>
+<identifierID>f31b8592-f943-4911-847a-bdc65a8bdacd</identifierID>
+<isPublic>false</isPublic>
+</dataElement>
+<dataElement id="d50">
+<type>INTEGER</type>
+<name>Decision50</name>
+<description/>
+<identifierID>f31b8592-f943-4911-847a-bdc65a8bdacd</identifierID>
 <isPublic>false</isPublic>
 </dataElement>
 </dataElements>
 <edges>
-<edge destinationNodeID="n1" edgeType="ET_CONTROL" sourceNodeID="n6">
+<edge destinationNodeID="n1" edgeType="ET_CONTROL" sourceNodeID="n50">
 <edgeType>ET_CONTROL</edgeType>
 </edge>
-<edge destinationNodeID="n2" edgeType="ET_CONTROL" sourceNodeID="n0">
+<edge destinationNodeID="n32" edgeType="ET_CONTROL" sourceNodeID="n0">
 <edgeType>ET_CONTROL</edgeType>
 </edge>
-<edge destinationNodeID="n3" edgeType="ET_CONTROL" sourceNodeID="n8">
+<edge destinationNodeID="n33" edgeType="ET_CONTROL" sourceNodeID="n32">
 <edgeType>ET_CONTROL</edgeType>
 </edge>
-<edge destinationNodeID="n4" edgeType="ET_CONTROL" sourceNodeID="n3">
+<edge destinationNodeID="n39" edgeType="ET_CONTROL" sourceNodeID="n33">
 <edgeType>ET_CONTROL</edgeType>
 </edge>
-<edge destinationNodeID="n5" edgeType="ET_CONTROL" sourceNodeID="n4">
+<edge destinationNodeID="n40" edgeType="ET_CONTROL" sourceNodeID="n42">
 <edgeType>ET_CONTROL</edgeType>
 </edge>
-<edge destinationNodeID="n6" edgeType="ET_CONTROL" sourceNodeID="n5">
+<edge destinationNodeID="n40" edgeType="ET_CONTROL" sourceNodeID="n44">
 <edgeType>ET_CONTROL</edgeType>
 </edge>
-<edge destinationNodeID="n8" edgeType="ET_CONTROL" sourceNodeID="n2">
+<edge destinationNodeID="n40" edgeType="ET_CONTROL" sourceNodeID="n46">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n41" edgeType="ET_CONTROL" sourceNodeID="n39">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n42" edgeType="ET_CONTROL" sourceNodeID="n41">
+<edgeType>ET_CONTROL</edgeType>
+<edgeCode>1</edgeCode>
+</edge>
+<edge destinationNodeID="n42" edgeType="ET_CONTROL" sourceNodeID="n47">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n43" edgeType="ET_CONTROL" sourceNodeID="n39">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n44" edgeType="ET_CONTROL" sourceNodeID="n43">
+<edgeType>ET_CONTROL</edgeType>
+<edgeCode>1</edgeCode>
+</edge>
+<edge destinationNodeID="n44" edgeType="ET_CONTROL" sourceNodeID="n48">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n45" edgeType="ET_CONTROL" sourceNodeID="n39">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n46" edgeType="ET_CONTROL" sourceNodeID="n45">
+<edgeType>ET_CONTROL</edgeType>
+<edgeCode>1</edgeCode>
+</edge>
+<edge destinationNodeID="n46" edgeType="ET_CONTROL" sourceNodeID="n49">
+<edgeType>ET_CONTROL</edgeType>
+</edge>
+<edge destinationNodeID="n47" edgeType="ET_CONTROL" sourceNodeID="n41">
+<edgeType>ET_CONTROL</edgeType>
+<edgeCode>0</edgeCode>
+</edge>
+<edge destinationNodeID="n48" edgeType="ET_CONTROL" sourceNodeID="n43">
+<edgeType>ET_CONTROL</edgeType>
+<edgeCode>0</edgeCode>
+</edge>
+<edge destinationNodeID="n49" edgeType="ET_CONTROL" sourceNodeID="n45">
+<edgeType>ET_CONTROL</edgeType>
+<edgeCode>0</edgeCode>
+</edge>
+<edge destinationNodeID="n50" edgeType="ET_CONTROL" sourceNodeID="n40">
 <edgeType>ET_CONTROL</edgeType>
 </edge>
 </edges>
 <dataEdges>
-<dataEdge connectorID="0" dataEdgeType="SYSTEM_WRITE" dataElementID="d6" nodeID="n0">
-<dataEdgeType>SYSTEM_WRITE</dataEdgeType>
-<isOptional>false</isOptional>
-</dataEdge>
-<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d0" nodeID="n2">
+<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d41" nodeID="n33">
 <dataEdgeType>WRITE</dataEdgeType>
 <isOptional>false</isOptional>
 </dataEdge>
-<dataEdge connectorID="1" dataEdgeType="SYSTEM_READ" dataElementID="d6" nodeID="n2">
-<dataEdgeType>SYSTEM_READ</dataEdgeType>
-<isOptional>false</isOptional>
-</dataEdge>
-<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d1" nodeID="n3">
+<dataEdge connectorID="1" dataEdgeType="WRITE" dataElementID="d42" nodeID="n33">
 <dataEdgeType>WRITE</dataEdgeType>
 <isOptional>false</isOptional>
 </dataEdge>
-<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d2" nodeID="n4">
+<dataEdge connectorID="2" dataEdgeType="WRITE" dataElementID="d43" nodeID="n33">
 <dataEdgeType>WRITE</dataEdgeType>
 <isOptional>false</isOptional>
 </dataEdge>
-<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d3" nodeID="n5">
-<dataEdgeType>WRITE</dataEdgeType>
-<isOptional>false</isOptional>
-</dataEdge>
-<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d4" nodeID="n6">
-<dataEdgeType>WRITE</dataEdgeType>
-<isOptional>false</isOptional>
-</dataEdge>
-<dataEdge connectorID="1" dataEdgeType="WRITE" dataElementID="d5" nodeID="n6">
-<dataEdgeType>WRITE</dataEdgeType>
-<isOptional>false</isOptional>
-</dataEdge>
-<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d7" nodeID="n8">
-<dataEdgeType>WRITE</dataEdgeType>
-<isOptional>false</isOptional>
-</dataEdge>
-<dataEdge connectorID="1" dataEdgeType="READ" dataElementID="d0" nodeID="n8">
+<dataEdge connectorID="0" dataEdgeType="READ" dataElementID="d42" nodeID="n41">
 <dataEdgeType>READ</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="1" dataEdgeType="WRITE" dataElementID="d48" nodeID="n41">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="0" dataEdgeType="READ" dataElementID="d43" nodeID="n43">
+<dataEdgeType>READ</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="1" dataEdgeType="WRITE" dataElementID="d49" nodeID="n43">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="0" dataEdgeType="READ" dataElementID="d41" nodeID="n45">
+<dataEdgeType>READ</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="1" dataEdgeType="WRITE" dataElementID="d50" nodeID="n45">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d44" nodeID="n47">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d45" nodeID="n48">
+<dataEdgeType>WRITE</dataEdgeType>
+<isOptional>false</isOptional>
+</dataEdge>
+<dataEdge connectorID="0" dataEdgeType="WRITE" dataElementID="d46" nodeID="n49">
+<dataEdgeType>WRITE</dataEdgeType>
 <isOptional>false</isOptional>
 </dataEdge>
 </dataEdges>
@@ -444,48 +748,104 @@
 </structuralNodeData>
 <structuralNodeData nodeID="n1">
 <type>NT_ENDFLOW</type>
-<topologicalID>7</topologicalID>
+<topologicalID>15</topologicalID>
 <branchID>0</branchID>
 <correspondingBlockNodeID>n0</correspondingBlockNodeID>
 </structuralNodeData>
-<structuralNodeData nodeID="n2">
+<structuralNodeData nodeID="n32">
 <type>NT_NORMAL</type>
 <topologicalID>1</topologicalID>
 <branchID>1</branchID>
 <splitNodeID>n0</splitNodeID>
 <correspondingBlockNodeID>n0</correspondingBlockNodeID>
 </structuralNodeData>
-<structuralNodeData nodeID="n3">
+<structuralNodeData nodeID="n33">
 <type>NT_NORMAL</type>
+<topologicalID>2</topologicalID>
+<branchID>1</branchID>
+<splitNodeID>n0</splitNodeID>
+<correspondingBlockNodeID>n0</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n39">
+<type>NT_AND_SPLIT</type>
 <topologicalID>3</topologicalID>
 <branchID>1</branchID>
 <splitNodeID>n0</splitNodeID>
-<correspondingBlockNodeID>n0</correspondingBlockNodeID>
+<correspondingBlockNodeID>n40</correspondingBlockNodeID>
 </structuralNodeData>
-<structuralNodeData nodeID="n4">
-<type>NT_NORMAL</type>
-<topologicalID>4</topologicalID>
+<structuralNodeData nodeID="n40">
+<type>NT_AND_JOIN</type>
+<topologicalID>13</topologicalID>
 <branchID>1</branchID>
 <splitNodeID>n0</splitNodeID>
+<correspondingBlockNodeID>n39</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n41">
+<type>NT_XOR_SPLIT</type>
+<topologicalID>7</topologicalID>
+<branchID>9</branchID>
+<splitNodeID>n39</splitNodeID>
+<correspondingBlockNodeID>n42</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n42">
+<type>NT_XOR_JOIN</type>
+<topologicalID>9</topologicalID>
+<branchID>9</branchID>
+<splitNodeID>n39</splitNodeID>
+<correspondingBlockNodeID>n41</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n43">
+<type>NT_XOR_SPLIT</type>
+<topologicalID>4</topologicalID>
+<branchID>10</branchID>
+<splitNodeID>n39</splitNodeID>
+<correspondingBlockNodeID>n44</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n44">
+<type>NT_XOR_JOIN</type>
+<topologicalID>6</topologicalID>
+<branchID>10</branchID>
+<splitNodeID>n39</splitNodeID>
+<correspondingBlockNodeID>n43</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n45">
+<type>NT_XOR_SPLIT</type>
+<topologicalID>10</topologicalID>
+<branchID>11</branchID>
+<splitNodeID>n39</splitNodeID>
+<correspondingBlockNodeID>n46</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n46">
+<type>NT_XOR_JOIN</type>
+<topologicalID>12</topologicalID>
+<branchID>11</branchID>
+<splitNodeID>n39</splitNodeID>
+<correspondingBlockNodeID>n45</correspondingBlockNodeID>
+</structuralNodeData>
+<structuralNodeData nodeID="n47">
+<type>NT_NORMAL</type>
+<topologicalID>8</topologicalID>
+<branchID>12</branchID>
+<splitNodeID>n41</splitNodeID>
 <correspondingBlockNodeID>n0</correspondingBlockNodeID>
 </structuralNodeData>
-<structuralNodeData nodeID="n5">
+<structuralNodeData nodeID="n48">
 <type>NT_NORMAL</type>
 <topologicalID>5</topologicalID>
-<branchID>1</branchID>
-<splitNodeID>n0</splitNodeID>
+<branchID>13</branchID>
+<splitNodeID>n43</splitNodeID>
 <correspondingBlockNodeID>n0</correspondingBlockNodeID>
 </structuralNodeData>
-<structuralNodeData nodeID="n6">
+<structuralNodeData nodeID="n49">
 <type>NT_NORMAL</type>
-<topologicalID>6</topologicalID>
-<branchID>1</branchID>
-<splitNodeID>n0</splitNodeID>
+<topologicalID>11</topologicalID>
+<branchID>14</branchID>
+<splitNodeID>n45</splitNodeID>
 <correspondingBlockNodeID>n0</correspondingBlockNodeID>
 </structuralNodeData>
-<structuralNodeData nodeID="n8">
+<structuralNodeData nodeID="n50">
 <type>NT_NORMAL</type>
-<topologicalID>2</topologicalID>
+<topologicalID>14</topologicalID>
 <branchID>1</branchID>
 <splitNodeID>n0</splitNodeID>
 <correspondingBlockNodeID>n0</correspondingBlockNodeID>

@@ -54,7 +54,7 @@ vt 0.008252 1.000919 0.001538
 # 24 texture coords
 
 g Node_start
-usemtl Material__26
+usemtl Material__start
 f 1/1/1 2/2/1 3/3/1 
 f 3/3/1 4/4/1 1/1/1 
 f 5/5/2 6/6/2 7/7/2 

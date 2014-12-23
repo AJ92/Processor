@@ -1,9 +1,12 @@
 package com.aj.processor.app.graphics.object;
 
 import com.aj.processor.app.graphics.camera.Camera;
+import com.aj.processor.app.graphics.model.Components.Mesh;
 import com.aj.processor.app.graphics.model.Line;
 import com.aj.processor.app.graphics.model.Model;
 import com.aj.processor.app.mathematics.Matrix.Matrix4x4;
+
+import java.util.ArrayList;
 
 /**
  * Created by AJ on 01.11.2014.
@@ -49,6 +52,12 @@ public class CompositeObject {
     private Camera camera_;
     private Positation positation_;
 
+
+    //RENDER OPTIONS
+    public final static int render_none = 0x0000;
+    public final static int render_standard = 0x0001;
+    //add more ... are checked in the renderer
+    private int render_ = render_standard;
 
 
     //more to follow...
@@ -161,6 +170,15 @@ public class CompositeObject {
         return false;
     }
 
+
+
+    public int getRenderType(){
+        return render_;
+    }
+
+    public void setRenderType(int renderType){
+        render_ = renderType;
+    }
 
 
     //next 2 methods not needed actually...

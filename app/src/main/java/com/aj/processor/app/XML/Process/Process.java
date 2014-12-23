@@ -46,6 +46,8 @@ public class Process {
     private ArrayList<ArrayList<CompositeObject> > co_edges_unsorted_ = new ArrayList<ArrayList<CompositeObject> >();
 
 
+    private ArrayList<CompositeObject> all3dObjects = new ArrayList<CompositeObject>();
+
 
     //branch stuff
     private ArrayList<Branch> linear_branches_unsorted = new ArrayList<Branch>();
@@ -69,12 +71,47 @@ public class Process {
     private ArrayList<ArrayList<ArrayList<Integer>>> branches_next_branchID_ = new ArrayList<ArrayList<ArrayList<Integer>>>();
     //UNUSED END
 
+
+
+
+
+    //line colors
+
+    private Vector4 line_et_control_color = new Vector4(250.0/255.0, 105.0/255.0, 0.0/255.0, 1.0);
+    //not sure if correct name...
+    //TODO:  get correct name ...
+    private Vector4 line_et_control_back_color = new Vector4(105.0/255.0, 210.0/255.0, 231.0/255.0, 1.0); //???
+
+
+    private String name = "";
+
+
     //dummy constructor
-    public Process(List<PComponent> pComponents) {
+    public Process(String name, List<PComponent> pComponents) {
+        this.name = name;
         componentList_ = pComponents;
         //generateSortedStructure();
         generateSortedStructure_v3();
+    }
 
+    public String getName(){
+        return name;
+    }
+
+    public ArrayList<CompositeObject> getAll3dObjects(){
+        return all3dObjects;
+    }
+
+    public void setVisible(){
+        for(CompositeObject co : all3dObjects){
+            co.setRenderType(CompositeObject.render_standard);
+        }
+    }
+
+    public void setInvisible(){
+        for(CompositeObject co : all3dObjects){
+            co.setRenderType(CompositeObject.render_none);
+        }
     }
 
     //called by openGL's render thread...
@@ -243,7 +280,6 @@ public class Process {
 
             //co_edges_unsorted_
             edge_index += 1;
-
         }
 
     }
@@ -361,7 +397,128 @@ public class Process {
 
     //called by openGL's render thread...
     public void generate3dDataObjects_v4(ObjectWorld ow){
-        Debugger.error(TAG,"generated...");
+        Debugger.error(TAG,"--------GENERATING 3D OBJECTS-------");
+
+        int x_pos_index = 0;
+        int y_pos_index = 0;
+
+        for(ArrayList<PComponent> layer : graph_layers){
+            y_pos_index = 0;
+            for(PComponent pc : layer){
+
+                double x_pos = (double) x_pos_index;
+                double y_pos = ((double) y_pos_index) - ((((double) layer.size()) - 1.0) / 2.0);
+
+                //get the nodes index to sort the pc into a mapping between 3d and data objects
+                int co_index = getStructuralNodeDataIndexByNode(pc);
+
+                CompositeObject test_node = gen3DNode(ow, pc);
+                if (test_node != null) {
+                    test_node.getPositation().set_position(x_pos * 4.0, -y_pos * 2.0, 0.0);
+                    test_node.getPositation().set_scale(
+                            1.8 * test_node.getPositation().get_scale().x(),
+                            1.8 * test_node.getPositation().get_scale().y(),
+                            1.8 * test_node.getPositation().get_scale().z());
+
+                    //sort the node in...
+                    co_node_sorted_.set(co_index, test_node);
+                }
+
+
+                CompositeObject text_co = gen3DNodeText(ow, pc);
+                if (text_co != null) {
+                    text_co.getPositation().set_position(0.0f + x_pos * 4.0, 0.0f - y_pos * 2.0, 0.25f);
+                    text_co.getPositation().set_scale(
+                            0.8 * text_co.getPositation().get_scale().x(),
+                            0.8 * text_co.getPositation().get_scale().y(),
+                            0.8 * text_co.getPositation().get_scale().z());
+                    //sort the node text in
+                    co_node_text_sorted_.set(co_index, text_co);
+                }
+
+                y_pos_index += 1;
+            }
+            x_pos_index += 1;
+        }
+
+
+
+
+
+
+
+        //now gen the connections...
+
+        int edge_index = 0;
+        for(PComponent pc_edge : edges_pc_unsorted_){
+
+            //check if we have 2 connections...
+
+
+            if(pc_edge.hasEdge()){
+                Edge edge = pc_edge.getEdge();
+                if(edge != null){
+                    //get source
+                    CompositeObject source_co = null;
+                    int source_index = -1;
+                    if(edge.hasSourceNodeID()){
+                        String sourceID = edge.getSourceNodeID();
+                        if(sourceID != null){
+                            source_index = getStructuralNodeDataIndexByNodeID(sourceID);
+                            if(source_index >= 0){
+                                source_co = co_node_sorted_.get(source_index);
+                            }
+                        }
+                    }
+
+                    //get destination
+                    CompositeObject destination_co = null;
+                    int destination_index = -1;
+                    if(edge.hasDestinationNodeID()){
+                        String destinationID = edge.getDestinationNodeID();
+                        if(destinationID != null){
+                            destination_index = getStructuralNodeDataIndexByNodeID(destinationID);
+                            if(destination_index >= 0){
+                                destination_co = co_node_sorted_.get(destination_index);
+                            }
+                        }
+                    }
+
+
+                    //now lets check if we got both
+                    if((source_co != null) && (destination_co != null)){
+                        Log.e(TAG,"creating line from: " + source_index + "  to: " + destination_index);
+                        //create a connection...
+                        ArrayList<CompositeObject> line_list = gen3DLine(ow, pc_edge, source_co, destination_co);
+                        co_edges_unsorted_.set(edge_index, line_list);
+                    }
+
+                }
+            }
+
+            //co_edges_unsorted_
+            edge_index += 1;
+        }
+
+
+
+        //add all 3d object to a list so we can access the easily
+
+        for(CompositeObject co : co_node_sorted_){
+            all3dObjects.add(co);
+        }
+        for(CompositeObject co : co_node_text_sorted_){
+            all3dObjects.add(co);
+        }
+        for(ArrayList<CompositeObject> co_list : co_edges_unsorted_){
+            for(CompositeObject co : co_list){
+                all3dObjects.add(co);
+            }
+        }
+
+
+
+        Debugger.error(TAG,"--------3D OBJECTS generated!-------");
     }
 
     private boolean containsBranch(ArrayList<Branch> list, Branch b){
@@ -405,10 +562,41 @@ public class Process {
 
 
                         if(type.equalsIgnoreCase("ET_CONTROL")){
-                            line_list.add(ow.loadLineObject("line control",p1,p2,new Vector4(0.0f,1.0f,0.0f,1.0f)));
-                            Log.e(TAG,"p1: " + p1.x() + " " + p1.y() + " " + p1.z() +
-                                  "    p2: " + p2.x() + " " + p2.y() + " " + p2.z());
-                            Log.e(TAG,"Line created!");
+                            line_list.add(ow.loadLineObject("line control",p1,p2,line_et_control_color));
+
+                        }
+
+                        //ceates 2 lines
+                        //"ET_CONTROL_TO_DUMMY"
+                        if(type.equalsIgnoreCase("ET_CONTROL_TO_DUMMY")){
+                            line_list.add(ow.loadLineObject("line control",p1,p2,line_et_control_color));
+                            line_list.add(ow.loadLineObject("line control",p2,
+                                    p2.add(new Vector3(0.9*2.0,0.0,0.0)),
+                                    line_et_control_color));
+
+                        }
+
+                        //"ET_CONTROL_FROM_DUMMY"   same as "ET_CONTROL"
+                        if(type.equalsIgnoreCase("ET_CONTROL_FROM_DUMMY")){
+                            line_list.add(ow.loadLineObject("line control",p1,p2,line_et_control_color));
+                        }
+
+                        //NOT SURE IF NAME IS CORRECT
+                        //TODO: find out correct name...
+                        if(type.equalsIgnoreCase("ET_CONTROL_BACK???")){
+
+                            line_list.add(ow.loadLineObject("line control back",
+                                    p1,
+                                    p1.add(new Vector3(0.0,0.0,-1.0)),
+                                    line_et_control_back_color));
+                            line_list.add(ow.loadLineObject("line control back",
+                                    p1.add(new Vector3(0.0,0.0,-1.0)),
+                                    p2.add(new Vector3(0.0,0.0,-1.0)),
+                                    line_et_control_back_color));
+                            line_list.add(ow.loadLineObject("line control back",
+                                    p2,
+                                    p2.add(new Vector3(0.0,0.0,-1.0)),
+                                    line_et_control_back_color));
                         }
                     }
                     else{
@@ -426,29 +614,47 @@ public class Process {
             if(pc.getStructuralNodeData().hasType()){
                 String type = pc.getStructuralNodeData().getType();
                 if(type != null){
+
+
+                    if(type.equalsIgnoreCase("NT_STARTFLOW")){
+                        return ow.loadModelObject("node start", "processComponents/Node/node_start.obj", true);
+                    }
+
+                    if(type.equalsIgnoreCase("NT_ENDFLOW")){
+                        return ow.loadModelObject("node end", "processComponents/Node/node_end.obj", true);
+                    }
+
+
                     if(type.equalsIgnoreCase("NT_NORMAL")){
                         return ow.loadModelObject("node normal", "processComponents/Node/node_normal.obj", true);
                     }
 
                     if(type.equalsIgnoreCase("NT_XOR_JOIN")){
-                        CompositeObject co = ow.loadModelObject("node conditional", "processComponents/Node/node_conditional.obj", true);
+                        CompositeObject co = ow.loadModelObject("node conditional join", "processComponents/Node/node_conditional.obj", true);
                         co.getPositation().set_scale(-1.0,1.0,1.0);
                         return co;
                     }
 
                     if(type.equalsIgnoreCase("NT_XOR_SPLIT")){
-                        CompositeObject co = ow.loadModelObject("node conditional", "processComponents/Node/node_conditional.obj", true);
+                        CompositeObject co = ow.loadModelObject("node conditional split", "processComponents/Node/node_conditional.obj", true);
                         return co;
                     }
 
                     if(type.equalsIgnoreCase("NT_AND_JOIN")){
-                        CompositeObject co = ow.loadModelObject("node split", "processComponents/Node/node_parallel.obj", true);
+                        CompositeObject co = ow.loadModelObject("node parallel split", "processComponents/Node/node_parallel.obj", true);
                         co.getPositation().set_scale(-1.0,1.0,1.0);
                         return co;
                     }
 
                     if(type.equalsIgnoreCase("NT_AND_SPLIT")){
-                        CompositeObject co = ow.loadModelObject("node join", "processComponents/Node/node_parallel.obj", true);
+                        CompositeObject co = ow.loadModelObject("node parallel join", "processComponents/Node/node_parallel.obj", true);
+                        return co;
+                    }
+
+                    if(type.equalsIgnoreCase("DUMMY_NODE")){
+                        CompositeObject co = new CompositeObject("Dummy node", CompositeObject.Object_Movement_Type_MovementDynamic);
+                        Positation posi = new Positation();
+                        co.setPositation(posi);
                         return co;
                     }
                 }
@@ -459,29 +665,38 @@ public class Process {
     }
 
     private CompositeObject gen3DNodeText(ObjectWorld ow, PComponent pc){
-        if(pc.hasNode()){
-            if(pc.getNode().hasName()){
-                String node_name = pc.getNode().getName();
-                if(node_name != null) {
-                    //skip empty name... if somebody was so smart to enter more than
-                    //one space there... it's not my fault xD
-                    if (!node_name.equals("") && !node_name.equals(" ")){
-                        CompositeObject text_co = ow.loadModelObject("test_text", "text_model.obj", false);
-                        text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
-                                "FF00FF_TEXT_BG.png", node_name, 100.0f, 0, 255, 0
-                        );
-                        return text_co;
+        if(pc.hasStructuralNodeData()) {
+            if (pc.getStructuralNodeData().hasType()) {
+                String type = pc.getStructuralNodeData().getType();
+
+                if (!type.equalsIgnoreCase("DUMMY_NODE")) {
+
+                    if (pc.hasNode()) {
+                        if (pc.getNode().hasName()) {
+                            String node_name = pc.getNode().getName();
+                            if (node_name != null) {
+                                //skip empty name... if somebody was so smart to enter more than
+                                //one space there... it's not my fault xD
+                                if (!node_name.equals("") && !node_name.equals(" ")) {
+                                    CompositeObject text_co = ow.loadModelObject("test_text", "text_model.obj", false);
+                                    text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
+                                            "FF00FF_TEXT_BG.png", node_name, 22.0f, 15, 15, 15
+                                    );
+                                    return text_co;
+                                }
+                            }
+                        }
+                        if (pc.getNode().hasID()) {
+                            String node_id = pc.getNode().getID();
+                            if (node_id != null) {
+                                CompositeObject text_co = ow.loadModelObject("test_text", "text_model.obj", false);
+                                text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
+                                        "FF00FF_TEXT_BG.png", node_id, 22.0f, 15, 15, 15
+                                );
+                                return text_co;
+                            }
+                        }
                     }
-                }
-            }
-            if(pc.getNode().hasID()){
-                String node_id = pc.getNode().getID();
-                if(node_id != null){
-                    CompositeObject text_co = ow.loadModelObject("test_text", "text_model.obj", false);
-                    text_co.getModel().get_meshs().get(0).get_material().setDiffuseText(
-                            "FF00FF_TEXT_BG.png", node_id, 100.0f, 0, 255, 0
-                    );
-                    return text_co;
                 }
             }
         }
@@ -764,10 +979,10 @@ public class Process {
             Debugger.error(TAG,"branch id: " + b.getBranchID());
 
             b.setOverlappingBranchCount(
-                getVerticalOverlappingBranchCount(
-                        b.getDistance(),
-                        b.getDistance() + b.getElements().size() - 1
-                )
+                    getVerticalOverlappingBranchCount(
+                            b.getDistance(),
+                            b.getDistance() + b.getElements().size() - 1
+                    )
             );
         }
 
@@ -782,6 +997,16 @@ public class Process {
     }
 
     private void generateSortedStructure_v3() {
+
+        if(componentList_ == null){
+            return;
+        }
+
+        if(componentList_.size() == 0){
+            return;
+        }
+
+
         ArrayList<PComponent> nodes_pc = new ArrayList<PComponent>();
         ArrayList<PComponent> structuralNodeData_pc = new ArrayList<PComponent>();
 
@@ -894,7 +1119,7 @@ public class Process {
 
         //check if first node is startnode...
         boolean has_start = false;
-        PComponent pc_start = node_structuralNodeData_pc_sorted_.get(0);
+        PComponent pc_start = getStartNode();
         has_start = isStartNode(pc_start);
         if (!has_start) {
             Log.e(TAG, "generateSortedStructure_v2()  no start node ...");
@@ -1110,6 +1335,7 @@ public class Process {
         }
 
 
+        /*
         Debugger.error(TAG,"-----------DEBUG LAYERS------------");
         //debug layers...
         for(ArrayList<PComponent> layer : graph_layers){
@@ -1118,7 +1344,7 @@ public class Process {
             }
             Debugger.error(TAG,"-----------LAYER END------------");
         }
-
+        */
 
         Debugger.error(TAG,"stretch layers...");
 
@@ -1140,8 +1366,6 @@ public class Process {
                     for(PComponent p_pc : previous_nodes){
                         if(isNodeInLayer(p_pc, layer)){
                             found = true;
-                            Debugger.error(TAG,"---------found!");
-                            Debugger.error(TAG,"---------layer_index: " + layer_index);
                             debugPComponent(pc);
                             break;
                         }
@@ -1203,6 +1427,89 @@ public class Process {
             cutEdgeInGraphLayer(edge);
         }
 
+        /*
+        Debugger.error(TAG,"-----------DEBUG LAYERS------------");
+        //debug layers...
+        for(ArrayList<PComponent> layer : graph_layers){
+
+            for(PComponent pc : layer){
+                debugPComponent(pc);
+            }
+            Debugger.error(TAG,"-----------LAYER END------------");
+        }
+        */
+
+        //check all edges if they are crossing
+        Debugger.error(TAG,"-----------CHECK FOR CROSSINGS------------");
+        int max_loops = 1000;
+        int loop = 0;
+        boolean crossing_edges = true;
+
+        while(crossing_edges){
+
+            crossing_edges = false;
+
+            for(PComponent edge_l_1 : edges_pc_unsorted_) {
+                if (edge_l_1.hasEdge()) {
+                    if (edge_l_1.getEdge() != null) {
+                        for (PComponent edge_l_2 : edges_pc_unsorted_) {
+                            if (edge_l_2.hasEdge()) {
+                                if (edge_l_2.getEdge() != null) {
+
+
+                                    if(areEdgesCrossing(edge_l_1, edge_l_2, graph_layers)){
+
+                                        Debugger.error(TAG,"-------CROSSING-");
+
+                                        //ok edges are crossing, get their destination layer indices
+                                        //and swap their position in the layers
+
+                                        crossing_edges = true;
+
+                                        //get destination nodes
+                                        String destination_node_1_id = getEdgeDestinationID(edge_l_1);
+                                        String destination_node_2_id = getEdgeDestinationID(edge_l_2);
+
+                                        PComponent destination_node_1 = getStructuralNodeDataByNodeID(destination_node_1_id);
+                                        PComponent destination_node_2 = getStructuralNodeDataByNodeID(destination_node_2_id);
+
+                                        if((destination_node_1 == null) || (destination_node_2 == null)){
+                                            continue;
+                                        }
+
+                                        //get destination Nodes indices  of layer in graph_layers...
+                                        int graph_layer_index_destination_node_1 = getGraphLayerIndexOfNode(destination_node_1,graph_layers);
+
+
+                                        //found nodes in layers
+                                        if(graph_layer_index_destination_node_1 >= 0){
+                                            //swap pos in layer
+
+                                            ArrayList<PComponent> layer = graph_layers.get(graph_layer_index_destination_node_1);
+                                            int node_1_index = getIndexOfNodeInLayer(destination_node_1,graph_layers.get(graph_layer_index_destination_node_1));
+                                            int node_2_index = getIndexOfNodeInLayer(destination_node_2,graph_layers.get(graph_layer_index_destination_node_1));
+
+
+                                            layer.set(node_1_index,destination_node_2);
+                                            layer.set(node_2_index,destination_node_1);
+
+                                        }
+
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            loop += 1;
+
+            if(loop >= max_loops){
+                crossing_edges = false;
+            }
+        }
 
         Debugger.error(TAG,"-----------DEBUG LAYERS------------");
         //debug layers...
@@ -1215,6 +1522,160 @@ public class Process {
         }
 
     }
+
+    private boolean areEdgesCrossing(PComponent edge1,
+                                     PComponent edge2,
+                                     ArrayList<ArrayList<PComponent>> graph_layers){
+
+        //check if input edges actually have edges...
+        if(!edge1.hasEdge() || !edge2.hasEdge()){
+            Debugger.error(TAG,"--------------edge1 or edge2 has no EDGE");
+            return false;
+        }
+        if((edge1.getEdge() == null) || (edge2.getEdge() == null)){
+            Debugger.error(TAG,"--------------edge1 or edge2 EDGE is null");
+            return false;
+        }
+
+
+        //check the indices on the layers...
+
+
+        //get source nodes
+        String source_node_1_id = getEdgeSourceID(edge1);
+        String source_node_2_id = getEdgeSourceID(edge2);
+
+        PComponent source_node_1 = getStructuralNodeDataByNodeID(source_node_1_id);
+        PComponent source_node_2 = getStructuralNodeDataByNodeID(source_node_2_id);
+
+        if((source_node_1 == null) || (source_node_2 == null)){
+            Debugger.error(TAG,"--------------source_node_1 or source_node_2 are null");
+            return false;
+        }
+
+        Debugger.error(TAG,"---CROSSING TEST:");
+
+        //get source Nodes indices of layer in graph_layers...
+        int graph_layer_index_source_node_1 = getGraphLayerIndexOfNode(source_node_1,graph_layers);
+        int graph_layer_index_source_node_2 = getGraphLayerIndexOfNode(source_node_2,graph_layers);
+
+
+
+        //couldn't find nodes in layers
+        if((graph_layer_index_source_node_1 < 0) || (graph_layer_index_source_node_1 < 0)){
+            return false;
+        }
+
+        //nodes are not on same level so they do not cross...
+        if(graph_layer_index_source_node_1 != graph_layer_index_source_node_2){
+            return false;
+        }
+
+        Debugger.error(TAG,"---graph_layer_index_source_node_1: " + graph_layer_index_source_node_1);
+        Debugger.error(TAG,"---graph_layer_index_source_node_2: " + graph_layer_index_source_node_2);
+
+
+
+        //get destination nodes
+        String destination_node_1_id = getEdgeDestinationID(edge1);
+        String destination_node_2_id = getEdgeDestinationID(edge2);
+
+        Debugger.error(TAG,"----destination_node_1_id: " + destination_node_1_id);
+        Debugger.error(TAG,"----destination_node_2_id: " + destination_node_2_id);
+
+
+        PComponent destination_node_1 = getStructuralNodeDataByNodeID(destination_node_1_id);
+        PComponent destination_node_2 = getStructuralNodeDataByNodeID(destination_node_2_id);
+
+        if((destination_node_1 == null) || (destination_node_2 == null)){
+            return false;
+        }
+
+        //get destination Nodes indices  of layer in graph_layers...
+        int graph_layer_index_destination_node_1 = getGraphLayerIndexOfNode(destination_node_1,graph_layers);
+        int graph_layer_index_destination_node_2 = getGraphLayerIndexOfNode(destination_node_2,graph_layers);
+
+        //couldn't find nodes in layers
+        if((graph_layer_index_destination_node_1 < 0) || (graph_layer_index_destination_node_2 < 0)){
+            return false;
+        }
+
+        Debugger.error(TAG,"---graph_layer_index_destination_node_1: " + graph_layer_index_destination_node_1);
+        Debugger.error(TAG,"---graph_layer_index_destination_node_2: " + graph_layer_index_destination_node_2);
+
+        //nodes are not on same level so they do not cross...
+        if(graph_layer_index_destination_node_1 != graph_layer_index_destination_node_2){
+            return false;
+        }
+
+
+
+        //get the node's indices on their levels...
+        int layer_index_source_node_1 = getIndexOfNodeInLayer(
+                source_node_1,
+                graph_layers.get(graph_layer_index_source_node_1)
+        );
+        int layer_index_source_node_2 = getIndexOfNodeInLayer(
+                source_node_2,
+                graph_layers.get(graph_layer_index_source_node_2)
+        );
+
+        int layer_index_destination_node_1 = getIndexOfNodeInLayer(
+                destination_node_1,
+                graph_layers.get(graph_layer_index_destination_node_1)
+        );
+        int layer_index_destination_node_2 = getIndexOfNodeInLayer(
+                destination_node_2,
+                graph_layers.get(graph_layer_index_destination_node_2)
+        );
+
+        //check if indices are correct...
+        if(     (layer_index_source_node_1 < 0) ||
+                (layer_index_source_node_2 < 0) ||
+                (layer_index_destination_node_1 < 0) ||
+                (layer_index_destination_node_2 < 0)){
+            return false;
+        }
+
+
+        //now check if crossing...
+        //same root ? no cross
+        if(layer_index_source_node_1 == layer_index_source_node_2){
+            return false;
+        }
+
+        //same destination ? no cross
+        if(layer_index_destination_node_1 == layer_index_destination_node_2){
+            return false;
+        }
+
+        Debugger.error(TAG,"---checking....");
+
+        if(layer_index_source_node_1 < layer_index_source_node_2){
+            if(layer_index_destination_node_1 < layer_index_destination_node_2){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
+
+        if(layer_index_source_node_1 > layer_index_source_node_2){
+            if(layer_index_destination_node_1 > layer_index_destination_node_2){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
+
+
+
+
+        return false;
+    }
+
+
 
     //looks almost the same as isEdgeOverMultipleLayers...
     private void cutEdgeInGraphLayer(PComponent edge){
@@ -1258,13 +1719,20 @@ public class Process {
                             last_dummy = createNewDummyNode();
                             graph_layers.get(current_index).add(last_dummy);
                             Debugger.error(TAG,"CUTTING...");
-                            edges_pc_unsorted_.add(createNewEdge(source_id,last_dummy.getNode().getID()));
 
+                            //make space for new data
+                            node_structuralNodeData_pc_sorted_.add(last_dummy);
+                            co_node_sorted_.add(new CompositeObject());
+                            co_node_text_sorted_.add(new CompositeObject());
+
+                            edges_pc_unsorted_.add(createNewEdge(source_id,last_dummy.getNode().getID(),"ET_CONTROL_TO_DUMMY"));
+                            co_edges_unsorted_.add(new ArrayList<CompositeObject>());
                             current_index += 1;
                         }
 
                         if(last_dummy!=null) {
-                            edges_pc_unsorted_.add(createNewEdge(last_dummy.getNode().getID(), destination_id));
+                            edges_pc_unsorted_.add(createNewEdge(last_dummy.getNode().getID(), destination_id, "ET_CONTROL_FROM_DUMMY"));
+                            co_edges_unsorted_.add(new ArrayList<CompositeObject>());
                         }
                     }
                 }
@@ -1272,9 +1740,9 @@ public class Process {
         }
     }
 
-    private PComponent createNewEdge(String from_nodeID, String to_nodeID){
+    private PComponent createNewEdge(String from_nodeID, String to_nodeID, String type){
         PComponent pc = new PComponent();
-        Edge e = new Edge(to_nodeID, from_nodeID, "ET_CONTROL");
+        Edge e = new Edge(to_nodeID, from_nodeID, type);
         pc.addEdge(e);
         return pc;
     }
@@ -1336,6 +1804,17 @@ public class Process {
         return false;
     }
 
+    private int getGraphLayerIndexOfNode(PComponent pc, ArrayList<ArrayList<PComponent>> graph_layers){
+        int index = 0;
+        for(ArrayList<PComponent> layer : graph_layers){
+            if(isNodeInLayer(pc,layer)){
+                return index;
+            }
+            index += 1;
+        }
+        return -1;
+    }
+
     private boolean isNodeInLayer(PComponent pc, ArrayList<PComponent> pc_list){
         String node_id = getNodesID(pc);
         if(node_id == null){
@@ -1350,6 +1829,24 @@ public class Process {
             }
         }
         return false;
+    }
+
+    private int getIndexOfNodeInLayer(PComponent pc, ArrayList<PComponent> pc_list){
+        String node_id = getNodesID(pc);
+        if(node_id == null){
+            return -1;
+        }
+        int index = 0;
+        for(PComponent pc_l : pc_list){
+            String l_node_id = getNodesID(pc_l);
+            if(l_node_id != null){
+                if(node_id.equalsIgnoreCase(l_node_id)){
+                    return index;
+                }
+            }
+            index += 1;
+        }
+        return -1;
     }
 
 
@@ -1733,9 +2230,13 @@ public class Process {
 
     private String getNodesID(PComponent pc){
         String id = null;
-        if(pc.hasNode()){
-            if(pc.getNode().hasID()){
-                id = pc.getNode().getID();
+        if(pc != null) {
+            if (pc.hasNode()) {
+                if (pc.getNode() != null) {
+                    if (pc.getNode().hasID()) {
+                        id = pc.getNode().getID();
+                    }
+                }
             }
         }
         return id;
@@ -2321,6 +2822,3 @@ public class Process {
 
 
 }
-
-
-

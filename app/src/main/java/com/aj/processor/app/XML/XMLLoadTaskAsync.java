@@ -85,11 +85,12 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
         }
     }
 
+    //untested...
     private String loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
         InputStream stream = null;
         // Instantiate the parser
         XMLParser parser = new XMLParser();
-        List<PComponent> pcomps = null;
+        List<PComponent> pcomps = new ArrayList<PComponent>();
 
         try {
             stream = downloadUrl(urlString);
@@ -103,7 +104,7 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
         }
 
         //pack the pcomps into a process
-        process = new Process(pcomps);
+        process = new Process(urlString, pcomps);
 
 
         return "loadXmlFromNetwork done.";
@@ -116,11 +117,16 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
         InputStream stream = null;
         // Instantiate the parser
         XMLParser parser = new XMLParser();
-        List<PComponent> pcomps = null;
+        List<PComponent> pcomps = new ArrayList<PComponent>();
 
         try {
             stream = openAsset(pathString);
-            pcomps = parser.parse(stream);
+            if(stream != null) {
+                pcomps = parser.parse(stream);
+            }
+            else{
+                Log.e("XMLLoadTaskAsync","STREAM FROM ASSET IS NULL... Does " + pathString + " even exist?");
+            }
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
         } finally {
@@ -130,7 +136,7 @@ public class XMLLoadTaskAsync extends AsyncTask<String, Void, String> {
         }
 
         //pack the pcomps into a process
-        process = new Process(pcomps);
+        process = new Process(pathString, pcomps);
 
 
         Log.e("XMLLoadTaskAsync","loadXmlFromAssets done?");

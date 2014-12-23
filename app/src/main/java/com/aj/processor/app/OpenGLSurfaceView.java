@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
+import java.util.Calendar;
+
 /**
  * Created by AJ on 14.11.2014.
  */
@@ -16,7 +18,7 @@ public class OpenGLSurfaceView extends GLSurfaceView {
     private final OpenGLEngine renderer;
     private MainInterface mainInterface;
     private ScaleGestureDetector sgd;
-    private String tag = "OpenGLSurfaceView";
+    private String TAG = "OpenGLSurfaceView";
 
     public OpenGLSurfaceView(Context context) {
         super(context);
@@ -30,13 +32,13 @@ public class OpenGLSurfaceView extends GLSurfaceView {
         renderer = new OpenGLEngine();
         setRenderer(renderer);
 
-
-        getHolder().setFormat(PixelFormat.TRANSLUCENT);
+// old : TRANSLUCENT
+        getHolder().setFormat(PixelFormat.TRANSPARENT);
         setZOrderMediaOverlay(true);
 
 
 
-        // Render the view only when there is a change in the drawing data
+        // Render the view all the time...
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
         sgd = new ScaleGestureDetector(context, new ScaleListener());
@@ -49,13 +51,28 @@ public class OpenGLSurfaceView extends GLSurfaceView {
     private float mPreviousScale = 1.0f;
 
 
-    private int rotMode = 0x0001;
-    private int moveMode = 0x0002;
+    public final static int rotMode = 0x0001;
+    public final static int moveMode = 0x0002;
+    public final static int scaleMode = 0x0004;
 
     private int interactMode = rotMode;
 
     private float max_scale = 64.0f;
     private float min_scale = 0.3f;
+
+
+    //recognize clicks
+    private final int MAX_CLICK_DURATION = 400;
+    private final int MAX_CLICK_DISTANCE = 5;
+    private long startClickTime;
+
+    private float x1;
+    private float y1;
+    private float x2;
+    private float y2;
+
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
@@ -66,9 +83,11 @@ public class OpenGLSurfaceView extends GLSurfaceView {
         float x = e.getX();
         float y = e.getY();
 
-        //detect pinch gesture...
-        sgd.onTouchEvent(e);
-        scale_renderer(mPreviousScale);
+        if(interactMode == scaleMode) {
+            //detect pinch gesture...
+            sgd.onTouchEvent(e);
+            scale_renderer(mPreviousScale);
+        }
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_MOVE:
@@ -76,45 +95,39 @@ public class OpenGLSurfaceView extends GLSurfaceView {
                 float dx = x - mPreviousX;
                 float dy = y - mPreviousY;
 
-                if(interactMode == rotMode) {
+                if (interactMode == rotMode) {
                     rotate_renderer(dx, dy);
-                }
-                else if(interactMode == moveMode){
+                } else if (interactMode == moveMode) {
                     pos_renderer(dx, dy);
                 }
 
-                requestRender();
+                //not required we render continuously...
+                //requestRender();
                 break;
+
+
+            case MotionEvent.ACTION_DOWN: {
+                startClickTime = Calendar.getInstance().getTimeInMillis();
+                x1 = e.getX();
+                y1 = e.getY();
+                break;
+            }
+
             case MotionEvent.ACTION_UP:
 
-                //left lower corner (toogle capturing of markers...)
-                if(x < 100.0f){
-                    if(y > (getHeight() - 100.0f)){
-                        //stop capturing... or start again...
-                        if(mainInterface != null){
-                            mainInterface.toggleOpenCV();
-                        }
-                        //reset renderer pos...
-                        pos_renderer(0.0f, 0.0f);
-                        scale_renderer(1.0f);
-                    }
+                long clickDuration = Calendar.getInstance().getTimeInMillis() - startClickTime;
+                x2 = e.getX();
+                y2 = e.getY();
+                float dx_click = x2 - x1;
+                float dy_click = y2 - y1;
+
+                if (clickDuration < MAX_CLICK_DURATION && dx_click < MAX_CLICK_DISTANCE && dy_click < MAX_CLICK_DISTANCE){
+                    //Debugger.error(TAG, "CLICK recognized");
+                    dispatchTouch(x2, y2);
                 }
 
-                //right lower corner (toogle move or rotate...)
-                if(x > (getWidth() - 100.0f)){
-                    if(y > (getHeight() - 100.0f)){
-                        if(interactMode == moveMode){
-                            interactMode = rotMode;
-                            Log.e(tag,"switched interaction mode to rotate");
-                        }
-                        else{
-                            interactMode = moveMode;
-                            Log.e(tag,"switched interaction mode to move");
-                        }
-                    }
-                }
-                requestRender();
-                break;
+                //not required we render continuously...
+                //requestRender();
         }
 
         mPreviousX = x;
@@ -122,18 +135,78 @@ public class OpenGLSurfaceView extends GLSurfaceView {
         return true;
     }
 
+    //dispatch the touch click event to its functions...
+    private void dispatchTouch(float x, float y){
+        //left upper corner (toogle capturing of markers...)
+        if(x < 100.0f){
+            if(y < 100.0f){
+                //stop capturing... or start again...
+                if(mainInterface != null){
+                    Log.e(TAG,"Toggle capturer");
+                    mainInterface.toggleOpenCV();
+                    Log.e(TAG,"Toggle capturer done !");
+                    //reset renderer pos...
+                    resetRenderer();
+                    return;
+                }
+            }
+        }
+
+        //right lower corner (toogle move or rotate...)
+        if(x < 200.0f){
+            if(y > (getHeight() - 200.0f)){
+                if(interactMode == moveMode){
+                    interactMode = scaleMode;
+                    Log.e(TAG,"switched interaction mode to scale");
+                    set_renderer_interact_mode();
+                    return;
+                }
+                else if(interactMode == scaleMode){
+                    interactMode = rotMode;
+                    Log.e(TAG,"switched interaction mode to rot");
+                    set_renderer_interact_mode();
+                    return;
+
+                }
+                else if(interactMode == rotMode){
+                    interactMode = moveMode;
+                    Log.e(TAG,"switched interaction mode to move");
+                    set_renderer_interact_mode();
+                    return;
+                }
+            }
+        }
+
+        //else
+        rendererTouch(x,y);
+    }
+
+
+    private void set_renderer_interact_mode(){
+        if(renderer != null){
+            renderer.setInteractMode(this.interactMode);
+        }
+    }
+
+
     private void rotate_renderer(float dx, float dy){
-        renderer.setAngleX(renderer.getAngleX() + (dx * TOUCH_SCALE_FACTOR) );
-        renderer.setAngleY(renderer.getAngleY() + (dy * TOUCH_SCALE_FACTOR) );
+        if(renderer != null){
+            renderer.setAngleX(renderer.getAngleX() + (dx * TOUCH_SCALE_FACTOR) );
+            renderer.setAngleY(renderer.getAngleY() + (dy * TOUCH_SCALE_FACTOR) );
+        }
     }
 
     private void scale_renderer(float scl){
-        renderer.setScale(scl);
+        if(renderer != null) {
+            renderer.setScale(scl);
+        }
     }
 
     private void pos_renderer(float x, float y){
-        renderer.setPosX(renderer.getPosX() + x);
-        renderer.setPosY(renderer.getPosY() + y);
+        if(renderer != null) {
+            renderer.setPosX(renderer.getPosX() + x);
+            renderer.setPosY(renderer.getPosY() + y);
+        }
     }
 
 
@@ -153,6 +226,26 @@ public class OpenGLSurfaceView extends GLSurfaceView {
         if(renderer != null) {
             this.mainInterface = mainInterface;
             renderer.setMainInterFace(mainInterface);
+        }
+    }
+
+
+    private void resetRenderer(){
+        if(renderer != null) {
+            //reset scale, rotate and pos of renderer...
+            renderer.setPosX(0);
+            renderer.setPosY(0);
+            scale_renderer(1.0f);
+            mPreviousScale = 1.0f;
+            renderer.setAngleX(0.0f);
+            renderer.setAngleY(0.0f);
+        }
+    }
+
+    private void rendererTouch(float x, float y){
+        if(renderer != null) {
+            //redirect the touch to the renderer...
+            renderer.onTouch(x,y);
         }
     }
 }

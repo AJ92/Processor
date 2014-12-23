@@ -47,7 +47,8 @@ public class ImagineActivity extends Activity {
         framework = new MainInterface(this, cameraMatrix, distortionCoefficients);
 
         // Import model
-        float[] conv = framework.importOBJ(house, null, 0.75f);
+        //we dont need to import anything here...
+        //float[] conv = framework.importOBJ(house, null, 0.75f);
 
         // Get and parse options to set
         Bundle options = getIntent().getExtras();
@@ -103,10 +104,26 @@ public class ImagineActivity extends Activity {
                     // do nothing
             }
 
+            //TODO: register marker values and XML documents...
+
             // register all trackables:
+            //modified .... we need xmls here...
+
+            //OLD VERSION
+            /*
             ArrayList<Integer> tra = options.getIntegerArrayList("trackers");
             for (int value : tra)
                 framework.registerEntity(new Tracking(value, true, conv));
+
+            */
+
+
+            //new version
+            ArrayList<Integer> trackers = options.getIntegerArrayList("trackers");
+            ArrayList<String> processes = options.getStringArrayList("processes");
+            for (int i = 0; i < trackers.size(); i++)
+                framework.registerEntity(new Tracking(trackers.get(i), processes.get(i), true, null));
+
         }
 
         // Call on create:
@@ -131,6 +148,10 @@ public class ImagineActivity extends Activity {
         framework.onDestroy();
     }
 
+
+    //modified
+    //one does not simply place models into code...
+    /*
     String house = "# Blender v2.68 (sub 0) OBJ File: ''\n" +
             "# www.blender.org\n" +
             "mtllib untitled.mtl\n" +
@@ -757,4 +778,6 @@ public class ImagineActivity extends Activity {
             "f 125 21 126\n" +
             "f 207 103 208\n" +
             "f 101 205 208";
+
+            */
 }

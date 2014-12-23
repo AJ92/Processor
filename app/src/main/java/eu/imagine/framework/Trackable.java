@@ -38,4 +38,8 @@ public class Trackable {
     public int getY(){
         return y_coord;
     }
+
+    public int getID(){
+        return this.ID;
+    }
 }

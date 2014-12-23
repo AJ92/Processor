@@ -1,3 +1,7 @@
+
+
+
+
 package com.aj.processor.app;
 
 import android.opengl.GLES20;
@@ -32,6 +36,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
+import eu.imagine.framework.Entity;
 import eu.imagine.framework.Messenger;
 import eu.imagine.framework.Trackable;
 
@@ -95,8 +100,12 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
     //DEFAULT MODEL to render in case we have broken models or so...
 
 
-    private boolean process_loaded = false;
-    private Process test_process;
+    private ArrayList<Process> processes_to_load_into_ow = new ArrayList<Process>();
+    private ArrayList<Process> processes = new ArrayList<Process>();
+
+    //mapping between process and marker id
+    private ArrayList<Entity> marker_process_mapping = new ArrayList<Entity>();
+
 
     private Camera default_cam;
 
@@ -107,11 +116,13 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
     private Matrix4x4 ortho_m = new Matrix4x4();
 
 
-    private Line x_dir;
-    private Line y_dir;
-    private Line z_dir;
+    //GIZMOS
+    //same as in OpenGLSurfaceView
+    private int gizmo_mode = OpenGLSurfaceView.rotMode;
 
-    private ArrayList<Line> lines = new ArrayList<Line>();
+    private ArrayList<Line> gizmo_move = new ArrayList<Line>();
+    private ArrayList<Line> gizmo_scale = new ArrayList<Line>();
+    private ArrayList<Line> gizmo_rotate = new ArrayList<Line>();
 
     private Positation gizmo_posi = new Positation();
 
@@ -209,14 +220,9 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
             log.pushTimer(this, "opengl frame");
 
 
-        //TODO:
-        //JUST A TEST CHECK...
-        if(process_loaded){
-            if(ow != null) {
-                loadProcessIntoObjectWorld(test_process);
-                process_loaded = false;
-            }
-        }
+        checkForProcessesToLoad();
+
+
 
         if(default_cam != null) {
             //create the projection matrix...
@@ -241,8 +247,8 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
 
             // ------------------ get new markerlist if needed --------
             if(mainInterface != null) {
-                if (mainInterface.getListUpdateStatus()) {
-                    this.toRender = mainInterface.getList();
+                if (mainInterface.getRecognizedTrackablesStatus()) {
+                    this.toRender = mainInterface.getRecognizedTrackables();
                     if (toRender == null) {
                         log.log(TAG, "Error getting list!");
                         toRender = new ArrayList<Trackable>();
@@ -324,6 +330,49 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                                 drawLine(co.getLine());
                             }
                         }
+
+
+
+
+                        //render gizmo
+
+                        //convert it to space coords
+                        Vector3 gizmo_space_pos = touch_to_space(default_cam, 100, window_size_y - 100);
+                        //scale the pos (move away from origin)
+                        Vector3 gizmo_space_pos_scaled = gizmo_space_pos.multiply( default_cam.getZNEAR() + 6.0);
+                        //move away from camera pos (the position we want to render our model at...)
+                        Vector3 gizmo_final_space_pos = default_cam.getPosition().add(gizmo_space_pos_scaled);
+
+                        gizmo_posi.set_position(gizmo_final_space_pos);
+
+
+                        v_m = default_cam.get_view_matrix();
+                        pv_m = p_m.multiply(v_m);
+
+                        pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
+
+                        if(gizmo_mode == OpenGLSurfaceView.moveMode) {
+                            //gizmo for move mode
+                            for (Line line_gizmo : gizmo_move) {
+                                drawLine(line_gizmo);
+                            }
+                        }
+                        else if(gizmo_mode == OpenGLSurfaceView.rotMode) {
+                            //gizmo for rotate mode
+                            for (Line line_gizmo : gizmo_rotate) {
+                                drawLine(line_gizmo);
+                            }
+                        }
+                        else if(gizmo_mode == OpenGLSurfaceView.scaleMode) {
+                            //gizmo for scale mode
+                            for (Line line_gizmo : gizmo_scale) {
+                                drawLine(line_gizmo);
+                            }
+                        }
+
+
+
+
                         GLES20.glDisableVertexAttribArray(locPositionLine);
                         //LINES DONE
                     }
@@ -335,35 +384,6 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
             }
 
 
-
-
-            //      ------------------- line shader only for gizmo atm-----------------
-
-            GLES20.glEnableVertexAttribArray(locPositionLine);
-            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-
-            //render gizmo
-
-            //convert it to space coords
-            Vector3 space_pos = touch_to_space(default_cam, 100, window_size_y - 100);
-            //scale the pos (move away from origin)
-            Vector3 space_pos_scaled = space_pos.multiply( default_cam.getZNEAR() + 6.0);
-            //move away from camera pos (the position we want to render our model at...)
-            Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
-
-            gizmo_posi.set_position(final_space_pos);
-
-
-            v_m = default_cam.get_view_matrix();
-            pv_m = p_m.multiply(v_m);
-
-            pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
-
-            //gizmo
-            drawLine(x_dir);
-            drawLine(y_dir);
-            drawLine(z_dir);
-
             GLES20.glDisableVertexAttribArray(locPositionLine);
 
 
@@ -373,6 +393,60 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                 log.debug(TAG, "OpenGL rendered frame in " + log.popTimer(this).time + "ms.");
             }
         }
+    }
+
+    public void checkForProcessesToLoad(){
+
+        if(processes_to_load_into_ow.size() > 0) {
+            for (Process p : processes_to_load_into_ow) {
+                loadProcessIntoObjectWorld(p);
+            }
+            processes_to_load_into_ow.clear();
+        }
+
+
+        if(mainInterface != null) {
+            if(mainInterface.getAllTrackingsStatus()){
+                for(Entity e : mainInterface.getAllTrackings()){
+                    addTrackingToMapping(e);
+                }
+            }
+        }
+    }
+
+    public void addTrackingToMapping(Entity e){
+        if(isTrackingInMapping(e)){
+            return;
+        }
+
+        //also load the process...
+        //TEST XML PARSER (after ow construction... cause we need ow...)
+        XMLLoadTaskAsync xmllta = new XMLLoadTaskAsync();
+        // add the renderer as listener so once xml and the process is ready we can
+        //construct a 3D representation of it
+        xmllta.addXMLProcessLoadedListener(this);
+        //xmllta.retreiveXMLFromAssets("test.xml");
+        xmllta.retreiveXMLFromAssets(e.getProcess());
+
+        marker_process_mapping.add(e);
+    }
+
+    public boolean isTrackingInMapping(Entity e){
+        for(Entity ent : marker_process_mapping){
+            if(ent.getID() == e.getID()){
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public void onTouch(double x, double y){
+
+    }
+
+
+    public void setInteractMode(int mode){
+        gizmo_mode = mode;
     }
 
     /**
@@ -509,14 +583,17 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
 
     @Override
     public void onXMLProcessLoaded(Process p) {
-        test_process = p;
-        process_loaded = true;
+        //just to make sure...
+        synchronized (this) {
+            processes_to_load_into_ow.add(p);
+        }
     }
 
     private void loadProcessIntoObjectWorld(Process p){
         //create the objects we need and connect them with lines and so on...
         //p.generate3dDataObjects_v3(ow);
         p.generate3dDataObjects_v4(ow);
+        processes.add(p);
     }
 
     private void createBasicAssets(){
@@ -533,14 +610,15 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
         ow = new ObjectWorld(ObjectWorld.store_mode_simple);
 
 
+        /*
         //TEST XML PARSER (after ow construction... cause we need ow...)
         XMLLoadTaskAsync xmllta = new XMLLoadTaskAsync();
         // add the renderer as listener so once xml and the process is ready we can
         //construct a 3D representation of it
         xmllta.addXMLProcessLoadedListener(this);
         //xmllta.retreiveXMLFromAssets("test.xml");
-        xmllta.retreiveXMLFromAssets("frage20nl.xml");
-
+        xmllta.retreiveXMLFromAssets("test.xml");
+        */
 
         /*
         for(int y = 0; y < 10; y++) {
@@ -571,24 +649,169 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
         */
 
 
-        //gizmo
-        x_dir = new Line(
+        ////////////////////////////////////////////////////////////////
+        //gizmo for move mode
+        gizmo_move.add(new Line(
                 0.0f,0.0f,0.0f,
                 0.5f,0.0f,0.0f,
                 1.0f,0.0f,0.0f,1.0f
-        );
+        ));
 
-        y_dir = new Line(
+        gizmo_move.add(new Line(
                 0.0f,0.0f,0.0f,
                 0.0f,0.5f,0.0f,
                 0.0f,1.0f,0.0f,1.0f
-        );
+        ));
 
-        z_dir = new Line(
+        gizmo_move.add(new Line(
                 0.0f,0.0f,0.0f,
                 0.0f,0.0f,0.5f,
                 0.0f,0.0f,1.0f,1.0f
-        );
+        ));
+
+
+
+        ////////////////////////////////////////////////////////////////
+        //gizmo for scale mode...
+        gizmo_scale.add(new Line(
+                0.0f,0.0f,0.0f,
+                0.5f,0.0f,0.0f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+
+        gizmo_scale.add(new Line(
+                0.0f,0.0f,0.0f,
+                0.0f,0.5f,0.0f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+
+        gizmo_scale.add(new Line(
+                0.0f,0.0f,0.0f,
+                0.0f,0.0f,0.5f,
+                0.0f,0.0f,1.0f,1.0f
+        ));
+        //interconnect the lines for scale...
+        gizmo_scale.add(new Line(
+                0.0f,0.25f,0.0f,
+                0.25f,0.0f,0.0f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+
+        gizmo_scale.add(new Line(
+                0.0f,0.0f,0.25f,
+                0.0f,0.25f,0.0f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+
+        gizmo_scale.add(new Line(
+                0.25f,0.0f,0.0f,
+                0.0f,0.0f,0.25f,
+                0.0f,0.0f,1.0f,1.0f
+        ));
+
+
+
+        ////////////////////////////////////////////////////////////////
+        //gizmo for rot mode...
+
+        //x axis circle
+        //front back
+        gizmo_rotate.add(new Line(
+                0.0f,-0.25f,0.5f,
+                0.0f,0.25f,0.5f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+        gizmo_rotate.add(new Line(
+                0.0f,-0.25f,-0.5f,
+                0.0f,0.25f,-0.5f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+
+        //top bottom
+        gizmo_rotate.add(new Line(
+                0.0f,0.5f,0.25f,
+                0.0f,0.5f,-0.25f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+        gizmo_rotate.add(new Line(
+                0.0f,-0.5f,0.25f,
+                0.0f,-0.5f,-0.25f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+
+        //interconnect exisiting lines...
+        gizmo_rotate.add(new Line(
+                0.0f,0.5f,0.25f,
+                0.0f,0.25f,0.5f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+        gizmo_rotate.add(new Line(
+                0.0f,-0.25f,0.5f,
+                0.0f,-0.5f,0.25f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+
+        gizmo_rotate.add(new Line(
+                0.0f,-0.25f,-0.5f,
+                0.0f,-0.5f,-0.25f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+        gizmo_rotate.add(new Line(
+                0.0f,0.5f,-0.25f,
+                0.0f,0.25f,-0.5f,
+                1.0f,0.0f,0.0f,1.0f
+        ));
+
+
+
+        //y axis circle
+        //front back
+        gizmo_rotate.add(new Line(
+                -0.25f,0.0f,0.5f,
+                0.25f,0.0f,0.5f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+        gizmo_rotate.add(new Line(
+                -0.25f,0.0f,-0.5f,
+                0.25f,0.0f,-0.5f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+
+        //top bottom
+        gizmo_rotate.add(new Line(
+                0.5f,0.0f,0.25f,
+                0.5f,0.0f,-0.25f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+        gizmo_rotate.add(new Line(
+                -0.5f,0.0f,0.25f,
+                -0.5f,0.0f,-0.25f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+
+        //interconnect exisiting lines...
+        gizmo_rotate.add(new Line(
+                0.5f,0.0f,0.25f,
+                0.25f,0.0f,0.5f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+        gizmo_rotate.add(new Line(
+                -0.25f,0.0f,0.5f,
+                -0.5f,0.0f,0.25f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+
+        gizmo_rotate.add(new Line(
+                -0.25f,0.0f,-0.5f,
+                -0.5f,0.0f,-0.25f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+        gizmo_rotate.add(new Line(
+                0.5f,0.0f,-0.25f,
+                0.25f,0.0f,-0.5f,
+                0.0f,1.0f,0.0f,1.0f
+        ));
+
 
 
         Log.e(TAG,"assets LOADED !!!");

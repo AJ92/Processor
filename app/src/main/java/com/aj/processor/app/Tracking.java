@@ -17,14 +17,20 @@ public class Tracking implements Entity {
     private boolean visible;
     private FloatBuffer FLOATBUFFER;
     private int ID;
+    private String process;
 
-    public Tracking(int ID, boolean visible, float[] verticeData) {
+    public Tracking(int ID, String process, boolean visible, float[] verticeData) {
         this.ID = ID;
+        this.process = process;
         this.visible = visible;
+
+        //no need
+        /*
         // For performance reasons, we build the buffer here:
         this.FLOATBUFFER = ByteBuffer.allocateDirect(verticeData.length *
                 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
         this.FLOATBUFFER.put(verticeData).position(0);
+        */
     }
 
     @Override
@@ -37,8 +43,17 @@ public class Tracking implements Entity {
         return this.visible;
     }
 
+    //new
+    @Override
+    public String getProcess(){
+        return this.process;
+    }
+
+    //no need
+    /*
     @Override
     public FloatBuffer getFloatBuffer() {
         return this.FLOATBUFFER;
     }
+    */
 }
