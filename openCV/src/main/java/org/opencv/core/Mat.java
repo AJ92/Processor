@@ -1024,15 +1024,15 @@ public class Mat {
  *
  * <p>// C++ code:</p>
  *
- * <p>m.create(this->size(), this->type());</p>
+ * <p>m.create(this->size(), this->type);</p>
  *
  * <p>so that the destination matrix is reallocated if needed. While
  * <code>m.copyTo(m);</code> works flawlessly, the function does not handle the
  * case of a partial overlap between the source and the destination matrices.
  * </code></p>
  *
- * <p>When the operation mask is specified, if the <code>Mat.create</code> call
- * shown above reallocates the matrix, the newly allocated matrix is initialized
+ * <p>When the operation mask is specified, and the <code>Mat.create</code> call
+ * shown above reallocated the matrix, the newly allocated matrix is initialized
  * with all zeros before copying the data.</p>
  *
  * @param m Destination matrix. If it does not have a proper size or type before
@@ -1060,15 +1060,15 @@ public class Mat {
  *
  * <p>// C++ code:</p>
  *
- * <p>m.create(this->size(), this->type());</p>
+ * <p>m.create(this->size(), this->type);</p>
  *
  * <p>so that the destination matrix is reallocated if needed. While
  * <code>m.copyTo(m);</code> works flawlessly, the function does not handle the
  * case of a partial overlap between the source and the destination matrices.
  * </code></p>
  *
- * <p>When the operation mask is specified, if the <code>Mat.create</code> call
- * shown above reallocates the matrix, the newly allocated matrix is initialized
+ * <p>When the operation mask is specified, and the <code>Mat.create</code> call
+ * shown above reallocated the matrix, the newly allocated matrix is initialized
  * with all zeros before copying the data.</p>
  *
  * @param m Destination matrix. If it does not have a proper size or type before
@@ -2341,7 +2341,7 @@ public class Mat {
  *
  * <p>// C++ code:</p>
  *
- * <p>Mat A1 = A + Mat.eye(A.size(), A.type())*lambda;</p>
+ * <p>Mat A1 = A + Mat.eye(A.size(), A.type)*lambda;</p>
  *
  * <p>Mat C = A1.t()*A1; // compute (A + lambda*I)^t * (A + lamda*I)</p>
  *

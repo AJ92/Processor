@@ -3930,10 +3930,6 @@ public class Imgproc {
  * back.
  * </code></p>
  *
- * <p>If conversion adds the alpha channel, its value will set to the maximum of
- * corresponding channel range: 255 for <code>CV_8U</code>, 65535 for
- * <code>CV_16U</code>, 1 for <code>CV_32F</code>.</p>
- *
  * <p>The function can do the following transformations:</p>
  * <ul>
  *   <li> RGB <em><-></em> GRAY (<code>CV_BGR2GRAY, CV_RGB2GRAY, CV_GRAY2BGR,
@@ -3946,7 +3942,7 @@ public class Imgproc {
  *
  * <p>and</p>
  *
- * <p><em>Gray to RGB[A]: R <- Y, G <- Y, B <- Y, A <- max(ChannelRange)</em></p>
+ * <p><em>Gray to RGB[A]: R <- Y, G <- Y, B <- Y, A <- 0</em></p>
  *
  * <p>The conversion from a RGB image to gray is done with:</p>
  *
@@ -4287,10 +4283,6 @@ public class Imgproc {
  * back.
  * </code></p>
  *
- * <p>If conversion adds the alpha channel, its value will set to the maximum of
- * corresponding channel range: 255 for <code>CV_8U</code>, 65535 for
- * <code>CV_16U</code>, 1 for <code>CV_32F</code>.</p>
- *
  * <p>The function can do the following transformations:</p>
  * <ul>
  *   <li> RGB <em><-></em> GRAY (<code>CV_BGR2GRAY, CV_RGB2GRAY, CV_GRAY2BGR,
@@ -4303,7 +4295,7 @@ public class Imgproc {
  *
  * <p>and</p>
  *
- * <p><em>Gray to RGB[A]: R <- Y, G <- Y, B <- Y, A <- max(ChannelRange)</em></p>
+ * <p><em>Gray to RGB[A]: R <- Y, G <- Y, B <- Y, A <- 0</em></p>
  *
  * <p>The conversion from a RGB image to gray is done with:</p>
  *
@@ -7100,7 +7092,7 @@ public class Imgproc {
  *
  * <p><em>tilted(X,Y) = sum(by: y&ltY,abs(x-X+1) <= Y-y-1) image(x,y)</em></p>
  *
- * <p>Using these integral images, you can calculate sum, mean, and standard
+ * <p>Using these integral images, you can calculate sa um, mean, and standard
  * deviation over a specific up-right or rotated rectangular region of the image
  * in a constant time, for example:</p>
  *
@@ -7149,7 +7141,7 @@ public class Imgproc {
  *
  * <p><em>tilted(X,Y) = sum(by: y&ltY,abs(x-X+1) <= Y-y-1) image(x,y)</em></p>
  *
- * <p>Using these integral images, you can calculate sum, mean, and standard
+ * <p>Using these integral images, you can calculate sa um, mean, and standard
  * deviation over a specific up-right or rotated rectangular region of the image
  * in a constant time, for example:</p>
  *
@@ -7201,7 +7193,7 @@ public class Imgproc {
  *
  * <p><em>tilted(X,Y) = sum(by: y&ltY,abs(x-X+1) <= Y-y-1) image(x,y)</em></p>
  *
- * <p>Using these integral images, you can calculate sum, mean, and standard
+ * <p>Using these integral images, you can calculate sa um, mean, and standard
  * deviation over a specific up-right or rotated rectangular region of the image
  * in a constant time, for example:</p>
  *
@@ -7252,7 +7244,7 @@ public class Imgproc {
  *
  * <p><em>tilted(X,Y) = sum(by: y&ltY,abs(x-X+1) <= Y-y-1) image(x,y)</em></p>
  *
- * <p>Using these integral images, you can calculate sum, mean, and standard
+ * <p>Using these integral images, you can calculate sa um, mean, and standard
  * deviation over a specific up-right or rotated rectangular region of the image
  * in a constant time, for example:</p>
  *
@@ -7306,7 +7298,7 @@ public class Imgproc {
  *
  * <p><em>tilted(X,Y) = sum(by: y&ltY,abs(x-X+1) <= Y-y-1) image(x,y)</em></p>
  *
- * <p>Using these integral images, you can calculate sum, mean, and standard
+ * <p>Using these integral images, you can calculate sa um, mean, and standard
  * deviation over a specific up-right or rotated rectangular region of the image
  * in a constant time, for example:</p>
  *
@@ -7359,7 +7351,7 @@ public class Imgproc {
  *
  * <p><em>tilted(X,Y) = sum(by: y&ltY,abs(x-X+1) <= Y-y-1) image(x,y)</em></p>
  *
- * <p>Using these integral images, you can calculate sum, mean, and standard
+ * <p>Using these integral images, you can calculate sa um, mean, and standard
  * deviation over a specific up-right or rotated rectangular region of the image
  * in a constant time, for example:</p>
  *

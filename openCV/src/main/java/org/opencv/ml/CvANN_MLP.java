@@ -171,11 +171,6 @@ public class CvANN_MLP extends CvStatModel {
  *
  * <p>The method returns a dummy value which should be ignored.</p>
  *
- * <p>If you are using the default <code>cvANN_MLP.SIGMOID_SYM</code> activation
- * function with the default parameter values fparam1=0 and fparam2=0 then the
- * function used is y = 1.7159*tanh(2/3 * x), so the output will range from
- * [-1.7159, 1.7159], instead of [0,1].</p>
- *
  * @param inputs Input samples.
  * @param outputs Predicted responses for corresponding samples.
  *
@@ -201,10 +196,6 @@ public class CvANN_MLP extends CvStatModel {
  * the network weights. It returns the number of done iterations.</p>
  *
  * <p>The RPROP training algorithm is parallelized with the TBB library.</p>
- *
- * <p>If you are using the default <code>cvANN_MLP.SIGMOID_SYM</code> activation
- * function then the output should be in the range [-1,1], instead of [0,1], for
- * optimal results.</p>
  *
  * @param inputs Floating-point matrix of input vectors, one vector per row.
  * @param outputs Floating-point matrix of the corresponding output vectors, one
@@ -252,10 +243,6 @@ public class CvANN_MLP extends CvStatModel {
  * the network weights. It returns the number of done iterations.</p>
  *
  * <p>The RPROP training algorithm is parallelized with the TBB library.</p>
- *
- * <p>If you are using the default <code>cvANN_MLP.SIGMOID_SYM</code> activation
- * function then the output should be in the range [-1,1], instead of [0,1], for
- * optimal results.</p>
  *
  * @param inputs Floating-point matrix of input vectors, one vector per row.
  * @param outputs Floating-point matrix of the corresponding output vectors, one

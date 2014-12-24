@@ -94,9 +94,9 @@ public class DescriptorExtractor {
  * added, for example: <code>SIFT</code> duplicates keypoint with several
  * dominant orientations (for each orientation).
  * @param descriptors Computed descriptors. In the second variant of the method
- * <code>descriptors[i]</code> are descriptors computed for a <code>keypoints[i]</code>.
- * Row <code>j</code> is the <code>keypoints</code> (or <code>keypoints[i]</code>)
- * is the descriptor for keypoint <code>j</code>-th keypoint.
+ * <code>descriptors[i]</code> are descriptors computed for a <code>keypoints[i]".
+ * Row </code>j<code> is the </code>keypoints<code> (or </code>keypoints[i]<code>)
+ * is the descriptor for keypoint </code>j"-th keypoint.
  *
  * @see <a href="http://docs.opencv.org/modules/features2d/doc/common_interfaces_of_descriptor_extractors.html#descriptorextractor-compute">org.opencv.features2d.DescriptorExtractor.compute</a>
  */
@@ -123,9 +123,9 @@ public class DescriptorExtractor {
  * added, for example: <code>SIFT</code> duplicates keypoint with several
  * dominant orientations (for each orientation).
  * @param descriptors Computed descriptors. In the second variant of the method
- * <code>descriptors[i]</code> are descriptors computed for a <code>keypoints[i]</code>.
- * Row <code>j</code> is the <code>keypoints</code> (or <code>keypoints[i]</code>)
- * is the descriptor for keypoint <code>j</code>-th keypoint.
+ * <code>descriptors[i]</code> are descriptors computed for a <code>keypoints[i]".
+ * Row </code>j<code> is the </code>keypoints<code> (or </code>keypoints[i]<code>)
+ * is the descriptor for keypoint </code>j"-th keypoint.
  *
  * @see <a href="http://docs.opencv.org/modules/features2d/doc/common_interfaces_of_descriptor_extractors.html#descriptorextractor-compute">org.opencv.features2d.DescriptorExtractor.compute</a>
  */

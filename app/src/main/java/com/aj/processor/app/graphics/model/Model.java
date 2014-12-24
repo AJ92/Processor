@@ -87,6 +87,7 @@ public class Model {
             }
         }
         isReady = true;
+        recalculate_size();
         //qDebug("Model::loadGLdata()");
     }
 
@@ -109,6 +110,9 @@ public class Model {
         this.size = temp_size;
     }
 
+    public double getSize(){
+        return this.size;
+    }
 
     public boolean isVisible() {
         return visible;

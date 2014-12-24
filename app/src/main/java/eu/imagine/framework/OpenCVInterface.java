@@ -116,7 +116,7 @@ public class OpenCVInterface implements CameraBridgeViewBase
     public void onResume(Activity mainActivity) {
         //changed to 2_4_9 from 2_4_6
         Debugger.error(TAG, "OpenCVInterface:onResume()");
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_9, mainActivity,
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, mainActivity,
                 mLoaderCallback);
         Debugger.error(TAG, "OpenCVInterface:onResume() done!");
     }

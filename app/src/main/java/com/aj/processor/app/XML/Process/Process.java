@@ -98,6 +98,14 @@ public class Process {
         return name;
     }
 
+    public ArrayList<CompositeObject> getAll3dNodes(){
+        return co_node_sorted_;
+    }
+
+    public ArrayList<PComponent> getAllDataNodes(){
+        return node_structuralNodeData_pc_sorted_;
+    }
+
     public ArrayList<CompositeObject> getAll3dObjects(){
         return all3dObjects;
     }
@@ -519,6 +527,28 @@ public class Process {
 
 
         Debugger.error(TAG,"--------3D OBJECTS generated!-------");
+
+        //debug some stats
+        Debugger.error(TAG,"--------GRAPH DATA-------");
+
+        Debugger.error(TAG,"-node_structuralNodeData_pc_sorted_: " + node_structuralNodeData_pc_sorted_.size());
+        Debugger.error(TAG,"-co_node_sorted_: " + co_node_sorted_.size());
+
+        Debugger.error(TAG,"-co_node_text_sorted_: " + co_node_text_sorted_.size());
+        Debugger.error(TAG,"-next_nodes_pc_: " + next_nodes_pc_.size());
+        Debugger.error(TAG,"-edges_pc_unsorted_: " + edges_pc_unsorted_.size());
+        Debugger.error(TAG,"-co_edges_unsorted_: " + co_edges_unsorted_.size());
+        Debugger.error(TAG,"-all3dObjects: " + all3dObjects.size());
+        Debugger.error(TAG,"-linear_branches_unsorted: " + linear_branches_unsorted.size());
+        Debugger.error(TAG,"-graph_layers: " + graph_layers.size());
+
+        Debugger.error(TAG,"-dummy_node_id: " + dummy_node_id);
+
+
+
+
+        Debugger.error(TAG,"--------GRAPH DATA END-------");
+
     }
 
     private boolean containsBranch(ArrayList<Branch> list, Branch b){

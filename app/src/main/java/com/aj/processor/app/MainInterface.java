@@ -1,12 +1,23 @@
 package com.aj.processor.app;
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.aj.processor.app.XML.Process.Components.Node;
+import com.aj.processor.app.XML.Process.PComponent;
+
 import org.opencv.android.JavaCameraView;
 import org.opencv.core.Point;
+
+
+
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -29,6 +40,19 @@ import eu.imagine.framework.Trackable;
  */
 public class MainInterface {
 
+    private static MainInterface instance;
+
+    public final static int MAININTERFACE_STATE_NODEUPDATE = 0x0001;
+    public final static int MAININTERFACE_STATE_NODEHIDE = 0x0002;
+
+
+
+    public static MainInterface getInstance(){
+        return instance;
+    }
+
+
+
     // Allow debug logging:
     public static boolean DEBUG_LOGGING = false;
     public static boolean DEBUG_FRAME_LOGGING = false;
@@ -44,6 +68,13 @@ public class MainInterface {
     private OpenCVInterface opencv;
     private RenderInterface render;
     private OpenGLSurfaceView renderView;
+
+    private NodeView nodeView;
+
+    //handler to retreive data/objects from the render thread (GLThread)
+    private Handler glThreadHandler;
+
+
     private Activity mainActivity;
     private final Object synLock = new Object();
 
@@ -70,7 +101,11 @@ public class MainInterface {
     private boolean is_CV_running = true;
 
     public MainInterface(Activity mainActivity,
-                         float[][] camMatrix, float[] distortionCoefficients) {
+                         float[][] camMatrix,
+                         float[] distortionCoefficients) {
+
+        instance = this;
+
         this.log = Messenger.getInstance();
         log.log(TAG, "Constructing framework.");
         this.mainActivity = mainActivity;
@@ -80,7 +115,60 @@ public class MainInterface {
         // Set camera matrix:
         this.camMatrix = camMatrix;
         this.distCoef = distortionCoefficients;
+
+        //attach handler object to main thread aka UIThread...
+        glThreadHandler = new Handler(Looper.getMainLooper()) {
+            /*
+             * handleMessage() defines the operations to perform when
+             * the Handler receives a new Message to process.
+             */
+            @Override
+            public void handleMessage(Message inputMessage){
+                //receive a message and process it...
+
+                // Gets the task from the incoming Message object.
+                NodeTask nodeTask = (NodeTask) inputMessage.obj;
+
+
+                switch (inputMessage.what) {
+                    // The decoding is done
+                    case MAININTERFACE_STATE_NODEUPDATE:
+                        //get the PComponent and retrieve the data and set it onto the ui...
+                        PComponent pc = nodeTask.getDataNode();
+                        if(pc != null) {
+                            if (pc.hasNode()) {
+                                Node n = pc.getNode();
+                                if (n != null) {
+                                    if (n.hasName()) {
+                                        String name = n.getName();
+                                        if (name != null) {
+                                            nodeView.setNodeName(name);
+                                        }
+                                    }
+                                    if (n.hasID()) {
+                                        String id = n.getID();
+                                        if (id != null) {
+                                            nodeView.setNodeID(id);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        nodeView.setAlpha(1.0f);
+                        break;
+
+                    case MAININTERFACE_STATE_NODEHIDE:
+                        nodeView.setAlpha(0.0f);
+                        break;
+                    default:
+                        super.handleMessage(inputMessage);
+                }
+
+            }
+        };
     }
+
+
 
     public void onCreate(ViewGroup groupView) {
         log.pushTimer(this, "start");
@@ -109,6 +197,19 @@ public class MainInterface {
             //retrieve marker when needed...
             renderView.setMaininterFace(this);
             //render.onCreate(renderView);
+
+
+
+
+
+            nodeView = new NodeView(mainActivity.getApplicationContext());
+            nodeView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup
+                    .LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            groupView.addView(nodeView);
+
+
+            renderView.setNodeView(nodeView);
+
         }
         // Set layout things:
         mainActivity.getWindow().addFlags(WindowManager.LayoutParams
@@ -460,6 +561,30 @@ public class MainInterface {
             newTrackings = false;
             //noinspection unchecked
             return (ArrayList<Entity>) allTrackings.clone();
+        }
+    }
+
+
+
+
+
+    // Handle status messages from tasks
+    public void handleState(NodeTask nodeTask, int state) {
+        switch (state) {
+            case MAININTERFACE_STATE_NODEUPDATE:
+                /*
+                 * Creates a message for the Handler
+                 * with the state and the task object
+                 */
+                Message completeMessage =
+                        glThreadHandler.obtainMessage(state, nodeTask);
+                completeMessage.sendToTarget();
+                break;
+            case MAININTERFACE_STATE_NODEHIDE:
+                Message completeMessage2 =
+                        glThreadHandler.obtainMessage(state, nodeTask);
+                completeMessage2.sendToTarget();
+                break;
         }
     }
 }

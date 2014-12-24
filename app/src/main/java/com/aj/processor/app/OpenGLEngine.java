@@ -4,10 +4,15 @@
 
 package com.aj.processor.app;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 
 
 import com.aj.processor.app.XML.Process.Components.Node;
@@ -107,6 +112,16 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
     private ArrayList<Entity> marker_process_mapping = new ArrayList<Entity>();
 
 
+    //store touch positions and dispatch them later in the onDraw function...
+    private ArrayList<Vector3> touch_positions = new ArrayList<Vector3>();
+
+
+
+    public final static int OPENGLENGINE_STATE_NODEUPDATE = 0x0001;
+    public final static int OPENGLENGINE_STATE_NODEHIDE = 0x0002;
+
+
+
     private Camera default_cam;
 
 
@@ -155,17 +170,17 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
 
     private Messenger log;
 
-    /**
-     * Constructor.
-     *
-     * @param mainInterface Pointer to MainInterface.
-     */
+
+
+
+
 
     public void setMainInterFace(MainInterface mainInterface){
         this.mainInterface = mainInterface;
     }
 
     protected OpenGLEngine() {
+        Debugger.error(TAG, "starting engine...");
         this.toRender = new ArrayList<Trackable>();
     }
 
@@ -205,6 +220,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
         ow = new ObjectWorld();
         createBasicAssets();
     }
+
 
 
 
@@ -268,116 +284,138 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
             if (ow != null) {
 
 
-
+                int x_pos = 0;
+                int y_pos = 0;
                 for (Trackable trackable : toRender) {
 
-                    //get the screen pos from the Trackable object
-                    int x_pos = trackable.getX();
-                    int y_pos = trackable.getY();
-
-                    Vector3 space_pos = space_pos = touch_to_space(default_cam, x_pos, y_pos);
+                    //only use the first one ...
 
 
+                    //stop after first one...
+                    if(isTrackableInMapping(trackable)){
+                        setProcessesInVisible();
+                        setProcessVisible(trackable);
+
+                        //check for touch on the visible process
+                        if(touch_positions.size() > 0) {
+                            checkTouchOnProcess(trackable);
+                        }
+
+                        //get the screen pos from the Trackable object
+                        x_pos = trackable.getX();
+                        y_pos = trackable.getY();
+
+                        break;
+                    }
+
+                }
+                if(toRender.size() == 0){
+                    setProcessesInVisible();
+                }
+
+                Vector3 space_pos = space_pos = touch_to_space(default_cam, x_pos, y_pos);
+
+
+                //scale the pos (move away from origin)
+                Vector3 space_pos_scaled = space_pos.multiply(default_cam.getZNEAR() + (3.0 * scale));
+                //move away from camera pos (the position we want to render our model at...)
+                Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
+
+                default_cam.set_position(default_cam.getPosition()
+                        .subtract(final_space_pos)
+                        .add(new Vector3(-this.pos_x / 100.0, this.pos_y / 100.0, 0.0)));
+
+
+                v_m = default_cam.get_view_matrix();
+                pv_m = p_m.multiply(v_m);
+
+                if(ow.getStoreMode() == ObjectWorld.store_mode_simple) {
+
+
+
+
+                    //MODELS
+                    GLES20.glEnableVertexAttribArray(locPositionSimple);
+                    GLES20.glEnableVertexAttribArray(locTexCoordSimple);
+                    GLES20.glEnableVertexAttribArray(locNormalSimple);
+                    for (CompositeObject co : ow.getCompositeObjectsModels()) {
+
+                        if (co.hasModel() && (co.getRenderType() == CompositeObject.render_standard)) {
+
+                            Positation posi = co.getPositation();
+
+                            m_m = posi.get_model_matrix();
+                            //vm_m = v_m.multiply(m_m);
+                            pvm_m = pv_m.multiply(m_m);
+
+
+                            drawModel(co.getModel());
+                        }
+                    }
+                    GLES20.glDisableVertexAttribArray(locPositionSimple);
+                    GLES20.glDisableVertexAttribArray(locTexCoordSimple);
+                    GLES20.glDisableVertexAttribArray(locNormalSimple);
+                    //MODELS DONE
+
+
+                    //LINES
+                    GLES20.glEnableVertexAttribArray(locPositionLine);
+                    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+                    for (CompositeObject co : ow.getCompositeObjectsLines()) {
+                        if (co.hasLine() && (co.getRenderType() == CompositeObject.render_standard)) {
+                            Positation posi = co.getPositation();
+                            pvm_m = pv_m.multiply(posi.get_model_matrix());
+                            drawLine(co.getLine());
+                        }
+                    }
+
+
+
+
+                    //render gizmo
+
+                    //convert it to space coords
+                    Vector3 gizmo_space_pos = touch_to_space(default_cam, 100, window_size_y - 100);
                     //scale the pos (move away from origin)
-                    Vector3 space_pos_scaled = space_pos.multiply(default_cam.getZNEAR() + (3.0 * scale));
+                    Vector3 gizmo_space_pos_scaled = gizmo_space_pos.multiply( default_cam.getZNEAR() + 6.0);
                     //move away from camera pos (the position we want to render our model at...)
-                    Vector3 final_space_pos = default_cam.getPosition().add(space_pos_scaled);
+                    Vector3 gizmo_final_space_pos = default_cam.getPosition().add(gizmo_space_pos_scaled);
 
-                    default_cam.set_position(default_cam.getPosition()
-                            .subtract(final_space_pos)
-                            .add(new Vector3(-this.pos_x / 100.0, this.pos_y / 100.0, 0.0)));
+                    gizmo_posi.set_position(gizmo_final_space_pos);
 
 
                     v_m = default_cam.get_view_matrix();
                     pv_m = p_m.multiply(v_m);
 
-                    if(ow.getStoreMode() == ObjectWorld.store_mode_simple) {
+                    pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
 
-
-
-
-                        //MODELS
-                        GLES20.glEnableVertexAttribArray(locPositionSimple);
-                        GLES20.glEnableVertexAttribArray(locTexCoordSimple);
-                        GLES20.glEnableVertexAttribArray(locNormalSimple);
-                        for (CompositeObject co : ow.getCompositeObjectsModels()) {
-
-                            if (co.hasModel()) {
-
-                                Positation posi = co.getPositation();
-
-                                m_m = posi.get_model_matrix();
-                                //vm_m = v_m.multiply(m_m);
-                                pvm_m = pv_m.multiply(m_m);
-
-
-                                drawModel(co.getModel());
-                            }
+                    if(gizmo_mode == OpenGLSurfaceView.moveMode) {
+                        //gizmo for move mode
+                        for (Line line_gizmo : gizmo_move) {
+                            drawLine(line_gizmo);
                         }
-                        GLES20.glDisableVertexAttribArray(locPositionSimple);
-                        GLES20.glDisableVertexAttribArray(locTexCoordSimple);
-                        GLES20.glDisableVertexAttribArray(locNormalSimple);
-                        //MODELS DONE
-
-
-                        //LINES
-                        GLES20.glEnableVertexAttribArray(locPositionLine);
-                        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-                        for (CompositeObject co : ow.getCompositeObjectsLines()) {
-                            if (co.hasLine()) {
-                                Positation posi = co.getPositation();
-                                pvm_m = pv_m.multiply(posi.get_model_matrix());
-                                drawLine(co.getLine());
-                            }
+                    }
+                    else if(gizmo_mode == OpenGLSurfaceView.rotMode) {
+                        //gizmo for rotate mode
+                        for (Line line_gizmo : gizmo_rotate) {
+                            drawLine(line_gizmo);
                         }
-
-
-
-
-                        //render gizmo
-
-                        //convert it to space coords
-                        Vector3 gizmo_space_pos = touch_to_space(default_cam, 100, window_size_y - 100);
-                        //scale the pos (move away from origin)
-                        Vector3 gizmo_space_pos_scaled = gizmo_space_pos.multiply( default_cam.getZNEAR() + 6.0);
-                        //move away from camera pos (the position we want to render our model at...)
-                        Vector3 gizmo_final_space_pos = default_cam.getPosition().add(gizmo_space_pos_scaled);
-
-                        gizmo_posi.set_position(gizmo_final_space_pos);
-
-
-                        v_m = default_cam.get_view_matrix();
-                        pv_m = p_m.multiply(v_m);
-
-                        pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
-
-                        if(gizmo_mode == OpenGLSurfaceView.moveMode) {
-                            //gizmo for move mode
-                            for (Line line_gizmo : gizmo_move) {
-                                drawLine(line_gizmo);
-                            }
+                    }
+                    else if(gizmo_mode == OpenGLSurfaceView.scaleMode) {
+                        //gizmo for scale mode
+                        for (Line line_gizmo : gizmo_scale) {
+                            drawLine(line_gizmo);
                         }
-                        else if(gizmo_mode == OpenGLSurfaceView.rotMode) {
-                            //gizmo for rotate mode
-                            for (Line line_gizmo : gizmo_rotate) {
-                                drawLine(line_gizmo);
-                            }
-                        }
-                        else if(gizmo_mode == OpenGLSurfaceView.scaleMode) {
-                            //gizmo for scale mode
-                            for (Line line_gizmo : gizmo_scale) {
-                                drawLine(line_gizmo);
-                            }
-                        }
-
-
-
-
-                        GLES20.glDisableVertexAttribArray(locPositionLine);
-                        //LINES DONE
                     }
 
+
+
+
+                    GLES20.glDisableVertexAttribArray(locPositionLine);
+                    //LINES DONE
                 }
+
+
 
 
 
@@ -394,6 +432,131 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
             }
         }
     }
+
+    public void setProcessesInVisible(){
+        for(Process p : processes){
+            p.setInvisible();
+        }
+    }
+
+    public void setProcessVisible(Trackable trackable){
+        //get the correct process and make it visible...
+        for(Entity ent : marker_process_mapping){
+            if(ent.getID() == trackable.getID()){
+                String proc = ent.getProcess();
+                for(Process p : processes){
+                    if(p.getName().equalsIgnoreCase(proc)) {
+                        p.setVisible();
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void checkTouchOnProcess(Trackable trackable){
+        //get the correct process and make it visible...
+        for(Entity ent : marker_process_mapping){
+            if(ent.getID() == trackable.getID()){
+                String proc = ent.getProcess();
+                for(Process p : processes){
+                    if(p.getName().equalsIgnoreCase(proc)) {
+                        //get the first touch position that find an object...
+                        for (Vector3 touch_p : touch_positions){
+
+                            Debugger.error(TAG,"--processing touch...");
+
+                            //search for an object...
+
+                            //get all the data from the process
+                            ArrayList<CompositeObject> all3dNodes = p.getAll3dNodes();
+
+                            Debugger.error(TAG,"---all3dNodes.size: " + all3dNodes.size());
+
+                            //convert the touch pos from screens space to 3D space
+                            Vector3 touch_p_3d_space = touch_to_space(default_cam, (int) touch_p.x(), (int) touch_p.y());
+
+                            Vector3 cam_pos = default_cam.getPosition();
+                            Debugger.error(TAG,"--cam pos: " + cam_pos.x() + "  " + cam_pos.y() + "  " + cam_pos.z());
+
+                            //interate trough all nodes and check if there is a suitable node
+                            //remember it's index
+
+
+                            for(int node_index = 0; node_index < all3dNodes.size(); node_index++){
+
+                                Debugger.error(TAG,"----processing node...");
+                                CompositeObject co = all3dNodes.get(node_index);
+
+                                if(co.hasPositation() && co.hasModel()) {
+                                    //get distance from camera to co
+                                    Vector3 model_pos = co.getPositation().getPosition();
+                                    Debugger.error(TAG,"----model pos: " + model_pos.x() + "  " + model_pos.y() + "  " + model_pos.z());
+
+
+                                    Vector3 diff = cam_pos.subtract(model_pos);
+                                    double len = diff.length();
+
+
+                                    //scale the pos (move away from origin by the distance to the co)
+                                    Vector3 space_pos_scaled = touch_p_3d_space.multiply(len);
+                                    //move away from camera pos (the position we want to render our model at...)
+                                    Vector3 final_space_pos = cam_pos.add(space_pos_scaled);
+
+                                    Debugger.error(TAG,"----space pos: " + final_space_pos.x() + "  " + final_space_pos.y() + "  " + final_space_pos.z());
+
+
+                                    //check if final_space_pos  is inside of the co's bounding sphere...
+                                    double spherical_radius = co.getModel().getSize();
+
+
+                                    //calculate distance between final_space_pos and model_pos
+                                    Vector3 distance_diff = model_pos.subtract(final_space_pos);
+                                    double distance = distance_diff.length();
+
+                                    //get maximum scale
+                                    Vector3 model_scale = co.getPositation().get_scale();
+
+                                    double max_scale = 0.0;
+                                    max_scale = Math.max(max_scale,model_scale.x());
+                                    max_scale = Math.max(max_scale,model_scale.y());
+                                    max_scale = Math.max(max_scale,model_scale.z());
+
+                                    Debugger.error(TAG,"----max_scale: " + max_scale);
+                                    Debugger.error(TAG,"----spherical_radius: " + spherical_radius);
+                                    Debugger.error(TAG,"----distance: " + distance);
+
+                                    if(distance < spherical_radius*max_scale){
+                                        //we found an object!!!
+                                        Debugger.error(TAG,"------touch: ");
+                                        //get the correct dataNode
+                                        ArrayList<PComponent> allDataNodes = p.getAllDataNodes();
+                                        PComponent pc = allDataNodes.get(node_index);
+
+
+                                        NodeTask nt = new NodeTask();
+                                        nt.setDataNode(pc);
+                                        nt.handleTaskState(OPENGLENGINE_STATE_NODEUPDATE);
+
+                                        touch_positions.clear();
+                                        return;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+
+        NodeTask nt = new NodeTask();
+        nt.handleTaskState(OPENGLENGINE_STATE_NODEHIDE);
+
+        touch_positions.clear();
+    }
+
 
     public void checkForProcessesToLoad(){
 
@@ -416,8 +579,11 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
 
     public void addTrackingToMapping(Entity e){
         if(isTrackingInMapping(e)){
+            Debugger.error(TAG,"Tracking is already registered and probably loaded - skip..");
             return;
         }
+
+        Debugger.error(TAG,"Tracking is not registered yet, loading it's Process and registering it...");
 
         //also load the process...
         //TEST XML PARSER (after ow construction... cause we need ow...)
@@ -434,14 +600,24 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
     public boolean isTrackingInMapping(Entity e){
         for(Entity ent : marker_process_mapping){
             if(ent.getID() == e.getID()){
-                return false;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isTrackableInMapping(Trackable tr){
+        for(Entity ent : marker_process_mapping){
+            if(ent.getID() == tr.getID()){
+                return true;
             }
         }
         return false;
     }
 
     public void onTouch(double x, double y){
-
+        Debugger.error(TAG,"adding touch...");
+        touch_positions.add(new Vector3(x,y,0.0));
     }
 
 
@@ -593,6 +769,7 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
         //create the objects we need and connect them with lines and so on...
         //p.generate3dDataObjects_v3(ow);
         p.generate3dDataObjects_v4(ow);
+        p.setInvisible();
         processes.add(p);
     }
 

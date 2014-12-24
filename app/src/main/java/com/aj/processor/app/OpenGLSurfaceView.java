@@ -13,10 +13,13 @@ import java.util.Calendar;
 /**
  * Created by AJ on 14.11.2014.
  */
+
+//TODO: create a callback from the openGL renderer to this view and try to set up NodeView
 public class OpenGLSurfaceView extends GLSurfaceView {
 
     private final OpenGLEngine renderer;
     private MainInterface mainInterface;
+    private NodeView nodeView;
     private ScaleGestureDetector sgd;
     private String TAG = "OpenGLSurfaceView";
 
@@ -30,9 +33,10 @@ public class OpenGLSurfaceView extends GLSurfaceView {
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 
         renderer = new OpenGLEngine();
+
         setRenderer(renderer);
 
-// old : TRANSLUCENT
+        // old : TRANSLUCENT  possible fix for sigseg fault...
         getHolder().setFormat(PixelFormat.TRANSPARENT);
         setZOrderMediaOverlay(true);
 
@@ -227,6 +231,10 @@ public class OpenGLSurfaceView extends GLSurfaceView {
             this.mainInterface = mainInterface;
             renderer.setMainInterFace(mainInterface);
         }
+    }
+
+    public void setNodeView(NodeView nv){
+        this.nodeView = nv;
     }
 
 

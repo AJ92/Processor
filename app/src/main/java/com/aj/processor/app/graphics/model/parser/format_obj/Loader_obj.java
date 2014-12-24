@@ -606,6 +606,7 @@ public class Loader_obj {
             Vector3 bounding_sphere_pos = new Vector3((v_min_x + v_max_x)/2.0f, (v_min_y + v_max_y)/2.0f, (v_min_z + v_max_z)/2.0f);
             double bounding_sphere_radius = vert1.distance(vert2) / 2.0f;
 
+            Debugger.error(TAG,"mesh bounding sphere: " + bounding_sphere_radius);
 
             //bounding_sphere_radius = 10.0;
 
