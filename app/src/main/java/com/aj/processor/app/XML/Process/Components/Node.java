@@ -9,6 +9,7 @@ public class Node {
     private String id_ = null;
     private String name_ = null;
     private String description_ = null;
+    private String staffAssignmentRule_ = null;
     //more to follow...
 
 
@@ -16,6 +17,7 @@ public class Node {
     public static final int attribute_id                = 0x0001;
     public static final int attribute_name              = 0x0002;
     public static final int attribute_description       = 0x0004;
+    public static final int attribute_staffAssignmentRule       = 0x0008;
     //more to follow...
 
 
@@ -83,4 +85,22 @@ public class Node {
         return description_;
     }
 
+
+
+    //staffAssignmentRule stuff...
+    public void setStaffAssignmentRule(String staffAssignmentRule){
+        staffAssignmentRule_ = staffAssignmentRule;
+        this.attributes_ = this.attributes_ | attribute_staffAssignmentRule; //binary or
+    }
+
+    public boolean hasStaffAssignmentRule(){
+        if((attributes_ & attribute_staffAssignmentRule) == attribute_staffAssignmentRule){ //binary and
+            return true;
+        }
+        return false;
+    }
+
+    public String getStaffAssignmentRule(){
+        return staffAssignmentRule_;
+    }
 }

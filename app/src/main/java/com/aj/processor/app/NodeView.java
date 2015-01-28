@@ -43,4 +43,14 @@ public class NodeView extends FrameLayout {
         TextView text = (TextView) findViewById(R.id.node_id);
         text.setText(id);
     }
+
+    public void setDescription(String description){
+        TextView text = (TextView) findViewById(R.id.node_description);
+        text.setText(description);
+    }
+
+    public void setStaff(String staff){
+        TextView text = (TextView) findViewById(R.id.node_staff);
+        text.setText(staff);
+    }
 }

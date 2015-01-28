@@ -7,4 +7,9 @@
     <string name="title_activity_dialog_node">dialog_node</string>
     <string name="title_activity_node_acitivity">NodeAcitivity</string>
 
+    <string name="node_view_id">ID:</string>
+    <string name="node_view_name">Name:</string>
+    <string name="node_view_description">Description:</string>
+    <string name="node_view_staff">Staff:</string>
+
 </resources>

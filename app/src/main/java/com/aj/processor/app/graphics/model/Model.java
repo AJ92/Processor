@@ -22,6 +22,7 @@ public class Model {
     ArrayList<Mesh> meshs = new ArrayList<Mesh>();
 
     //flags
+    private boolean instance = false;
     private boolean visible = true;
 
     String TAG = "Model";
@@ -37,6 +38,14 @@ public class Model {
     //copy the stuff from mdl to the new object!
     public Model(Model mdl){
 
+    }
+
+    public void setIsInstance(boolean instance){
+        this.instance = instance;
+    }
+
+    public boolean isInstance(){
+        return instance;
     }
 
     //getter n setter...

@@ -135,6 +135,7 @@ public class XMLParser {
         String node_id = readNodeIDAttrib(parser);
         String node_name = null;
         String node_description = null;
+        String node_staffAssignmentRule = null;
         Debugger.warning("XMLParser","2");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -147,6 +148,9 @@ public class XMLParser {
             else if (name.equals("description")) {
                 node_description = readDescription(parser);
             }
+            else if (name.equals("staffAssignmentRule")) {
+                node_staffAssignmentRule = readStaffAssignmentRule(parser);
+            }
             else {
                 skip(parser);
             }
@@ -156,6 +160,7 @@ public class XMLParser {
         Node n = new Node(node_id);
         n.setName(node_name);
         n.setDescription(node_description);
+        n.setStaffAssignmentRule(node_staffAssignmentRule);
         PComponent pc = new PComponent(n);
         return pc;
     }
@@ -515,6 +520,13 @@ public class XMLParser {
         String description = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "description");
         return description;
+    }
+
+    private String readStaffAssignmentRule(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, "staffAssignmentRule");
+        String staffAssignmentRule = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, "staffAssignmentRule");
+        return staffAssignmentRule;
     }
 
     private String readEdgeType(XmlPullParser parser) throws XmlPullParserException, IOException {

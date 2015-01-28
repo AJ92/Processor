@@ -151,6 +151,19 @@ public class MainInterface {
                                             nodeView.setNodeID(id);
                                         }
                                     }
+                                    if (n.hasDescription()) {
+                                        String desc = n.getDescription();
+                                        if (desc != null) {
+                                            nodeView.setDescription(desc);
+                                        }
+                                    }
+                                    if (n.hasStaffAssignmentRule()) {
+                                        String staff = n.getStaffAssignmentRule();
+                                        if (staff != null) {
+                                            nodeView.setStaff(staff);
+                                        }
+                                    }
+
                                 }
                             }
                         }
@@ -206,6 +219,8 @@ public class MainInterface {
             nodeView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup
                     .LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             groupView.addView(nodeView);
+
+            nodeView.setAlpha(0.0f);
 
 
             renderView.setNodeView(nodeView);

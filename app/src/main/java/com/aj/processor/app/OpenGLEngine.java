@@ -21,6 +21,7 @@ import com.aj.processor.app.XML.Process.PComponent;
 import com.aj.processor.app.XML.XMLLoadTaskAsync;
 import com.aj.processor.app.XML.XMLProcessLoadedListener;
 import com.aj.processor.app.graphics.camera.Camera;
+import com.aj.processor.app.graphics.model.Components.Material;
 import com.aj.processor.app.graphics.model.Components.Mesh;
 import com.aj.processor.app.graphics.model.Line;
 import com.aj.processor.app.graphics.model.Model;
@@ -329,10 +330,15 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                 v_m = default_cam.get_view_matrix();
                 pv_m = p_m.multiply(v_m);
 
+
+
+
+
+
+                /*
+                        RENDER MODE SIMPLE
+                 */
                 if(ow.getStoreMode() == ObjectWorld.store_mode_simple) {
-
-
-
 
                     //MODELS
                     GLES20.glEnableVertexAttribArray(locPositionSimple);
@@ -356,64 +362,152 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
                     GLES20.glDisableVertexAttribArray(locTexCoordSimple);
                     GLES20.glDisableVertexAttribArray(locNormalSimple);
                     //MODELS DONE
-
-
-                    //LINES
-                    GLES20.glEnableVertexAttribArray(locPositionLine);
-                    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-                    for (CompositeObject co : ow.getCompositeObjectsLines()) {
-                        if (co.hasLine() && (co.getRenderType() == CompositeObject.render_standard)) {
-                            Positation posi = co.getPositation();
-                            pvm_m = pv_m.multiply(posi.get_model_matrix());
-                            drawLine(co.getLine());
-                        }
-                    }
-
-
-
-
-                    //render gizmo
-
-                    //convert it to space coords
-                    Vector3 gizmo_space_pos = touch_to_space(default_cam, 100, window_size_y - 100);
-                    //scale the pos (move away from origin)
-                    Vector3 gizmo_space_pos_scaled = gizmo_space_pos.multiply( default_cam.getZNEAR() + 6.0);
-                    //move away from camera pos (the position we want to render our model at...)
-                    Vector3 gizmo_final_space_pos = default_cam.getPosition().add(gizmo_space_pos_scaled);
-
-                    gizmo_posi.set_position(gizmo_final_space_pos);
-
-
-                    v_m = default_cam.get_view_matrix();
-                    pv_m = p_m.multiply(v_m);
-
-                    pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
-
-                    if(gizmo_mode == OpenGLSurfaceView.moveMode) {
-                        //gizmo for move mode
-                        for (Line line_gizmo : gizmo_move) {
-                            drawLine(line_gizmo);
-                        }
-                    }
-                    else if(gizmo_mode == OpenGLSurfaceView.rotMode) {
-                        //gizmo for rotate mode
-                        for (Line line_gizmo : gizmo_rotate) {
-                            drawLine(line_gizmo);
-                        }
-                    }
-                    else if(gizmo_mode == OpenGLSurfaceView.scaleMode) {
-                        //gizmo for scale mode
-                        for (Line line_gizmo : gizmo_scale) {
-                            drawLine(line_gizmo);
-                        }
-                    }
-
-
-
-
-                    GLES20.glDisableVertexAttribArray(locPositionLine);
-                    //LINES DONE
                 }
+                /*
+                        RENDER MODE SIMPLE SORTED
+                 */
+                else if(ow.getStoreMode() == ObjectWorld.store_mode_simple_sorted){
+                    //get all the data first
+                    ArrayList<ArrayList<CompositeObject> > compositeObjects_mesh_list_simple_sorted = ow.getCompositeObjects_mesh_list_simple_sorted();
+                    ArrayList<ArrayList<Mesh> > mesh_model_simple_sorted = ow.getMesh_model_simple_sorted();
+                    ArrayList<ArrayList<Model> > model_mesh_simple_sorted = ow.getModel_mesh_simple_sorted();
+                    ArrayList<Material> material_mesh_simple_sorted = ow.getMaterial_mesh_simple_sorted();
+
+
+
+                    //MODELS
+                    GLES20.glEnableVertexAttribArray(locPositionSimple);
+                    GLES20.glEnableVertexAttribArray(locTexCoordSimple);
+                    GLES20.glEnableVertexAttribArray(locNormalSimple);
+
+                    GLES20.glUseProgram(programSimple);
+
+                    int mtl_index = 0;
+                    for (Material mtl : material_mesh_simple_sorted) {
+                        //set up the texture
+                        // Set the active texture unit to texture unit 0.
+                        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+                        // Bind the texture to this unit.
+                        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mtl.get_diffuse_map_texture());
+                        // Tell the texture uniform sampler to use this texture in the shader by binding to texture unit 0.
+                        GLES20.glUniform1i(locTextureSimple, 0);
+
+
+
+                        int co_index = 0;
+                        for(CompositeObject co : compositeObjects_mesh_list_simple_sorted.get(mtl_index)) {
+
+                            if (co.hasModel() && (co.getRenderType() == CompositeObject.render_standard)) {
+
+                                Positation posi = co.getPositation();
+
+                                m_m = posi.get_model_matrix();
+                                //vm_m = v_m.multiply(m_m);
+                                pvm_m = pv_m.multiply(m_m);
+
+
+                                // Pass in the position information
+
+                                Mesh mesh = mesh_model_simple_sorted.get(mtl_index).get(co_index);
+
+
+
+                                if (mesh.isLoaded()) {
+
+                                    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mesh.get_vertex_vbo());
+                                    //actually if once enabled we dont need to enable again.... but safety first xD
+                                    //GLES20.glEnableVertexAttribArray(locPositionSimple);
+                                    GLES20.glVertexAttribPointer(locPositionSimple, 3, GLES20.GL_FLOAT, false, 0, 0);
+
+                                    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mesh.get_texcoord_vbo());
+                                    //GLES20.glEnableVertexAttribArray(locTexCoordSimple);
+                                    GLES20.glVertexAttribPointer(locTexCoordSimple, 3, GLES20.GL_FLOAT, false, 0, 0);
+
+                                    GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mesh.get_normal_vbo());
+                                    //GLES20.glEnableVertexAttribArray(locNormalSimple);
+                                    GLES20.glVertexAttribPointer(locNormalSimple, 3, GLES20.GL_FLOAT, false, 0, 0);
+
+
+                                    //TRANSPOSE
+                                    render_mat = pvm_m.getFloatArray(true);
+
+                                    GLES20.glUniformMatrix4fv(locMVPMatrixSimple, 1, false, render_mat, 0);
+                                    if (mesh.get_triangle_count() == 0) {
+                                        return;
+                                    }
+                                    GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, mesh.get_triangle_count() * 3);
+                                }
+
+                            }
+                            co_index += 1;
+                        }
+                        //Debugger.error(TAG,"saved " + (co_index - 1) + "texture bindings");
+                        mtl_index += 1;
+                    }
+                    GLES20.glDisableVertexAttribArray(locPositionSimple);
+                    GLES20.glDisableVertexAttribArray(locTexCoordSimple);
+                    GLES20.glDisableVertexAttribArray(locNormalSimple);
+                    //MODELS DONE
+
+
+
+                }
+
+
+
+                //LINES
+                GLES20.glEnableVertexAttribArray(locPositionLine);
+                GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+                for (CompositeObject co : ow.getCompositeObjectsLines()) {
+                    if (co.hasLine() && (co.getRenderType() == CompositeObject.render_standard)) {
+                        Positation posi = co.getPositation();
+                        pvm_m = pv_m.multiply(posi.get_model_matrix());
+                        drawLine(co.getLine());
+                    }
+                }
+
+
+
+
+                //render gizmo
+
+                //convert it to space coords
+                Vector3 gizmo_space_pos = touch_to_space(default_cam, 100, window_size_y - 100);
+                //scale the pos (move away from origin)
+                Vector3 gizmo_space_pos_scaled = gizmo_space_pos.multiply( default_cam.getZNEAR() + 6.0);
+                //move away from camera pos (the position we want to render our model at...)
+                Vector3 gizmo_final_space_pos = default_cam.getPosition().add(gizmo_space_pos_scaled);
+
+                gizmo_posi.set_position(gizmo_final_space_pos);
+
+
+                v_m = default_cam.get_view_matrix();
+                pv_m = p_m.multiply(v_m);
+
+                pvm_m = pv_m.multiply(gizmo_posi.get_model_matrix());
+
+                if(gizmo_mode == OpenGLSurfaceView.moveMode) {
+                    //gizmo for move mode
+                    for (Line line_gizmo : gizmo_move) {
+                        drawLine(line_gizmo);
+                    }
+                }
+                else if(gizmo_mode == OpenGLSurfaceView.rotMode) {
+                    //gizmo for rotate mode
+                    for (Line line_gizmo : gizmo_rotate) {
+                        drawLine(line_gizmo);
+                    }
+                }
+                else if(gizmo_mode == OpenGLSurfaceView.scaleMode) {
+                    //gizmo for scale mode
+                    for (Line line_gizmo : gizmo_scale) {
+                        drawLine(line_gizmo);
+                    }
+                }
+
+                GLES20.glDisableVertexAttribArray(locPositionLine);
+                //LINES DONE
+
 
 
 
@@ -784,7 +878,10 @@ public class OpenGLEngine implements GLSurfaceView.Renderer, XMLProcessLoadedLis
 
         //creates it's own ModelLoader
         //simple storage mode is a linear unsorted list of models!!!
-        ow = new ObjectWorld(ObjectWorld.store_mode_simple);
+        //ow = new ObjectWorld(ObjectWorld.store_mode_simple);
+
+        //simple sortage mode but with sorted lists of meshs by materials
+        ow = new ObjectWorld(ObjectWorld.store_mode_simple_sorted);
 
 
         /*

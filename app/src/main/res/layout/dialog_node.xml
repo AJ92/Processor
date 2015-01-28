@@ -1,34 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
 
 
-    <TextView android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:text="Node:"
-        android:textSize="12pt"/>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:orientation="vertical" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:background="@color/nodeViewBGColor">
+
+
+        <Space
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_gravity="center_horizontal" />
+
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="vertical" android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:orientation="horizontal" android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-            <TextView android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:text="ID:"
-                android:textSize="8pt"/>
-            <TextView android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:text="Name:"
-                android:textSize="8pt"/>
-            <TextView android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:text="more soon..."
-                android:textSize="8pt"/>
+            <Space
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center_horizontal" />
+
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical" android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView android:layout_height="wrap_content"
+                    android:layout_width="fill_parent"
+                    android:text="Node:"
+                    android:textSize="12pt"/>
+
+                <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:orientation="horizontal" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:orientation="vertical" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView android:layout_height="wrap_content"
+                            android:layout_width="fill_parent"
+                            android:text="@string/node_view_id"
+                            android:textSize="8pt"/>
+                        <TextView android:layout_height="wrap_content"
+                            android:layout_width="fill_parent"
+                            android:text="@string/node_view_name"
+                            android:textSize="8pt"/>
+                        <TextView android:layout_height="wrap_content"
+                            android:layout_width="fill_parent"
+                            android:text="@string/node_view_staff"
+                            android:textSize="8pt"/>
+
+                        <TextView android:layout_height="wrap_content"
+                            android:layout_width="fill_parent"
+                            android:text="@string/node_view_description"
+                            android:textSize="8pt"/>
+
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_gravity="center_horizontal" />
+
+                    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:orientation="vertical" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView android:layout_height="wrap_content"
+                            android:layout_width="fill_parent"
+                            android:text="none"
+                            android:textSize="8pt"
+                            android:id="@+id/node_id"/>
+
+                        <TextView android:layout_height="wrap_content"
+                            android:layout_width="fill_parent"
+                            android:text="none"
+                            android:textSize="8pt"
+                            android:id="@+id/node_name"/>
+
+                        <TextView android:layout_height="wrap_content"
+                            android:layout_width="fill_parent"
+                            android:text="none"
+                            android:textSize="8pt"
+                            android:id="@+id/node_staff"/>
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="none"
+                    android:id="@+id/node_description"
+                    android:lines="3" />
+
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_gravity="center_horizontal" />
 
         </LinearLayout>
 
@@ -36,24 +121,6 @@
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_gravity="center_horizontal" />
-
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:orientation="vertical" android:layout_width="wrap_content"
-            android:layout_height="match_parent">
-
-            <TextView android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:text="none"
-                android:textSize="8pt"
-                android:id="@+id/node_id"/>
-
-            <TextView android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:text="none"
-                android:textSize="8pt"
-                android:id="@+id/node_name"/>
-
-        </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>

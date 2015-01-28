@@ -49,6 +49,8 @@ public class ModelLoader {
             //check if already loaded...
             m.loadGLdata();
 
+
+
             unique_models_list.add(m);
             unique_models_path_list.add(m.get_path());
             unique_models_reference_count_list.add(1);
@@ -59,6 +61,8 @@ public class ModelLoader {
             m.set_meshs(unique_models_list.get(index).get_meshs());
             //check if already loaded...
             m.loadGLdata();
+
+            m.setIsInstance(true);
 
             //update the ref counter
             int count = unique_models_reference_count_list.get(index);
